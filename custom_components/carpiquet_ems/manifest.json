@@ -1,0 +1,12 @@
+{
+  "domain": "carpiquet_ems",
+  "name": "Carpiquet EMS",
+  "version": "0.1.1-alpha",
+  "documentation": "https://github.com/morgannormand14-cell/Carpiquet-EMS",
+  "issue_tracker": "https://github.com/morgannormand14-cell/Carpiquet-EMS/issues",
+  "codeowners": [],
+  "config_flow": true,
+  "dependencies": [],
+  "iot_class": "Local Polling",
+  "requirements": []
+}

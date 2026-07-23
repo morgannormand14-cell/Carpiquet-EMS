@@ -1,0 +1,26 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Carpiquet EMS",
+        "description": "Configurez les entit\u00e9s et param\u00e8tres. Version uniquement en simulation.",
+        "data": {
+          "grid_power_entity": "Entit\u00e9 puissance r\u00e9seau",
+          "hyper_soc_entity": "Entit\u00e9 SOC Hyper 2000",
+          "hyper_pv_entity": "Entit\u00e9 PV Hyper 2000",
+          "hyper_output_entity": "Entit\u00e9 limite de sortie Hyper 2000",
+          "solarflow_soc_entity": "Entit\u00e9 SOC SolarFlow 2400 Pro",
+          "solarflow_pv_entity": "Entit\u00e9 PV SolarFlow 2400 Pro",
+          "solarflow_output_entity": "Entit\u00e9 limite de sortie SolarFlow 2400 Pro",
+          "hyper_capacity_kwh": "Capacit\u00e9 Hyper (kWh)",
+          "solarflow_capacity_kwh": "Capacit\u00e9 SolarFlow (kWh)",
+          "hyper_max_power_w": "Puissance maximale Hyper (W)",
+          "solarflow_max_power_w": "Puissance maximale SolarFlow (W)",
+          "minimum_soc": "SOC minimum (%)",
+          "grid_target": "Cible r\u00e9seau (W)",
+          "grid_deadband": "Bande morte r\u00e9seau (W)"
+        }
+      }
+    }
+  }
+}

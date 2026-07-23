@@ -1,0 +1,26 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Carpiquet EMS",
+        "description": "Configure entities and battery parameters. Simulation-only release.",
+        "data": {
+          "grid_power_entity": "Grid power entity",
+          "hyper_soc_entity": "Hyper 2000 SOC entity",
+          "hyper_pv_entity": "Hyper 2000 PV entity",
+          "hyper_output_entity": "Hyper 2000 output-limit entity",
+          "solarflow_soc_entity": "SolarFlow 2400 Pro SOC entity",
+          "solarflow_pv_entity": "SolarFlow 2400 Pro PV entity",
+          "solarflow_output_entity": "SolarFlow 2400 Pro output-limit entity",
+          "hyper_capacity_kwh": "Hyper capacity (kWh)",
+          "solarflow_capacity_kwh": "SolarFlow capacity (kWh)",
+          "hyper_max_power_w": "Hyper maximum output (W)",
+          "solarflow_max_power_w": "SolarFlow maximum output (W)",
+          "minimum_soc": "Minimum SOC (%)",
+          "grid_target": "Grid target (W)",
+          "grid_deadband": "Grid deadband (W)"
+        }
+      }
+    }
+  }
+}

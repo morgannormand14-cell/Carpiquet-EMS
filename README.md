@@ -11,17 +11,33 @@
   <strong>Engineered for reliability. Built for Home Assistant.</strong>
 </p>
 
-> **Golden Rule: Safety before performance. Always.**
+> **Safety before performance. Always.**
 
-Carpiquet EMS is an open-source Energy Management System for Home Assistant, initially designed for a Zendure Hyper 2000, a Zendure SolarFlow 2400 Pro and a Shelly Pro 3EM.
+## Current Milestone
 
-## Current Status
+**v0.3.0-alpha — Normandy / Sprint 2 — Premium Dashboard**
 
-**v0.3.0-alpha — Normandy / Sprint 1**
+This milestone adds:
 
-This development package focuses on project foundations, branding, architecture and documentation.
+- Premium Cockpit dashboard;
+- EMS Health Center;
+- health score and system status;
+- native history views;
+- UI Kit and dashboard documentation.
 
-The runtime integration remains simulation-only.
+The integration remains simulation-only.
+
+## Dashboard
+
+The official dashboard is stored at:
+
+`dashboards/carpiquet_ems.yaml`
+
+See:
+
+- [Dashboard Design](docs/DASHBOARD_DESIGN.md)
+- [UI Kit](docs/UI_KIT.md)
+- [Validation Checklist](docs/SPRINT2_VALIDATION.md)
 
 ## Documentation
 
@@ -29,19 +45,7 @@ The runtime integration remains simulation-only.
 - [Roadmap](docs/ROADMAP.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [EMS Specification](docs/EMS_SPECIFICATION.md)
-- [Algorithm](docs/ALGORITHM.md)
-- [Design System](docs/DESIGN_SYSTEM.md)
 - [Security](docs/SECURITY.md)
-- [Installation](docs/INSTALLATION.md)
-- [Configuration](docs/CONFIGURATION.md)
-- [Dashboard](docs/DASHBOARD.md)
-- [FAQ](docs/FAQ.md)
-- [History](docs/HISTORY.md)
-- [Sprint Report](docs/SPRINT_REPORT.md)
-
-## Safety
-
-No real Zendure command is enabled in the current alpha baseline.
 
 ## Founder
 

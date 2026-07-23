@@ -1,76 +1,191 @@
 title: Carpiquet EMS
 views:
-  - title: Vue d'ensemble
-    path: overview
-    icon: mdi:home-battery
-    cards:
-      - type: markdown
-        content: |
-          # Carpiquet EMS
-          **Mode simulation** — aucune commande réelle n'est envoyée aux appareils Zendure.
-      - type: entities
-        title: Réseau et régulation
-        show_header_toggle: false
-        entities:
-          - sensor.carpiquet_ems_grid_power
-          - sensor.carpiquet_ems_requested_discharge
-          - sensor.carpiquet_ems_total_simulated_battery_power
-          - sensor.carpiquet_ems_simulated_grid_power
-          - switch.carpiquet_ems_simulation_mode
-      - type: horizontal-stack
+  - title: Cockpit
+    path: cockpit
+    icon: mdi:home-lightning-bolt
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        cards:
+          - type: markdown
+            content: |
+              # 🏴 Carpiquet EMS
+              **Every watt counts.**
+
+              *Intelligent energy management for Zendure.*
+
+              **Mode : SIMULATION**  
+              **Engineered for reliability. Built for Home Assistant.**
+
+          - type: tile
+            entity: sensor.carpiquet_ems_system_status
+            name: État général
+            icon: mdi:heart-pulse
+            vertical: false
+
+          - type: gauge
+            entity: sensor.carpiquet_ems_health_score
+            name: Santé EMS
+            min: 0
+            max: 100
+            severity:
+              red: 0
+              yellow: 67
+              green: 100
+
+      - type: grid
+        title: Réseau
+        cards:
+          - type: gauge
+            entity: sensor.carpiquet_ems_grid_power
+            name: Réseau EDF
+            min: -1000
+            max: 3600
+            needle: true
+            severity:
+              green: -1000
+              yellow: 20
+              red: 1000
+
+          - type: entities
+            title: Régulation
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_grid_power
+                name: Import / export
+              - entity: sensor.carpiquet_ems_requested_discharge
+                name: Décharge demandée
+              - entity: sensor.carpiquet_ems_total_simulated_battery_power
+                name: Puissance simulée totale
+              - entity: sensor.carpiquet_ems_simulated_grid_power
+                name: Réseau simulé
+              - entity: number.carpiquet_ems_grid_target
+                name: Cible réseau
+              - entity: number.carpiquet_ems_grid_deadband
+                name: Bande morte
+
+      - type: grid
+        title: Hyper 2000
         cards:
           - type: gauge
             entity: sensor.carpiquet_ems_hyper_2000_soc
-            name: Hyper 2000
+            name: SOC Hyper
             min: 0
             max: 100
+            severity:
+              red: 0
+              yellow: 10
+              green: 50
+
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_hyper_2000_pv_power
+                name: Production PV
+              - entity: sensor.carpiquet_ems_hyper_2000_simulated_power
+                name: Sortie simulée
+              - entity: binary_sensor.carpiquet_ems_hyper_2000_health
+                name: Communication
+
+      - type: grid
+        title: SolarFlow 2400 Pro
+        cards:
           - type: gauge
             entity: sensor.carpiquet_ems_solarflow_2400_pro_soc
-            name: SolarFlow 2400 Pro
+            name: SOC SolarFlow
             min: 0
             max: 100
-      - type: entities
-        title: Hyper 2000
-        entities:
-          - sensor.carpiquet_ems_hyper_2000_soc
-          - sensor.carpiquet_ems_hyper_2000_pv_power
-          - sensor.carpiquet_ems_hyper_2000_simulated_power
-      - type: entities
-        title: SolarFlow 2400 Pro
-        entities:
-          - sensor.carpiquet_ems_solarflow_2400_pro_soc
-          - sensor.carpiquet_ems_solarflow_2400_pro_pv_power
-          - sensor.carpiquet_ems_solarflow_2400_pro_simulated_power
-      - type: gauge
-        entity: sensor.carpiquet_ems_battery_balance_index
-        name: Indice d'équilibrage
-        min: 0
-        max: 100
-      - type: entities
-        title: Paramètres
-        entities:
-          - number.carpiquet_ems_minimum_soc
-          - number.carpiquet_ems_grid_target
-          - number.carpiquet_ems_grid_deadband
+            severity:
+              red: 0
+              yellow: 10
+              green: 50
+
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_solarflow_2400_pro_pv_power
+                name: Production PV
+              - entity: sensor.carpiquet_ems_solarflow_2400_pro_simulated_power
+                name: Sortie simulée
+              - entity: binary_sensor.carpiquet_ems_solarflow_2400_pro_health
+                name: Communication
+
+      - type: grid
+        title: EMS
+        cards:
+          - type: gauge
+            entity: sensor.carpiquet_ems_battery_balance_index
+            name: Indice d'équilibrage
+            min: 0
+            max: 100
+            severity:
+              red: 0
+              yellow: 70
+              green: 90
+
+          - type: entities
+            title: Paramètres
+            show_header_toggle: false
+            entities:
+              - entity: switch.carpiquet_ems_simulation_mode
+                name: Mode simulation
+              - entity: number.carpiquet_ems_minimum_soc
+                name: SOC minimum
+              - entity: binary_sensor.carpiquet_ems_grid_meter_health
+                name: Shelly Pro 3EM
+
+  - title: Santé
+    path: health
+    icon: mdi:heart-pulse
+    type: sections
+    sections:
+      - type: grid
+        cards:
+          - type: markdown
+            content: |
+              # ❤️ EMS Health Center
+              Cette vue présente la disponibilité des sources utilisées par Carpiquet EMS.
+
+          - type: gauge
+            entity: sensor.carpiquet_ems_health_score
+            name: Score global
+            min: 0
+            max: 100
+            severity:
+              red: 0
+              yellow: 67
+              green: 100
+
+          - type: entities
+            title: Composants
+            entities:
+              - binary_sensor.carpiquet_ems_grid_meter_health
+              - binary_sensor.carpiquet_ems_hyper_2000_health
+              - binary_sensor.carpiquet_ems_solarflow_2400_pro_health
+              - sensor.carpiquet_ems_system_status
+
   - title: Historique
     path: history
     icon: mdi:chart-line
     cards:
       - type: history-graph
-        title: Réseau et puissance simulée
+        title: Réseau et simulation — 24 h
         hours_to_show: 24
         entities:
           - sensor.carpiquet_ems_grid_power
           - sensor.carpiquet_ems_total_simulated_battery_power
           - sensor.carpiquet_ems_simulated_grid_power
+
       - type: history-graph
-        title: État de charge
+        title: SOC des batteries — 24 h
         hours_to_show: 24
         entities:
           - sensor.carpiquet_ems_hyper_2000_soc
           - sensor.carpiquet_ems_solarflow_2400_pro_soc
+
       - type: history-graph
-        title: Production photovoltaïque
+        title: Production PV — 24 h
         hours_to_show: 24
         entities:
           - sensor.carpiquet_ems_hyper_2000_pv_power

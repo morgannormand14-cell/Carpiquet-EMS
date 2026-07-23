@@ -1,33 +1,33 @@
-# Sprint Report — Sprint 1
+# Sprint Report — Sprint 2
 
 ## Version
 
-v0.3.0-alpha — Normandy
+v0.3.0-alpha — Normandy / Sprint 2
 
 ## Theme
 
-Foundation & Branding
+Premium Dashboard
 
-## Completed
+## Delivered
 
-- project governance documents;
-- architecture and functional specification;
-- design system;
-- security and contribution policies;
-- installation, configuration, dashboard and FAQ documentation;
-- project history;
-- RFC and ADR foundations;
-- official logo and release visual;
-- repository-ready Sprint 1 package.
+- RFC-0002;
+- Premium Cockpit dashboard;
+- EMS Health Center;
+- History view;
+- UI Kit documentation;
+- Dashboard design specification;
+- health score and system status sensors;
+- grid, Hyper and SolarFlow health binary sensors;
+- validation checklist;
+- release documentation.
 
-## Not Implemented in Sprint 1
+## Safety
 
-- real battery control;
-- final balancing algorithm;
-- automatic dashboard creation;
-- premium dashboard code;
-- EMS Health runtime entities.
+Simulation-only behaviour is preserved.
 
-## Next Sprint
+## Deferred to Sprint 3
 
-Sprint 2 — Premium Dashboard
+- automatic dashboard deployment;
+- configuration wizard improvements;
+- dashboard option toggles;
+- dependency and migration assistant.

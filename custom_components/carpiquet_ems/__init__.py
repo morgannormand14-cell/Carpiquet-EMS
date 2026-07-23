@@ -3,7 +3,7 @@ from homeassistant.core import HomeAssistant
 from .const import DOMAIN
 from .coordinator import CarpiquetEMSCoordinator
 
-PLATFORMS = ["sensor", "number", "switch"]
+PLATFORMS = ["sensor", "binary_sensor", "number", "switch"]
 
 async def async_setup(hass: HomeAssistant, config: dict) -> bool:
     return True

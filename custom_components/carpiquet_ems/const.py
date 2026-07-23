@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.3.0-alpha"
+VERSION = "0.3.0-alpha-sprint2"
 DEFAULT_SCAN_INTERVAL = 2
 
 CONF_GRID_POWER_ENTITY = "grid_power_entity"
@@ -36,3 +36,10 @@ ATTR_SOLARFLOW_SIMULATED = "solarflow_simulated_power_w"
 ATTR_TOTAL_SIMULATED = "total_simulated_power_w"
 ATTR_SIMULATED_GRID = "simulated_grid_power_w"
 ATTR_BALANCE_INDEX = "balance_index_percent"
+
+ATTR_HEALTH_SCORE = "health_score_percent"
+ATTR_SYSTEM_STATUS = "system_status"
+ATTR_GRID_METER_AVAILABLE = "grid_meter_available"
+ATTR_HYPER_AVAILABLE = "hyper_available"
+ATTR_SOLARFLOW_AVAILABLE = "solarflow_available"
+ATTR_LAST_UPDATE_AGE = "last_update_age_seconds"

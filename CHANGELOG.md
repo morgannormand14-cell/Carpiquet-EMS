@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.2.0-alpha
+
+- Dashboard Home Assistant natif.
+- Documentation du dashboard.
+- Noms d’entités préfixés sur une installation propre.
+- Mode simulation conservé.
+- Correction d’un test unitaire.
+
+# Changelog
+
 ## 0.1.1-alpha
 
 - Improved simulation model.

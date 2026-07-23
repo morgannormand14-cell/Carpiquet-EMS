@@ -23,7 +23,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
 class CarpiquetSensor(CoordinatorEntity, SensorEntity):
     def __init__(self, coordinator, entry, key, name, data_key, unit, device_class):
         super().__init__(coordinator)
-        self._attr_name = name
+        self._attr_name = f"Carpiquet EMS {name}"
         self._attr_unique_id = f"{entry.entry_id}_{key}"
         self._attr_entity_id = f"sensor.carpiquet_ems_{key}"
         self._attr_native_unit_of_measurement = unit
@@ -38,6 +38,6 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
     def extra_state_attributes(self):
         return {
             "mode": "simulation",
-            "version": "0.1.1-alpha",
+            "version": "0.2.0-alpha",
             **self.coordinator.data,
         }

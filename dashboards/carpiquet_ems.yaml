@@ -1,0 +1,77 @@
+title: Carpiquet EMS
+views:
+  - title: Vue d'ensemble
+    path: overview
+    icon: mdi:home-battery
+    cards:
+      - type: markdown
+        content: |
+          # Carpiquet EMS
+          **Mode simulation** — aucune commande réelle n'est envoyée aux appareils Zendure.
+      - type: entities
+        title: Réseau et régulation
+        show_header_toggle: false
+        entities:
+          - sensor.carpiquet_ems_grid_power
+          - sensor.carpiquet_ems_requested_discharge
+          - sensor.carpiquet_ems_total_simulated_battery_power
+          - sensor.carpiquet_ems_simulated_grid_power
+          - switch.carpiquet_ems_simulation_mode
+      - type: horizontal-stack
+        cards:
+          - type: gauge
+            entity: sensor.carpiquet_ems_hyper_2000_soc
+            name: Hyper 2000
+            min: 0
+            max: 100
+          - type: gauge
+            entity: sensor.carpiquet_ems_solarflow_2400_pro_soc
+            name: SolarFlow 2400 Pro
+            min: 0
+            max: 100
+      - type: entities
+        title: Hyper 2000
+        entities:
+          - sensor.carpiquet_ems_hyper_2000_soc
+          - sensor.carpiquet_ems_hyper_2000_pv_power
+          - sensor.carpiquet_ems_hyper_2000_simulated_power
+      - type: entities
+        title: SolarFlow 2400 Pro
+        entities:
+          - sensor.carpiquet_ems_solarflow_2400_pro_soc
+          - sensor.carpiquet_ems_solarflow_2400_pro_pv_power
+          - sensor.carpiquet_ems_solarflow_2400_pro_simulated_power
+      - type: gauge
+        entity: sensor.carpiquet_ems_battery_balance_index
+        name: Indice d'équilibrage
+        min: 0
+        max: 100
+      - type: entities
+        title: Paramètres
+        entities:
+          - number.carpiquet_ems_minimum_soc
+          - number.carpiquet_ems_grid_target
+          - number.carpiquet_ems_grid_deadband
+  - title: Historique
+    path: history
+    icon: mdi:chart-line
+    cards:
+      - type: history-graph
+        title: Réseau et puissance simulée
+        hours_to_show: 24
+        entities:
+          - sensor.carpiquet_ems_grid_power
+          - sensor.carpiquet_ems_total_simulated_battery_power
+          - sensor.carpiquet_ems_simulated_grid_power
+      - type: history-graph
+        title: État de charge
+        hours_to_show: 24
+        entities:
+          - sensor.carpiquet_ems_hyper_2000_soc
+          - sensor.carpiquet_ems_solarflow_2400_pro_soc
+      - type: history-graph
+        title: Production photovoltaïque
+        hours_to_show: 24
+        entities:
+          - sensor.carpiquet_ems_hyper_2000_pv_power
+          - sensor.carpiquet_ems_solarflow_2400_pro_pv_power

@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.1.1-alpha"
+VERSION = "0.2.0-alpha"
 DEFAULT_SCAN_INTERVAL = 2
 
 CONF_GRID_POWER_ENTITY = "grid_power_entity"

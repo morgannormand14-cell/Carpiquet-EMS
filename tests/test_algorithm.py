@@ -29,7 +29,7 @@ def test_limits_are_respected():
     r = allocate_discharge_power(5000, hyper(90), solarflow(90), 10)
     assert r.hyper_power_w <= 1200
     assert r.solarflow_power_w <= 2400
-    assert r.hyper_power_w + r.solarflow_power <= 3600
+    assert r.hyper_power_w + r.solarflow_power_w <= 2400
 
 def test_both_at_minimum_are_protected():
     r = allocate_discharge_power(3600, hyper(10), solarflow(10), 10)

@@ -2,7 +2,7 @@
 
 Energy Management System for Home Assistant, designed for a Zendure Hyper 2000 + SolarFlow 2400 Pro installation with a Shelly Pro 3EM grid meter.
 
-## v0.1.1-alpha
+## v0.2.0-alpha
 
 This release is **simulation-only**. It reads Home Assistant entities and calculates theoretical battery discharge. It never writes to the Zendure output-limit entities.
 
@@ -46,3 +46,12 @@ This version is simulation-only. It does not call `number.set_value` on Zendure 
 ## Installation
 
 Copy `custom_components/carpiquet_ems` into `/config/custom_components/carpiquet_ems`, restart Home Assistant, then add **Carpiquet EMS**.
+
+
+## Dashboard
+
+Un dashboard Home Assistant natif est fourni dans `dashboards/carpiquet_ems.yaml`. Consultez `docs/dashboard.md`.
+
+## Migration des noms d’entités
+
+Home Assistant conserve les anciens identifiants. Pour obtenir les noms `sensor.carpiquet_ems_*`, supprimez puis recréez l’entrée d’intégration après la mise à jour.

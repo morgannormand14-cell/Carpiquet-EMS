@@ -1,28 +1,30 @@
 # Changelog
 
-## 0.2.0-alpha
+## v0.3.0-alpha — Normandy / Sprint 1
 
-- Dashboard Home Assistant natif.
-- Documentation du dashboard.
-- Noms d’entités préfixés sur une installation propre.
-- Mode simulation conservé.
-- Correction d’un test unitaire.
+### Added
 
-# Changelog
+- official project identity;
+- Project Charter;
+- Roadmap;
+- Architecture;
+- EMS Specification;
+- Algorithm reference;
+- Design System;
+- Security Policy;
+- Contribution Guide;
+- History and FAQ;
+- RFC and ADR foundations;
+- GitHub issue and pull-request templates;
+- project board and sprint report;
+- official logo and release presentation assets.
 
-## 0.1.1-alpha
+### Safety
 
-- Improved simulation model.
-- Minimum SOC default 10%.
-- Stable entity IDs.
-- PV diagnostics.
-- Simulated grid power.
-- Requested discharge sensor.
-- Runtime diagnostic attributes.
-- Real-world scenario tests.
-- Strict minimum-SOC protection.
-- Still simulation-only.
+Runtime control remains simulation-only.
 
-## 0.1.0-alpha
+## v0.2.0-alpha — Horizon
 
-- Initial Home Assistant custom integration skeleton.
+- HACS-oriented integration structure;
+- extended simulation diagnostics;
+- initial dashboard assets.

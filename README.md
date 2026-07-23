@@ -1,57 +1,48 @@
-# Carpiquet EMS
+# 🏴 Carpiquet EMS
 
-Energy Management System for Home Assistant, designed for a Zendure Hyper 2000 + SolarFlow 2400 Pro installation with a Shelly Pro 3EM grid meter.
+<p align="center">
+  <img src="assets/logo/carpiquet-ems-logo.png" alt="Carpiquet EMS logo" width="360">
+</p>
 
-## v0.2.0-alpha
+<p align="center">
+  <strong>Every watt counts.</strong><br>
+  <strong>Intelligent energy management for Zendure.</strong><br>
+  <em>Designed with ❤️ in Normandy.</em><br>
+  <strong>Engineered for reliability. Built for Home Assistant.</strong>
+</p>
 
-This release is **simulation-only**. It reads Home Assistant entities and calculates theoretical battery discharge. It never writes to the Zendure output-limit entities.
+> **Golden Rule: Safety before performance. Always.**
 
-### Current installation
+Carpiquet EMS is an open-source Energy Management System for Home Assistant, initially designed for a Zendure Hyper 2000, a Zendure SolarFlow 2400 Pro and a Shelly Pro 3EM.
 
-- Grid: `sensor.shellypro3em_441d64748468_energy_meter_2_puissance`
-- Hyper SOC: `sensor.hyper_2000_electric_level`
-- Hyper PV: `sensor.hyper_2000_solar_input_power`
-- Hyper output: `number.hyper_2000_output_limit`
-- SolarFlow SOC: `sensor.solarflow_2400_pro_electric_level`
-- SolarFlow PV: `sensor.solarflow_2400_pro_solar_input_power`
-- SolarFlow output: `number.solarflow_2400_pro_output_limit`
+## Current Status
 
-### Battery configuration
+**v0.3.0-alpha — Normandy / Sprint 1**
 
-- Hyper 2000: 3.84 kWh, 1200 W maximum
-- SolarFlow 2400 Pro: 5.28 kWh, 2400 W maximum
-- Minimum SOC: 10%
-- Combined maximum: 3600 W
+This development package focuses on project foundations, branding, architecture and documentation.
 
-### Grid sign convention
+The runtime integration remains simulation-only.
 
-- Positive Shelly value = import from EDF
-- Negative Shelly value = export/injection to EDF
+## Documentation
 
-### Improvements
-
-- Stable `sensor.carpiquet_ems_*` entity IDs.
-- Strict minimum-SOC protection.
-- Minimum SOC default 10%.
-- PV monitoring.
-- Simulated grid power.
-- Detailed diagnostics.
-- Tests for the observed real-world scenarios.
-- No Zendure commands.
+- [Project Charter](docs/PROJECT_CHARTER.md)
+- [Roadmap](docs/ROADMAP.md)
+- [Architecture](docs/ARCHITECTURE.md)
+- [EMS Specification](docs/EMS_SPECIFICATION.md)
+- [Algorithm](docs/ALGORITHM.md)
+- [Design System](docs/DESIGN_SYSTEM.md)
+- [Security](docs/SECURITY.md)
+- [Installation](docs/INSTALLATION.md)
+- [Configuration](docs/CONFIGURATION.md)
+- [Dashboard](docs/DASHBOARD.md)
+- [FAQ](docs/FAQ.md)
+- [History](docs/HISTORY.md)
+- [Sprint Report](docs/SPRINT_REPORT.md)
 
 ## Safety
 
-This version is simulation-only. It does not call `number.set_value` on Zendure output-limit entities.
+No real Zendure command is enabled in the current alpha baseline.
 
-## Installation
+## Founder
 
-Copy `custom_components/carpiquet_ems` into `/config/custom_components/carpiquet_ems`, restart Home Assistant, then add **Carpiquet EMS**.
-
-
-## Dashboard
-
-Un dashboard Home Assistant natif est fourni dans `dashboards/carpiquet_ems.yaml`. Consultez `docs/dashboard.md`.
-
-## Migration des noms d’entités
-
-Home Assistant conserve les anciens identifiants. Pour obtenir les noms `sensor.carpiquet_ems_*`, supprimez puis recréez l’entrée d’intégration après la mise à jour.
+**Morgan Normand — Founder & Product Owner**

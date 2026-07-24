@@ -1,43 +1,39 @@
 # 🏴 Carpiquet EMS
 
-<p align="center">
-  <img src="assets/logo/carpiquet-ems-logo.png" alt="Carpiquet EMS logo" width="360">
-</p>
+> **Every watt counts.**  
+> **Intelligent energy management for Zendure.**  
+> *Designed with ❤️ in Normandy.*  
+> **Engineered for reliability. Built for Home Assistant.**
 
-<p align="center">
-  <strong>Every watt counts.</strong><br>
-  <strong>Intelligent energy management for Zendure.</strong><br>
-  <em>Designed with ❤️ in Normandy.</em><br>
-  <strong>Engineered for reliability. Built for Home Assistant.</strong>
-</p>
+## Current milestone
 
-> **Safety before performance. Always.**
+**v0.3.0-alpha — Normandy / Sprint 3 — Onboarding**
 
-## Current Milestone
+Carpiquet EMS is a Home Assistant custom integration for a Zendure Hyper 2000,
+a Zendure SolarFlow 2400 Pro and a Shelly Pro 3EM.
 
-**v0.3.0-alpha — Normandy / Sprint 2 — Premium Dashboard**
+Sprint 3 adds:
 
-This milestone adds:
+- entity selectors in the configuration assistant;
+- an Options Flow for later configuration changes;
+- a guided Premium Dashboard installer;
+- French interface strings;
+- complete onboarding and validation documentation.
 
-- Premium Cockpit dashboard;
-- EMS Health Center;
-- health score and system status;
-- native history views;
-- UI Kit and dashboard documentation.
+## Safety
 
-The integration remains simulation-only.
+This alpha release is **100% simulation-only**. No command is sent to Zendure
+output-limit entities.
+
+## Installation
+
+See [Installation](docs/INSTALLATION.md) and
+[Dashboard installation](docs/DASHBOARD_INSTALLATION.md).
 
 ## Dashboard
 
-The official dashboard is stored at:
-
-`dashboards/carpiquet_ems.yaml`
-
-See:
-
-- [Dashboard Design](docs/DASHBOARD_DESIGN.md)
-- [UI Kit](docs/UI_KIT.md)
-- [Validation Checklist](docs/SPRINT2_VALIDATION.md)
+The dashboard source is stored at `dashboards/carpiquet_ems.yaml` and is also
+bundled inside the integration.
 
 ## Documentation
 
@@ -45,7 +41,8 @@ See:
 - [Roadmap](docs/ROADMAP.md)
 - [Architecture](docs/ARCHITECTURE.md)
 - [EMS Specification](docs/EMS_SPECIFICATION.md)
-- [Security](docs/SECURITY.md)
+- [RFC-0003](docs/RFC-0003-ONBOARDING.md)
+- [Sprint 3 validation](docs/SPRINT3_VALIDATION.md)
 
 ## Founder
 

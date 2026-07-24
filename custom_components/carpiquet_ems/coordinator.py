@@ -25,10 +25,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
     def _is_available(self, entity_id):
         state = self._state(entity_id)
-        return bool(
-            state
-            and state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE, None, "")
-        )
+        return bool(state and state.state not in (STATE_UNKNOWN, STATE_UNAVAILABLE, None, ""))
 
     def _state_float(self, entity_id, default=0.0):
         state = self._state(entity_id)
@@ -48,56 +45,34 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             solar_pv_entity = self.config[CONF_SOLARFLOW_PV_ENTITY]
 
             grid_available = self._is_available(grid_entity)
-            hyper_available = (
-                self._is_available(hyper_soc_entity)
-                and self._is_available(hyper_pv_entity)
-            )
-            solar_available = (
-                self._is_available(solar_soc_entity)
-                and self._is_available(solar_pv_entity)
-            )
+            hyper_available = self._is_available(hyper_soc_entity) and self._is_available(hyper_pv_entity)
+            solar_available = self._is_available(solar_soc_entity) and self._is_available(solar_pv_entity)
 
             grid = self._state_float(grid_entity)
             hyper_soc = self._state_float(hyper_soc_entity)
             solar_soc = self._state_float(solar_soc_entity)
             hyper_pv = self._state_float(hyper_pv_entity)
             solar_pv = self._state_float(solar_pv_entity)
-
             target = float(self.config[CONF_GRID_TARGET])
             deadband = float(self.config[CONF_GRID_DEADBAND])
             minimum_soc = float(self.config[CONF_MIN_SOC])
 
             error = grid - target
             requested = error if grid_available and error > deadband else 0.0
-
             result = allocate_discharge_power(
                 requested,
-                BatteryState(
-                    hyper_soc,
-                    float(self.config[CONF_HYPER_CAPACITY_KWH]),
-                    float(self.config[CONF_HYPER_MAX_POWER_W]),
-                ),
-                BatteryState(
-                    solar_soc,
-                    float(self.config[CONF_SOLARFLOW_CAPACITY_KWH]),
-                    float(self.config[CONF_SOLARFLOW_MAX_POWER_W]),
-                ),
+                BatteryState(hyper_soc, float(self.config[CONF_HYPER_CAPACITY_KWH]), float(self.config[CONF_HYPER_MAX_POWER_W])),
+                BatteryState(solar_soc, float(self.config[CONF_SOLARFLOW_CAPACITY_KWH]), float(self.config[CONF_SOLARFLOW_MAX_POWER_W])),
                 minimum_soc,
             )
-
             total = result.hyper_power_w + result.solarflow_power_w
             availability = [grid_available, hyper_available, solar_available]
             health_score = round(sum(availability) / len(availability) * 100)
-            if health_score == 100:
-                system_status = "healthy"
-            elif health_score >= 67:
-                system_status = "warning"
-            else:
-                system_status = "critical"
+            system_status = "healthy" if health_score == 100 else "warning" if health_score >= 67 else "critical"
 
             return {
                 ATTR_GRID_POWER: round(grid, 1),
-                ATTR_REQUESTED_DISCHARGE: result.requested_power_w,
+                ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_HYPER_SOC: round(hyper_soc, 1),
                 ATTR_SOLARFLOW_SOC: round(solar_soc, 1),
                 ATTR_HYPER_PV: round(hyper_pv, 1),

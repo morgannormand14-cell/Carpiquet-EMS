@@ -1,0 +1,13 @@
+install_dashboard:
+  name: Installer le Premium Dashboard
+  description: >-
+    Copie le dashboard officiel Carpiquet EMS dans le dossier
+    /config/dashboards. Aucune commande n'est envoyée aux appareils Zendure.
+  fields:
+    overwrite:
+      name: Remplacer le fichier existant
+      description: Remplace le dashboard déjà installé.
+      required: false
+      default: false
+      selector:
+        boolean:

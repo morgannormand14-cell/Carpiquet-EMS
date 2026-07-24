@@ -1,6 +1,10 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.3.0-alpha-sprint2"
+VERSION = "0.3.0-alpha-sprint3"
 DEFAULT_SCAN_INTERVAL = 2
+
+SERVICE_INSTALL_DASHBOARD = "install_dashboard"
+DASHBOARD_FILENAME = "carpiquet_ems.yaml"
+DASHBOARD_RELATIVE_PATH = "dashboards/carpiquet_ems.yaml"
 
 CONF_GRID_POWER_ENTITY = "grid_power_entity"
 CONF_HYPER_SOC_ENTITY = "hyper_soc_entity"
@@ -36,7 +40,6 @@ ATTR_SOLARFLOW_SIMULATED = "solarflow_simulated_power_w"
 ATTR_TOTAL_SIMULATED = "total_simulated_power_w"
 ATTR_SIMULATED_GRID = "simulated_grid_power_w"
 ATTR_BALANCE_INDEX = "balance_index_percent"
-
 ATTR_HEALTH_SCORE = "health_score_percent"
 ATTR_SYSTEM_STATUS = "system_status"
 ATTR_GRID_METER_AVAILABLE = "grid_meter_available"

@@ -1,7 +1,7 @@
 ---
 name: Feature request
 about: Suggest an improvement
-title: "[FEATURE] "
+title: "[Feature] "
 labels: enhancement
 ---
 
@@ -9,8 +9,4 @@ labels: enhancement
 
 ## Proposed solution
 
-## Alternatives
-
 ## Safety impact
-
-## Related EMS rule or RFC

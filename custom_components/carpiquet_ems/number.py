@@ -17,7 +17,6 @@ class EMSNumber(CoordinatorEntity, NumberEntity):
         self._entry = entry
         self._attr_name = f"Carpiquet EMS {name}"
         self._attr_unique_id = f"{entry.entry_id}_{key}"
-        self._attr_entity_id = f"number.carpiquet_ems_{key}"
         self._attr_native_min_value = minimum
         self._attr_native_max_value = maximum
         self._attr_native_step = step

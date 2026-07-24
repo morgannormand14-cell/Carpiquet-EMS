@@ -1,26 +1,29 @@
 # Changelog
 
-## v0.3.0-alpha — Normandy / Sprint 2
+## v0.3.0-alpha — Normandy / Sprint 3
 
 ### Added
 
-- official Premium Cockpit dashboard;
-- EMS Health Center;
-- native 24-hour history views;
-- system status sensor;
-- health score sensor;
-- grid-meter, Hyper and SolarFlow health binary sensors;
-- RFC-0002;
-- dashboard design specification;
-- Carpiquet EMS UI Kit;
-- Sprint 2 validation checklist and release notes.
+- entity selectors in Config Flow;
+- duplicate-entry protection;
+- Options Flow;
+- guided dashboard installation service;
+- bundled Premium Dashboard;
+- French strings and service descriptions;
+- Sprint 3 onboarding documentation and validation checklist.
 
 ### Safety
 
-The integration remains simulation-only and never writes to Zendure output-limit entities.
+Runtime remains simulation-only. No Zendure output-limit entity is written.
+
+## v0.3.0-alpha — Normandy / Sprint 2
+
+- Premium Cockpit dashboard;
+- EMS Health Center;
+- native history views;
+- health score and system status;
+- health binary sensors.
 
 ## v0.3.0-alpha — Normandy / Sprint 1
 
-- project foundations;
-- architecture and specifications;
-- branding and engineering documentation.
+- project foundation, governance, architecture and branding.

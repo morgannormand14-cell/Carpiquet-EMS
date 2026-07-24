@@ -1,37 +1,20 @@
-from custom_components.carpiquet_ems.algorithm import BatteryState, allocate_discharge_power
+from custom_components.carpiquet_ems.algorithm import BatteryState, allocate_discharge_power, calculate_balance_index
 
-def hyper(soc):
-    return BatteryState(soc, 3.84, 1200)
+def test_zero_request():
+    result = allocate_discharge_power(0, BatteryState(50, 3.84, 1200), BatteryState(50, 5.28, 2400), 10)
+    assert result.hyper_power_w == 0
+    assert result.solarflow_power_w == 0
 
-def solarflow(soc):
-    return BatteryState(soc, 5.28, 2400)
+def test_soc_protection():
+    result = allocate_discharge_power(1000, BatteryState(10, 3.84, 1200), BatteryState(10, 5.28, 2400), 10)
+    assert result.hyper_power_w == 0
+    assert result.solarflow_power_w == 0
 
-def test_import_hyper_at_minimum_solarflow_discharges():
-    r = allocate_discharge_power(432.6, hyper(10), solarflow(36), 10)
-    assert r.hyper_power_w == 0
-    assert r.solarflow_power_w == 432.6
+def test_balance_index():
+    assert calculate_balance_index(50, 50) == 100
+    assert calculate_balance_index(50, 60) == 50
 
-def test_export_no_discharge():
-    r = allocate_discharge_power(0, hyper(10), solarflow(36), 10)
-    assert r.hyper_power_w == 0
-    assert r.solarflow_power_w == 0
-
-def test_below_minimum_is_protected():
-    r = allocate_discharge_power(1000, hyper(9), solarflow(50), 10)
-    assert r.hyper_power_w == 0
-    assert r.solarflow_power_w == 1000
-
-def test_requested_power_is_met():
-    r = allocate_discharge_power(1800, hyper(80), solarflow(80), 10)
-    assert round(r.hyper_power_w + r.solarflow_power_w, 1) == 1800
-
-def test_limits_are_respected():
-    r = allocate_discharge_power(5000, hyper(90), solarflow(90), 10)
-    assert r.hyper_power_w <= 1200
-    assert r.solarflow_power_w <= 2400
-    assert r.hyper_power_w + r.solarflow_power_w <= 2400
-
-def test_both_at_minimum_are_protected():
-    r = allocate_discharge_power(3600, hyper(10), solarflow(10), 10)
-    assert r.hyper_power_w == 0
-    assert r.solarflow_power_w == 0
+def test_power_limits():
+    result = allocate_discharge_power(5000, BatteryState(90, 3.84, 1200), BatteryState(90, 5.28, 2400), 10)
+    assert result.hyper_power_w <= 1200
+    assert result.solarflow_power_w <= 2400

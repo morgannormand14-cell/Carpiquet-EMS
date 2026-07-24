@@ -11,7 +11,6 @@ class SimulationSwitch(CoordinatorEntity, SwitchEntity):
         super().__init__(coordinator)
         self._attr_name = "Carpiquet EMS Simulation Mode"
         self._attr_unique_id = f"{entry.entry_id}_simulation_mode"
-        self._attr_entity_id = "switch.carpiquet_ems_simulation_mode"
         self._is_on = True
 
     @property

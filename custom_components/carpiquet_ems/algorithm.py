@@ -1,10 +1,12 @@
 from dataclasses import dataclass
 
+
 @dataclass(frozen=True)
 class BatteryState:
     soc_percent: float
     capacity_kwh: float
     max_power_w: float
+
 
 @dataclass(frozen=True)
 class AllocationResult:
@@ -13,14 +15,18 @@ class AllocationResult:
     requested_power_w: float
     balance_index_percent: float
 
+
 def clamp(value, low, high):
     return max(low, min(high, value))
+
 
 def available_energy_kwh(soc_percent, minimum_soc, capacity_kwh):
     return max(0.0, soc_percent - minimum_soc) / 100.0 * capacity_kwh
 
+
 def calculate_balance_index(hyper_soc, solarflow_soc):
     return round(clamp(100.0 - abs(hyper_soc - solarflow_soc) * 5.0, 0.0, 100.0), 1)
+
 
 def allocate_discharge_power(requested_power_w, hyper, solarflow, minimum_soc):
     requested = max(0.0, requested_power_w)

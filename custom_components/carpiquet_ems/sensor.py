@@ -38,6 +38,13 @@ SENSORS = [
     ("hyper_max_soc", "Hyper 2000 Max SOC", ATTR_HYPER_MAX_SOC, "%", "battery"),
     ("solarflow_min_soc", "SolarFlow 2400 Pro Min SOC", ATTR_SOLARFLOW_MIN_SOC, "%", "battery"),
     ("solarflow_max_soc", "SolarFlow 2400 Pro Max SOC", ATTR_SOLARFLOW_MAX_SOC, "%", "battery"),
+    ("automation_state", "Automation State", ATTR_AUTOMATION_STATE, None, None),
+    ("automation_reason", "Automation Reason", ATTR_AUTOMATION_REASON, None, None),
+    ("automation_request", "Automation Request", ATTR_AUTOMATION_REQUEST_W, "W", "power"),
+    ("automation_cycle", "Automation Cycle", ATTR_AUTOMATION_CYCLE, None, None),
+    ("automation_last_transition", "Automation Last Transition", ATTR_AUTOMATION_LAST_TRANSITION, None, None),
+    ("automation_hold_remaining", "Automation Hold Remaining", ATTR_AUTOMATION_HOLD_REMAINING, "s", "duration"),
+    ("automation_policy", "Automation Policy", ATTR_AUTOMATION_POLICY, None, None),
 ]
 
 async def async_setup_entry(hass, entry, async_add_entities):

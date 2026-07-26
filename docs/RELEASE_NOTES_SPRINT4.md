@@ -1,6 +1,6 @@
-# Carpiquet EMS v0.4.1-alpha — Sprint 4
+# Carpiquet EMS v0.4.1-alpha — Sprint 5
 
-This Sprint 4 revision adds dynamic Zendure topology and persistent auto-learning fallbacks.
+This Sprint 5 revision adds dynamic Zendure topology and persistent auto-learning fallbacks.
 
 Highlights:
 - 8 Zendure live entity sources;

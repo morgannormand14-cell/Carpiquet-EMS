@@ -22,7 +22,10 @@
           "solarflow_max_soc_entity": "SOC maximum SolarFlow 2400 Pro",
           "grid_target": "Cible réseau (W)",
           "grid_deadband": "Bande morte (W)",
-          "ramp_limit_w": "Limite de variation par cycle (W)"
+          "ramp_limit_w": "Limite de variation par cycle (W)",
+          "automation_enabled": "Moteur d'automatisation activé",
+          "automation_min_hold_seconds": "Durée minimale d'un état (s)",
+          "automation_allow_fallback": "Autoriser l'automatisation en mode fallback"
         }
       },
       "batteries": {
@@ -63,7 +66,10 @@
           "solarflow_max_soc_entity": "SOC maximum SolarFlow 2400 Pro",
           "grid_target": "Cible réseau (W)",
           "grid_deadband": "Bande morte (W)",
-          "ramp_limit_w": "Limite de variation par cycle (W)"
+          "ramp_limit_w": "Limite de variation par cycle (W)",
+          "automation_enabled": "Moteur d'automatisation activé",
+          "automation_min_hold_seconds": "Durée minimale d'un état (s)",
+          "automation_allow_fallback": "Autoriser l'automatisation en mode fallback"
         }
       },
       "batteries": {

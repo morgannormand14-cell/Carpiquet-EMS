@@ -6,7 +6,7 @@
 >
 > *Designed with ❤️ in Normandy.*
 
-# ⚡ v0.4.3-alpha — Sprint 4 Config Flow Hotfix
+# ⚡ v0.4.3-alpha — Sprint 5 Config Flow Hotfix
 
 ## Correctif
 - ✅ Correction de `extra keys not allowed`
@@ -32,7 +32,7 @@
 **100 % simulation-only.**
 Aucune commande réelle de limite de sortie Zendure n'est envoyée.
 
-Tag : `v0.4.3-alpha-sprint4`
+Tag : `v0.5.0-alpha-sprint5`
 Pré-release : **Oui**
 
 🏴 **Carpiquet EMS — Every watt counts.**

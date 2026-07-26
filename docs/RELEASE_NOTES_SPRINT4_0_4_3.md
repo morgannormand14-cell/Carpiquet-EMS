@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.4.3-alpha — Sprint 4 hotfix
+# Carpiquet EMS v0.4.3-alpha — Sprint 5 hotfix
 
 - Fixes first-step Config Flow submission error (`extra keys not allowed`).
 - Uses a stable explicit schema for Home Assistant selectors.

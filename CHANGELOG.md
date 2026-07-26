@@ -1,6 +1,17 @@
 # Changelog
 
-## v0.4.3-alpha — Sprint 4 Config Flow hotfix
+## v0.5.0-alpha — Sprint 5 Automation Engine
+
+- Added deterministic automation state machine.
+- Added disabled / safe_hold / idle / discharge states.
+- Added grid, battery and fallback safety gates.
+- Added configurable minimum state hold.
+- Added automation sensors and safety binary sensor.
+- Added functional Automation Engine simulation switch.
+- Added Automation dashboard view.
+- Preserved simulation-only safety boundary.
+
+## v0.4.3-alpha — Sprint 5 Config Flow hotfix
 
 - Fixed first-step Config Flow submission reporting all fields as extra keys.
 - Replaced reconstructed schema with one stable explicit schema.
@@ -8,7 +19,7 @@
 - Battery serial validation moved to the flow logic.
 - Dashboard and onboarding improvements from v0.4.2 preserved.
 
-## v0.4.2-alpha — Sprint 4 corrective release
+## v0.4.2-alpha — Sprint 5 corrective release
 
 - Battery type dropdown for AB2000X / AB3000L / I2400.
 - Five-digit serial validation with leading-zero support.
@@ -16,7 +27,7 @@
 - Simplified dashboard labels in Cockpit, Health Center and Zendure views.
 - Simulation-only safety unchanged.
 
-## v0.4.1-alpha — Sprint 4 dynamic Zendure revision
+## v0.4.1-alpha — Sprint 5 dynamic Zendure revision
 
 - Dynamic capacities, max powers and min/max SOC sourced from Zendure entities.
 - Persistent self-updating fallback cache.
@@ -24,9 +35,9 @@
 - Battery topology based on pack_num.
 - Automatic type + serial BMS entity mapping.
 - Cockpit synthesis and new Zendure dashboard view.
-- Fixes Sprint 4 Config Flow schema regression.
+- Fixes Sprint 5 Config Flow schema regression.
 
-## v0.4.0-alpha — Normandy / Sprint 4
+## v0.4.0-alpha — Normandy / Sprint 5
 
 ### Added
 

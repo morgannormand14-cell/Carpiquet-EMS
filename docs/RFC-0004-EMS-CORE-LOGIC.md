@@ -1,7 +1,7 @@
 # RFC-0004 — EMS Core Logic
 
 ## Status
-Accepted — Sprint 4 revision v0.4.1.
+Accepted — Sprint 5 revision v0.4.1.
 
 ## Dynamic Zendure values
 Eight installation values are selected as Home Assistant entities:

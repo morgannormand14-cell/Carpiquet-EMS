@@ -8,6 +8,7 @@ from homeassistant.helpers.storage import Store
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 
 from .algorithm import BatteryState, allocate_discharge_power
+from .automation_engine import AutomationInput, POLICY, STATE_IDLE, decide_automation
 from .const import *
 from .topology import valid_numeric
 
@@ -29,6 +30,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self.entry = config_entry
         self.config = config_entry.data | config_entry.options
         self._previous_simulated_power = 0.0
+        self._automation_state = STATE_IDLE
+        self._automation_cycle = 0
+        self._automation_last_transition_dt = datetime.now(timezone.utc)
         self._fallbacks = {
             fallback_key: self.config.get(fallback_key)
             for _, fallback_key, _, _ in DYNAMIC.values()
@@ -183,6 +187,49 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._previous_simulated_power = total
 
             total_batteries, active_batteries, physical_socs = self._battery_status()
+
+            now = datetime.now(timezone.utc)
+            elapsed = (now - self._automation_last_transition_dt).total_seconds()
+            automation_enabled = bool(
+                self.config.get(CONF_AUTOMATION_ENABLED, DEFAULT_AUTOMATION_ENABLED)
+            )
+            allow_fallback = bool(
+                self.config.get(CONF_AUTOMATION_ALLOW_FALLBACK, DEFAULT_AUTOMATION_ALLOW_FALLBACK)
+            )
+            minimum_hold = float(
+                self.config.get(
+                    CONF_AUTOMATION_MIN_HOLD_SECONDS,
+                    DEFAULT_AUTOMATION_MIN_HOLD_SECONDS,
+                )
+            )
+            automation = decide_automation(
+                AutomationInput(
+                    enabled=automation_enabled,
+                    grid_available=grid_ok,
+                    active_batteries=active_batteries,
+                    fallback_active=fallback_count > 0,
+                    allow_fallback=allow_fallback,
+                    grid_power_w=grid,
+                    grid_target_w=target,
+                    deadband_w=deadband,
+                    requested_discharge_w=requested,
+                    previous_state=self._automation_state,
+                    seconds_since_transition=elapsed,
+                    minimum_hold_seconds=minimum_hold,
+                )
+            )
+            if automation.transition:
+                self._automation_state = automation.state
+                self._automation_last_transition_dt = now
+            self._automation_cycle += 1
+
+            # Sprint 5 remains simulation-only: automation gates the simulated request.
+            if automation.state != "discharge":
+                hyper_power = 0.0
+                solar_power = 0.0
+                total = 0.0
+                self._previous_simulated_power = 0.0
+
             total_capacity = dynamic["hyper_capacity"] + dynamic["solarflow_capacity"]
             if total_capacity > 0:
                 average_soc = (
@@ -239,6 +286,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_HYPER_MAX_SOC: round(dynamic["hyper_max_soc"], 1),
                 ATTR_SOLARFLOW_MIN_SOC: round(dynamic["solarflow_min_soc"], 1),
                 ATTR_SOLARFLOW_MAX_SOC: round(dynamic["solarflow_max_soc"], 1),
+                ATTR_AUTOMATION_STATE: automation.state,
+                ATTR_AUTOMATION_REASON: automation.reason,
+                ATTR_AUTOMATION_REQUEST_W: automation.request_w,
+                ATTR_AUTOMATION_CYCLE: self._automation_cycle,
+                ATTR_AUTOMATION_LAST_TRANSITION: self._automation_last_transition_dt.isoformat(),
+                ATTR_AUTOMATION_HOLD_REMAINING: automation.hold_remaining_seconds,
+                ATTR_AUTOMATION_SAFETY_OK: automation.safety_ok,
+                ATTR_AUTOMATION_POLICY: POLICY,
+                ATTR_AUTOMATION_ENABLED: automation_enabled,
                 ATTR_DYNAMIC_SOURCES: sources,
                 ATTR_FALLBACKS: dict(self._fallbacks),
             }

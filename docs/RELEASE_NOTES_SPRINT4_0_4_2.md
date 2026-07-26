@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.4.2-alpha — Sprint 4 corrective release
+# Carpiquet EMS v0.4.2-alpha — Sprint 5 corrective release
 
 ## Corrections
 - Battery type selector: AB2000X / AB3000L / I2400.

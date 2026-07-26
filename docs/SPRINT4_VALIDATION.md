@@ -1,4 +1,4 @@
-# Sprint 4 v0.4.1 Validation Checklist
+# Sprint 5 v0.4.1 Validation Checklist
 
 ## Installation
 - [ ] Config Flow opens

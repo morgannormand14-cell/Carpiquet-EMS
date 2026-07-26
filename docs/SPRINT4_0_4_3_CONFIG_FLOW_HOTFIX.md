@@ -1,4 +1,4 @@
-# v0.4.3-alpha-sprint4 — Config Flow Hotfix
+# v0.5.0-alpha-sprint5 — Config Flow Hotfix
 
 ## Symptom
 

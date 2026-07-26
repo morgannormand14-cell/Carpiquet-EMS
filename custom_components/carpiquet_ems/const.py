@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.4.3-alpha-sprint4"
+VERSION = "0.5.0-alpha-sprint5"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -90,3 +90,21 @@ ATTR_SOLARFLOW_MIN_SOC = "solarflow_min_soc"
 ATTR_SOLARFLOW_MAX_SOC = "solarflow_max_soc"
 ATTR_DYNAMIC_SOURCES = "dynamic_sources"
 ATTR_FALLBACKS = "fallbacks"
+
+CONF_AUTOMATION_ENABLED = "automation_enabled"
+CONF_AUTOMATION_MIN_HOLD_SECONDS = "automation_min_hold_seconds"
+CONF_AUTOMATION_ALLOW_FALLBACK = "automation_allow_fallback"
+
+DEFAULT_AUTOMATION_ENABLED = True
+DEFAULT_AUTOMATION_MIN_HOLD_SECONDS = 10
+DEFAULT_AUTOMATION_ALLOW_FALLBACK = True
+
+ATTR_AUTOMATION_STATE = "automation_state"
+ATTR_AUTOMATION_REASON = "automation_reason"
+ATTR_AUTOMATION_REQUEST_W = "automation_request_w"
+ATTR_AUTOMATION_CYCLE = "automation_cycle"
+ATTR_AUTOMATION_LAST_TRANSITION = "automation_last_transition"
+ATTR_AUTOMATION_HOLD_REMAINING = "automation_hold_remaining_seconds"
+ATTR_AUTOMATION_SAFETY_OK = "automation_safety_ok"
+ATTR_AUTOMATION_POLICY = "automation_policy"
+ATTR_AUTOMATION_ENABLED = "automation_enabled"

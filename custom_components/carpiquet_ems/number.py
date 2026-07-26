@@ -8,6 +8,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         EMSNumber(coordinator, entry, CONF_GRID_TARGET, "Grid Target", -5000, 5000, 1),
         EMSNumber(coordinator, entry, CONF_GRID_DEADBAND, "Grid Deadband", 0, 1000, 1),
         EMSNumber(coordinator, entry, CONF_RAMP_LIMIT_W, "Ramp Limit", 0, 5000, 10),
+        EMSNumber(coordinator, entry, CONF_AUTOMATION_MIN_HOLD_SECONDS, "Automation Minimum Hold", 0, 300, 1),
     ])
 
 class EMSNumber(CoordinatorEntity, NumberEntity):

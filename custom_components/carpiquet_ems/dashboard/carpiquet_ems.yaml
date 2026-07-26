@@ -16,7 +16,7 @@ views:
               *Intelligent energy management for Zendure.*
 
               **Mode : SIMULATION**
-              **Sprint 4 — EMS Core Logic**
+              **Sprint 5 — EMS Core Logic**
           - type: tile
             entity: sensor.carpiquet_ems_system_status
             name: État général
@@ -53,6 +53,10 @@ views:
                 name: État des données
               - entity: sensor.carpiquet_ems_fallback_active_count
                 name: Fallbacks actifs
+              - entity: switch.carpiquet_ems_automation_engine
+                name: Moteur d'automatisation
+              - entity: sensor.carpiquet_ems_automation_state
+                name: État automation
 
       - type: grid
         title: Réseau
@@ -216,6 +220,10 @@ views:
                 name: Mode des données
               - entity: sensor.carpiquet_ems_fallback_active_count
                 name: Fallbacks actifs
+              - entity: switch.carpiquet_ems_automation_engine
+                name: Moteur d'automatisation
+              - entity: sensor.carpiquet_ems_automation_state
+                name: État automation
               - entity: sensor.carpiquet_ems_last_fallback_sync
                 name: Dernière synchronisation
 
@@ -290,3 +298,94 @@ views:
                 name: HEMS actif
 
       # __CARPIQUET_BATTERY_CARDS__
+
+
+  - title: Automation
+    path: automation
+    icon: mdi:robot-industrial
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        title: Automation Engine
+        cards:
+          - type: markdown
+            content: |
+              # 🤖 Automation Engine
+              **Sprint 5 — Simulation Only**
+
+              Le moteur décide quand l'EMS simulé doit rester inactif,
+              passer en décharge ou se placer en sécurité.
+
+              **Aucune commande réelle Zendure n'est envoyée.**
+          - type: entities
+            title: État
+            show_header_toggle: false
+            entities:
+              - entity: switch.carpiquet_ems_automation_engine
+                name: Moteur activé
+              - entity: sensor.carpiquet_ems_automation_state
+                name: État
+              - entity: sensor.carpiquet_ems_automation_reason
+                name: Raison
+              - entity: binary_sensor.carpiquet_ems_automation_safety_gate
+                name: Garde-fou sécurité
+              - entity: sensor.carpiquet_ems_automation_policy
+                name: Politique
+              - entity: sensor.carpiquet_ems_automation_cycle
+                name: Cycle
+              - entity: sensor.carpiquet_ems_automation_last_transition
+                name: Dernière transition
+              - entity: sensor.carpiquet_ems_automation_hold_remaining
+                name: Temporisation restante
+
+      - type: grid
+        title: Décision
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_grid_power
+                name: Réseau
+              - entity: number.carpiquet_ems_grid_target
+                name: Cible réseau
+              - entity: number.carpiquet_ems_grid_deadband
+                name: Bande morte
+              - entity: sensor.carpiquet_ems_requested_discharge
+                name: Demande EMS
+              - entity: sensor.carpiquet_ems_automation_request
+                name: Demande automation
+              - entity: sensor.carpiquet_ems_total_simulated_battery_power
+                name: Sortie simulée
+              - entity: number.carpiquet_ems_automation_minimum_hold
+                name: Durée minimale d'état
+
+      - type: grid
+        title: Sécurité
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: switch.carpiquet_ems_simulation_mode
+                name: Simulation Only
+              - entity: sensor.carpiquet_ems_data_mode
+                name: Données
+              - entity: sensor.carpiquet_ems_active_batteries
+                name: Batteries actives
+              - entity: binary_sensor.carpiquet_ems_grid_meter_health
+                name: Compteur réseau
+              - entity: binary_sensor.carpiquet_ems_hyper_2000_health
+                name: Hyper 2000
+              - entity: binary_sensor.carpiquet_ems_solarflow_2400_pro_health
+                name: SolarFlow 2400 Pro
+
+      - type: grid
+        title: Historique automation
+        cards:
+          - type: history-graph
+            title: Décisions — 24 h
+            hours_to_show: 24
+            entities:
+              - sensor.carpiquet_ems_automation_state
+              - sensor.carpiquet_ems_automation_request
+              - sensor.carpiquet_ems_total_simulated_battery_power

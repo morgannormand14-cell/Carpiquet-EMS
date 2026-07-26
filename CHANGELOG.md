@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.2-alpha — Sprint 4 corrective release
+
+- Battery type dropdown for AB2000X / AB3000L / I2400.
+- Five-digit serial validation with leading-zero support.
+- Corrected dashboard entity IDs.
+- Simplified dashboard labels in Cockpit, Health Center and Zendure views.
+- Simulation-only safety unchanged.
+
 ## v0.4.1-alpha — Sprint 4 dynamic Zendure revision
 
 - Dynamic capacities, max powers and min/max SOC sourced from Zendure entities.

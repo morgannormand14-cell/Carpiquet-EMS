@@ -6,33 +6,31 @@
 >
 > *Designed with ❤️ in Normandy.*
 
-# ⚡ Sprint 4 — EMS Core Logic & Zendure Topology
+# ⚡ v0.4.2-alpha — Sprint 4 Corrective Release
 
-## Dynamic Zendure data
-- ✅ Capacity read live from Zendure
-- ✅ Maximum power read live from Zendure
-- ✅ Hyper / SolarFlow min SOC read live
-- ✅ Hyper / SolarFlow max SOC read live
-- ✅ Persistent auto-learning fallback
-- ✅ LIVE / FALLBACK ACTIF status
-
-## Battery topology
-- ✅ `pack_num` detection
-- ✅ Type + serial onboarding
-- ✅ Automatic BMS entity mapping
-- ✅ Dynamic battery blocks in generated dashboard
+## Onboarding
+- ✅ Battery type selector: AB2000X / AB3000L / I2400
+- ✅ Serial validation on exactly 5 digits
+- ✅ Leading zeros preserved
+- ✅ Clear instruction to use the last 5 digits shown in the Zendure app
 
 ## Dashboard
-- ✅ Cockpit system summary
-- ✅ Health Center
-- ✅ History
-- ✅ New Zendure view
+- ✅ Corrected Hyper / SolarFlow dynamic entity IDs
+- ✅ Cleaner labels in Cockpit
+- ✅ Cleaner French labels in EMS Health Center
+- ✅ Cleaner labels in Zendure view
 
-## Safety
+## Dynamic Zendure logic
+- ✅ Live values
+- ✅ Persistent auto-learning fallback
+- ✅ LIVE / FALLBACK ACTIF
+- ✅ Battery topology and automatic BMS mapping
+
+## 🛡 Safety
 **100% simulation-only.**
-No real Zendure output limit is written.
+No real Zendure output-limit command is sent.
 
-Tag: `v0.4.1-alpha-sprint4`
+Tag: `v0.4.2-alpha-sprint4`
 Pre-release: **Yes**
 
 🏴 **Carpiquet EMS — Every watt counts.**

@@ -27,13 +27,14 @@
       },
       "batteries": {
         "title": "Carpiquet EMS — Batteries Zendure",
-        "description": "Hyper détecté : {hyper_count} batterie(s). SolarFlow détecté : {solarflow_count} batterie(s). Indiquez uniquement le type et le numéro de série ; Carpiquet EMS associe les entités automatiquement."
+        "description": "Hyper détecté : {hyper_count} batterie(s). SolarFlow détecté : {solarflow_count} batterie(s). Pour chaque batterie, choisissez le type (AB2000X, AB3000L ou I2400), puis indiquez exactement les 5 derniers chiffres du numéro de série affiché dans l'application Zendure. Conservez les zéros initiaux (ex. 00545, 03090)."
       }
     },
     "error": {
       "dynamic_value_unavailable": "Une valeur Zendure dynamique est indisponible ou invalide. Elle doit être lisible lors de l'installation pour initialiser le fallback.",
       "pack_count_unavailable": "Impossible de lire le nombre de batteries Hyper ou SolarFlow.",
-      "battery_not_found": "Une batterie n'a pas pu être validée à partir de son type et de son numéro de série."
+      "battery_not_found": "Une batterie n'a pas pu être validée à partir de son type et de son numéro de série.",
+      "serial_must_be_five_digits": "Le numéro de série doit contenir exactement 5 chiffres."
     },
     "abort": {
       "already_configured": "Carpiquet EMS est déjà configuré."
@@ -66,12 +67,13 @@
       },
       "batteries": {
         "title": "Topologie batteries Zendure",
-        "description": "Mettez à jour type et numéro de série si le nombre de batteries a changé."
+        "description": "Choisissez le type de chaque batterie (AB2000X, AB3000L ou I2400) et indiquez exactement les 5 derniers chiffres du numéro de série affiché dans l'application Zendure. Conservez les zéros initiaux."
       }
     },
     "error": {
       "pack_count_unavailable": "Impossible de lire le nombre de batteries.",
-      "battery_not_found": "Une batterie n'a pas pu être validée."
+      "battery_not_found": "Une batterie n'a pas pu être validée.",
+      "serial_must_be_five_digits": "Le numéro de série doit contenir exactement 5 chiffres."
     }
   }
 }

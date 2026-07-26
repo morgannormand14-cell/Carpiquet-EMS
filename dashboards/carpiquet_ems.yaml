@@ -99,14 +99,22 @@ views:
             min: 0
             max: 100
           - type: entities
+            show_header_toggle: false
             entities:
-              - sensor.carpiquet_ems_hyper_2000_pv_power
-              - sensor.carpiquet_ems_hyper_2000_simulated_power
-              - sensor.carpiquet_ems_hyper_capacity
-              - sensor.carpiquet_ems_hyper_max_power
-              - sensor.carpiquet_ems_hyper_min_soc
-              - sensor.carpiquet_ems_hyper_max_soc
-              - binary_sensor.carpiquet_ems_hyper_2000_health
+              - entity: sensor.carpiquet_ems_hyper_2000_pv_power
+                name: Puissance PV
+              - entity: sensor.carpiquet_ems_hyper_2000_simulated_power
+                name: Puissance simulée
+              - entity: sensor.carpiquet_ems_hyper_2000_capacity
+                name: Capacité totale
+              - entity: sensor.carpiquet_ems_hyper_2000_max_power
+                name: Puissance maximale
+              - entity: sensor.carpiquet_ems_hyper_2000_min_soc
+                name: SOC minimum
+              - entity: sensor.carpiquet_ems_hyper_2000_max_soc
+                name: SOC maximum
+              - entity: binary_sensor.carpiquet_ems_hyper_2000_health
+                name: Santé
 
       - type: grid
         title: SolarFlow 2400 Pro
@@ -117,14 +125,22 @@ views:
             min: 0
             max: 100
           - type: entities
+            show_header_toggle: false
             entities:
-              - sensor.carpiquet_ems_solarflow_2400_pro_pv_power
-              - sensor.carpiquet_ems_solarflow_2400_pro_simulated_power
-              - sensor.carpiquet_ems_solarflow_capacity
-              - sensor.carpiquet_ems_solarflow_max_power
-              - sensor.carpiquet_ems_solarflow_min_soc
-              - sensor.carpiquet_ems_solarflow_max_soc
-              - binary_sensor.carpiquet_ems_solarflow_2400_pro_health
+              - entity: sensor.carpiquet_ems_solarflow_2400_pro_pv_power
+                name: Puissance PV
+              - entity: sensor.carpiquet_ems_solarflow_2400_pro_simulated_power
+                name: Puissance simulée
+              - entity: sensor.carpiquet_ems_solarflow_2400_pro_capacity
+                name: Capacité totale
+              - entity: sensor.carpiquet_ems_solarflow_2400_pro_max_power
+                name: Puissance maximale
+              - entity: sensor.carpiquet_ems_solarflow_2400_pro_min_soc
+                name: SOC minimum
+              - entity: sensor.carpiquet_ems_solarflow_2400_pro_max_soc
+                name: SOC maximum
+              - entity: binary_sensor.carpiquet_ems_solarflow_2400_pro_health
+                name: Santé
 
   - title: Santé
     path: health
@@ -144,13 +160,20 @@ views:
             max: 100
           - type: entities
             title: Composants
+            show_header_toggle: false
             entities:
-              - binary_sensor.carpiquet_ems_grid_meter_health
-              - binary_sensor.carpiquet_ems_hyper_2000_health
-              - binary_sensor.carpiquet_ems_solarflow_2400_pro_health
-              - sensor.carpiquet_ems_system_status
-              - sensor.carpiquet_ems_data_mode
-              - sensor.carpiquet_ems_last_fallback_sync
+              - entity: binary_sensor.carpiquet_ems_grid_meter_health
+                name: Santé compteur réseau
+              - entity: binary_sensor.carpiquet_ems_hyper_2000_health
+                name: Santé Hyper 2000
+              - entity: binary_sensor.carpiquet_ems_solarflow_2400_pro_health
+                name: Santé SolarFlow 2400 Pro
+              - entity: sensor.carpiquet_ems_system_status
+                name: État système
+              - entity: sensor.carpiquet_ems_data_mode
+                name: Mode des données
+              - entity: sensor.carpiquet_ems_last_fallback_sync
+                name: Dernière synchronisation fallback
 
   - title: Historique
     path: history
@@ -202,20 +225,34 @@ views:
           - type: entities
             show_header_toggle: false
             entities:
-              - sensor.hyper_2000_electric_level
-              - sensor.hyper_2000_total_kwh
-              - sensor.hyper_2000_available_kwh
-              - sensor.hyper_2000_pack_num
-              - sensor.hyper_2000_inverse_max_power
-              - number.hyper_2000_min_soc
-              - number.hyper_2000_soc_set
-              - sensor.hyper_2000_solar_input_power
-              - sensor.hyper_2000_output_home_power
-              - sensor.hyper_2000_hyper_tmp
-              - sensor.hyper_2000_remaining_time
-              - sensor.hyper_2000_roundtrip_efficiency
-              - binary_sensor.hyper_2000_wifi_state
-              - binary_sensor.hyper_2000_hems_state
+              - entity: sensor.hyper_2000_electric_level
+                name: Niveau de batterie
+              - entity: sensor.hyper_2000_total_kwh
+                name: Capacité totale
+              - entity: sensor.hyper_2000_available_kwh
+                name: Énergie disponible
+              - entity: sensor.hyper_2000_pack_num
+                name: Nombre de batteries
+              - entity: sensor.hyper_2000_inverse_max_power
+                name: Puissance maximale
+              - entity: number.hyper_2000_min_soc
+                name: SOC minimum
+              - entity: number.hyper_2000_soc_set
+                name: SOC maximum
+              - entity: sensor.hyper_2000_solar_input_power
+                name: Puissance d'entrée solaire
+              - entity: sensor.hyper_2000_output_home_power
+                name: Puissance de sortie
+              - entity: sensor.hyper_2000_hyper_tmp
+                name: Température
+              - entity: sensor.hyper_2000_remaining_time
+                name: Temps restant
+              - entity: sensor.hyper_2000_roundtrip_efficiency
+                name: Rendement aller-retour
+              - entity: binary_sensor.hyper_2000_wifi_state
+                name: État du Wi-Fi
+              - entity: binary_sensor.hyper_2000_hems_state
+                name: HEMS actif
 
       - type: grid
         title: SolarFlow 2400 Pro — Zendure
@@ -223,19 +260,33 @@ views:
           - type: entities
             show_header_toggle: false
             entities:
-              - sensor.solarflow_2400_pro_electric_level
-              - sensor.solarflow_2400_pro_total_kwh
-              - sensor.solarflow_2400_pro_available_kwh
-              - sensor.solarflow_2400_pro_pack_num
-              - sensor.solarflow_2400_pro_inverse_max_power
-              - number.solarflow_2400_pro_min_soc
-              - number.solarflow_2400_pro_soc_set
-              - sensor.solarflow_2400_pro_solar_input_power
-              - sensor.solarflow_2400_pro_output_home_power
-              - sensor.solarflow_2400_pro_hyper_tmp
-              - sensor.solarflow_2400_pro_remaining_time
-              - sensor.solarflow_2400_pro_roundtrip_efficiency
-              - sensor.solarflow_2400_pro_rssi
-              - binary_sensor.solarflow_2400_pro_hems_state
+              - entity: sensor.solarflow_2400_pro_electric_level
+                name: Niveau de batterie
+              - entity: sensor.solarflow_2400_pro_total_kwh
+                name: Capacité totale
+              - entity: sensor.solarflow_2400_pro_available_kwh
+                name: Énergie disponible
+              - entity: sensor.solarflow_2400_pro_pack_num
+                name: Nombre de batteries
+              - entity: sensor.solarflow_2400_pro_inverse_max_power
+                name: Puissance maximale
+              - entity: number.solarflow_2400_pro_min_soc
+                name: SOC minimum
+              - entity: number.solarflow_2400_pro_soc_set
+                name: SOC maximum
+              - entity: sensor.solarflow_2400_pro_solar_input_power
+                name: Puissance d'entrée solaire
+              - entity: sensor.solarflow_2400_pro_output_home_power
+                name: Puissance de sortie
+              - entity: sensor.solarflow_2400_pro_hyper_tmp
+                name: Température
+              - entity: sensor.solarflow_2400_pro_remaining_time
+                name: Temps restant
+              - entity: sensor.solarflow_2400_pro_roundtrip_efficiency
+                name: Rendement aller-retour
+              - entity: sensor.solarflow_2400_pro_rssi
+                name: RSSI
+              - entity: binary_sensor.solarflow_2400_pro_hems_state
+                name: HEMS actif
 
       # __CARPIQUET_BATTERY_CARDS__

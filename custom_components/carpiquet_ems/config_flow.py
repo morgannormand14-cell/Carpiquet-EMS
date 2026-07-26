@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
+import re
 import voluptuous as vol
 from homeassistant import config_entries
 from homeassistant.data_entry_flow import FlowResult
@@ -44,6 +45,20 @@ def _entity(domain: str):
 
 def _text():
     return selector.TextSelector(selector.TextSelectorConfig(type=selector.TextSelectorType.TEXT))
+
+def _battery_type_selector():
+    return selector.SelectSelector(
+        selector.SelectSelectorConfig(
+            options=["AB2000X", "AB3000L", "I2400"],
+            mode=selector.SelectSelectorMode.DROPDOWN,
+        )
+    )
+
+def _serial_validator(value: str) -> str:
+    serial = str(value).strip()
+    if not re.fullmatch(r"\d{5}", serial):
+        raise vol.Invalid("serial_must_be_five_digits")
+    return serial
 
 def _main_schema(defaults: dict[str, Any]) -> vol.Schema:
     fields = {
@@ -93,8 +108,8 @@ def _battery_schema(hyper_count: int, solar_count: int, defaults: dict[str, Any]
         for index in range(1, count + 1):
             type_key = f"{system}_battery_{index}_type"
             serial_key = f"{system}_battery_{index}_serial"
-            schema[vol.Required(type_key, default=defaults.get(type_key, ""))] = _text()
-            schema[vol.Required(serial_key, default=defaults.get(serial_key, ""))] = _text()
+            schema[vol.Required(type_key, default=defaults.get(type_key, "AB2000X"))] = _battery_type_selector()
+            schema[vol.Required(serial_key, default=defaults.get(serial_key, ""))] = vol.All(_text(), _serial_validator)
     return vol.Schema(schema)
 
 def _battery_defaults(batteries: list[dict[str, Any]]) -> dict[str, Any]:

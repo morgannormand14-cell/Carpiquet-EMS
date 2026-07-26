@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.4.3-alpha — Sprint 4 Config Flow hotfix
+
+- Fixed first-step Config Flow submission reporting all fields as extra keys.
+- Replaced reconstructed schema with one stable explicit schema.
+- Suggested values now use Home Assistant's schema helper.
+- Battery serial validation moved to the flow logic.
+- Dashboard and onboarding improvements from v0.4.2 preserved.
+
 ## v0.4.2-alpha — Sprint 4 corrective release
 
 - Battery type dropdown for AB2000X / AB3000L / I2400.

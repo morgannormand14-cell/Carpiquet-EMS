@@ -6,31 +6,33 @@
 >
 > *Designed with ❤️ in Normandy.*
 
-# ⚡ v0.4.2-alpha — Sprint 4 Corrective Release
+# ⚡ v0.4.3-alpha — Sprint 4 Config Flow Hotfix
 
-## Onboarding
-- ✅ Battery type selector: AB2000X / AB3000L / I2400
-- ✅ Serial validation on exactly 5 digits
-- ✅ Leading zeros preserved
-- ✅ Clear instruction to use the last 5 digits shown in the Zendure app
+## Correctif
+- ✅ Correction de `extra keys not allowed`
+- ✅ Schéma Config Flow stable et explicite
+- ✅ Sélecteurs Home Assistant conservés
+- ✅ Sélecteur batterie AB2000X / AB3000L / I2400
+- ✅ Numéro de série sur exactement 5 chiffres
+- ✅ Zéros initiaux conservés
 
 ## Dashboard
-- ✅ Corrected Hyper / SolarFlow dynamic entity IDs
-- ✅ Cleaner labels in Cockpit
-- ✅ Cleaner French labels in EMS Health Center
-- ✅ Cleaner labels in Zendure view
+- ✅ IDs Hyper / SolarFlow corrigés
+- ✅ Libellés Cockpit simplifiés
+- ✅ EMS Health Center francisé
+- ✅ Vue Zendure simplifiée
 
-## Dynamic Zendure logic
-- ✅ Live values
-- ✅ Persistent auto-learning fallback
+## Zendure
+- ✅ Valeurs LIVE
+- ✅ Fallback persistant auto-apprenant
 - ✅ LIVE / FALLBACK ACTIF
-- ✅ Battery topology and automatic BMS mapping
+- ✅ Topologie batteries et association BMS automatique
 
-## 🛡 Safety
-**100% simulation-only.**
-No real Zendure output-limit command is sent.
+## 🛡 Sécurité
+**100 % simulation-only.**
+Aucune commande réelle de limite de sortie Zendure n'est envoyée.
 
-Tag: `v0.4.2-alpha-sprint4`
-Pre-release: **Yes**
+Tag : `v0.4.3-alpha-sprint4`
+Pré-release : **Oui**
 
 🏴 **Carpiquet EMS — Every watt counts.**

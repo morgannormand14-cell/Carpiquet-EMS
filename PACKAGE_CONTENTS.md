@@ -1,6 +1,6 @@
 # Carpiquet EMS — Full Sprint 4 Package
 
-Version: `0.4.2-alpha-sprint4`
+Version: `0.4.3-alpha-sprint4`
 
 Complete project package including:
 - Home Assistant integration runtime

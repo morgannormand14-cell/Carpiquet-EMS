@@ -34,7 +34,8 @@
       "dynamic_value_unavailable": "Une valeur Zendure dynamique est indisponible ou invalide. Elle doit être lisible lors de l'installation pour initialiser le fallback.",
       "pack_count_unavailable": "Impossible de lire le nombre de batteries Hyper ou SolarFlow.",
       "battery_not_found": "Une batterie n'a pas pu être validée à partir de son type et de son numéro de série.",
-      "serial_must_be_five_digits": "Le numéro de série doit contenir exactement 5 chiffres."
+      "serial_must_be_five_digits": "Le numéro de série doit contenir exactement 5 chiffres.",
+      "battery_type_invalid": "Type de batterie non pris en charge."
     },
     "abort": {
       "already_configured": "Carpiquet EMS est déjà configuré."
@@ -73,7 +74,8 @@
     "error": {
       "pack_count_unavailable": "Impossible de lire le nombre de batteries.",
       "battery_not_found": "Une batterie n'a pas pu être validée.",
-      "serial_must_be_five_digits": "Le numéro de série doit contenir exactement 5 chiffres."
+      "serial_must_be_five_digits": "Le numéro de série doit contenir exactement 5 chiffres.",
+      "battery_type_invalid": "Type de batterie non pris en charge."
     }
   }
 }

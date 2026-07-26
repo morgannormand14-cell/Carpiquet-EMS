@@ -19,7 +19,8 @@
           "solarflow_max_power_w": "Puissance maximale SolarFlow (W)",
           "minimum_soc": "SOC minimum (%)",
           "grid_target": "Cible réseau (W)",
-          "grid_deadband": "Bande morte (W)"
+          "grid_deadband": "Bande morte (W)",
+          "ramp_limit_w": "Limite de variation par cycle (W)"
         }
       }
     },
@@ -46,7 +47,8 @@
           "solarflow_max_power_w": "Puissance maximale SolarFlow (W)",
           "minimum_soc": "SOC minimum (%)",
           "grid_target": "Cible réseau (W)",
-          "grid_deadband": "Bande morte (W)"
+          "grid_deadband": "Bande morte (W)",
+          "ramp_limit_w": "Limite de variation par cycle (W)"
         }
       }
     }

@@ -1,6 +1,6 @@
 # Changelog
 
-## v0.3.1-alpha — Normandy / Sprint 3
+## v0.4.0-alpha — Normandy / Sprint 4
 
 ### Added
 

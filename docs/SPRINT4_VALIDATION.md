@@ -1,0 +1,15 @@
+# Sprint 4 Validation Checklist
+- [ ] HACS installs `v0.4.0-alpha-sprint4`
+- [ ] Config Flow and Options Flow open
+- [ ] Existing entry loads
+- [ ] Cockpit / Santé / Historique load
+- [ ] No `Entity not found`
+- [ ] Deadband works
+- [ ] Minimum SOC reserve works
+- [ ] Offline battery is excluded
+- [ ] Maximum power limits are respected
+- [ ] Ramp limiter works
+- [ ] Core diagnostics are visible
+- [ ] Simulation switch stays ON
+- [ ] Zendure output limits are never written
+- [ ] No unexpected log errors

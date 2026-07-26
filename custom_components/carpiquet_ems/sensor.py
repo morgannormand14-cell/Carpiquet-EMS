@@ -17,6 +17,14 @@ SENSORS = [
     ("battery_balance_index", "Battery Balance Index", ATTR_BALANCE_INDEX, "%", None),
     ("health_score", "Health Score", ATTR_HEALTH_SCORE, "%", None),
     ("system_status", "System Status", ATTR_SYSTEM_STATUS, None, None),
+    ("effective_request", "Effective Request", ATTR_EFFECTIVE_REQUEST, "W", "power"),
+    ("unserved_power", "Unserved Power", ATTR_UNSERVED_POWER, "W", "power"),
+    ("hyper_available_power", "Hyper 2000 Available Power", ATTR_HYPER_AVAILABLE_POWER, "W", "power"),
+    ("solarflow_available_power", "SolarFlow 2400 Pro Available Power", ATTR_SOLARFLOW_AVAILABLE_POWER, "W", "power"),
+    ("total_available_power", "Total Available Power", ATTR_TOTAL_AVAILABLE_POWER, "W", "power"),
+    ("active_batteries", "Active Batteries", ATTR_ACTIVE_BATTERIES, None, None),
+    ("dispatch_mode", "Dispatch Mode", ATTR_DISPATCH_MODE, None, None),
+    ("limit_reason", "Limit Reason", ATTR_LIMIT_REASON, None, None),
 ]
 
 async def async_setup_entry(hass, entry, async_add_entities):

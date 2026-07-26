@@ -1,7 +1,3 @@
-# Full Sprint 3 Package
-
-This archive contains the complete Carpiquet EMS project, not only an overlay.
-It includes runtime code, dashboards, documentation, tests, GitHub templates,
-workflow, release notes, validation checklist, screenshots and branding assets.
-
-Upload the entire extracted directory contents to the repository root.
+# Full Sprint 4 Package
+Complete project package for `v0.4.0-alpha-sprint4`.
+Includes runtime integration, EMS Core Logic v2, dashboard, documentation, tests, GitHub templates/workflows, assets and release notes.

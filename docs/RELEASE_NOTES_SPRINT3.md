@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.3.1-alpha — Normandy / Sprint 3
+# Carpiquet EMS v0.4.0-alpha — Normandy / Sprint 4
 
 ## Onboarding
 
@@ -24,4 +24,4 @@ Carpiquet EMS remains 100% simulation-only. The integration never writes to:
 
 ### Tag
 
-`v0.3.1-alpha-sprint3`
+`v0.4.0-alpha-sprint4`

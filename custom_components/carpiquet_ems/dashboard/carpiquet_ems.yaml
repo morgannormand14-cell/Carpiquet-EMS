@@ -16,7 +16,7 @@ views:
               *Intelligent energy management for Zendure.*
 
               **Mode : SIMULATION**  
-              **Sprint 3 — Onboarding**
+              **Sprint 4 — EMS Core Logic**
           - type: tile
             entity: sensor.carpiquet_ems_system_status
             name: État général
@@ -52,6 +52,10 @@ views:
                 name: Import / export
               - entity: sensor.carpiquet_ems_requested_discharge
                 name: Décharge demandée
+              - entity: sensor.carpiquet_ems_effective_request
+                name: Demande effective
+              - entity: sensor.carpiquet_ems_unserved_power
+                name: Puissance non servie
               - entity: sensor.carpiquet_ems_total_simulated_battery_power
                 name: Puissance simulée totale
               - entity: sensor.carpiquet_ems_simulated_grid_power
@@ -122,6 +126,14 @@ views:
                 name: Mode simulation
               - entity: number.carpiquet_ems_minimum_soc
                 name: SOC minimum
+              - entity: sensor.carpiquet_ems_total_available_power
+                name: Puissance disponible
+              - entity: sensor.carpiquet_ems_active_batteries
+                name: Batteries actives
+              - entity: sensor.carpiquet_ems_dispatch_mode
+                name: Stratégie de répartition
+              - entity: sensor.carpiquet_ems_limit_reason
+                name: Limitation
               - entity: binary_sensor.carpiquet_ems_grid_meter_health
                 name: Shelly Pro 3EM
 

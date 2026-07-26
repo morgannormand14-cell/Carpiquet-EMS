@@ -17,6 +17,7 @@ from .const import (
     CONF_HYPER_PV_ENTITY,
     CONF_HYPER_SOC_ENTITY,
     CONF_MIN_SOC,
+    CONF_RAMP_LIMIT_W,
     CONF_SOLARFLOW_CAPACITY_KWH,
     CONF_SOLARFLOW_MAX_POWER_W,
     CONF_SOLARFLOW_OUTPUT_ENTITY,
@@ -27,6 +28,7 @@ from .const import (
     DEFAULT_HYPER_CAPACITY_KWH,
     DEFAULT_HYPER_MAX_POWER_W,
     DEFAULT_MIN_SOC,
+    DEFAULT_RAMP_LIMIT_W,
     DEFAULT_SOLARFLOW_CAPACITY_KWH,
     DEFAULT_SOLARFLOW_MAX_POWER_W,
     DOMAIN,
@@ -96,6 +98,7 @@ def _schema(defaults: dict[str, Any]) -> vol.Schema:
             ): vol.All(vol.Coerce(float), vol.Range(min=1, max=10000)),
             vol.Required(
                 CONF_MIN_SOC,
+    CONF_RAMP_LIMIT_W,
                 default=defaults.get(CONF_MIN_SOC, DEFAULT_MIN_SOC),
             ): vol.All(vol.Coerce(float), vol.Range(min=0, max=100)),
             vol.Required(
@@ -106,6 +109,10 @@ def _schema(defaults: dict[str, Any]) -> vol.Schema:
                 CONF_GRID_DEADBAND,
                 default=defaults.get(CONF_GRID_DEADBAND, DEFAULT_GRID_DEADBAND),
             ): vol.All(vol.Coerce(float), vol.Range(min=0, max=1000)),
+            vol.Required(
+                CONF_RAMP_LIMIT_W,
+                default=defaults.get(CONF_RAMP_LIMIT_W, DEFAULT_RAMP_LIMIT_W),
+            ): vol.All(vol.Coerce(float), vol.Range(min=0, max=5000)),
         }
     )
 

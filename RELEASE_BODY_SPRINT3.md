@@ -41,7 +41,7 @@ No command is sent to Zendure devices. Output-limit entities are never modified.
 
 ### 🏷️ Release
 
-- Tag: `v0.3.1-alpha-sprint3`
+- Tag: `v0.4.0-alpha-sprint4`
 - Pre-release: **Yes**
 - Latest release: **No**
 - Discussion category: **Announcements**

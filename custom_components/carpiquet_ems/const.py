@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.3.1-alpha-sprint3"
+VERSION = "0.4.0-alpha-sprint4"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -47,3 +47,14 @@ ATTR_GRID_METER_AVAILABLE = "grid_meter_available"
 ATTR_HYPER_AVAILABLE = "hyper_available"
 ATTR_SOLARFLOW_AVAILABLE = "solarflow_available"
 ATTR_LAST_UPDATE_AGE = "last_update_age_seconds"
+
+CONF_RAMP_LIMIT_W = "ramp_limit_w"
+DEFAULT_RAMP_LIMIT_W = 500.0
+ATTR_EFFECTIVE_REQUEST = "effective_request_w"
+ATTR_UNSERVED_POWER = "unserved_power_w"
+ATTR_HYPER_AVAILABLE_POWER = "hyper_available_power_w"
+ATTR_SOLARFLOW_AVAILABLE_POWER = "solarflow_available_power_w"
+ATTR_TOTAL_AVAILABLE_POWER = "total_available_power_w"
+ATTR_ACTIVE_BATTERIES = "active_batteries"
+ATTR_DISPATCH_MODE = "dispatch_mode"
+ATTR_LIMIT_REASON = "limit_reason"

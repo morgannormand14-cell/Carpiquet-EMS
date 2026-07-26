@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.4.1-alpha — Sprint 4 dynamic Zendure revision
+
+- Dynamic capacities, max powers and min/max SOC sourced from Zendure entities.
+- Persistent self-updating fallback cache.
+- LIVE / FALLBACK ACTIF diagnostics.
+- Battery topology based on pack_num.
+- Automatic type + serial BMS entity mapping.
+- Cockpit synthesis and new Zendure dashboard view.
+- Fixes Sprint 4 Config Flow schema regression.
+
 ## v0.4.0-alpha — Normandy / Sprint 4
 
 ### Added

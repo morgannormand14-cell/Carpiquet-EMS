@@ -1,17 +1,27 @@
 # RFC-0004 — EMS Core Logic
+
 ## Status
-Accepted for Sprint 4.
-## Objective
-Build a deterministic and diagnosable EMS simulation core without enabling real device control.
-## Rules
-1. Grid error drives the discharge request.
-2. Deadband filters small errors.
-3. Unavailable batteries are excluded.
-4. Minimum SOC is a hard reserve.
-5. Maximum device power is a hard ceiling.
-6. Available energy above reserve weights the allocation.
-7. A per-cycle ramp limiter smooths simulated output.
-8. The engine exposes limitation reason and unserved demand.
-9. No Zendure write is permitted in Sprint 4.
-## Dispatch mode
-`energy_weighted_balanced`
+Accepted — Sprint 4 revision v0.4.1.
+
+## Dynamic Zendure values
+Eight installation values are selected as Home Assistant entities:
+- Hyper / SolarFlow total capacity
+- Hyper / SolarFlow maximum AC power
+- Hyper / SolarFlow minimum SOC
+- Hyper / SolarFlow maximum SOC
+
+At installation, the current valid values seed persistent fallbacks.
+
+At runtime:
+1. valid live Zendure value → used immediately;
+2. if different from stored fallback → fallback is updated;
+3. unavailable / invalid live value → last valid fallback is used;
+4. `Data Mode` reports `LIVE` or `FALLBACK ACTIF`.
+
+## Battery topology
+`pack_num` determines how many batteries must be identified.
+The user enters only battery type + serial number.
+Carpiquet EMS derives and validates the BMS entity IDs.
+
+## Safety
+Simulation only. No Zendure output-limit write is enabled.

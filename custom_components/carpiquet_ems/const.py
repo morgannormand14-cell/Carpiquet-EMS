@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.4.0-alpha-sprint4"
+VERSION = "0.4.1-alpha-sprint4"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -14,24 +14,46 @@ CONF_HYPER_OUTPUT_ENTITY = "hyper_output_entity"
 CONF_SOLARFLOW_SOC_ENTITY = "solarflow_soc_entity"
 CONF_SOLARFLOW_PV_ENTITY = "solarflow_pv_entity"
 CONF_SOLARFLOW_OUTPUT_ENTITY = "solarflow_output_entity"
-CONF_HYPER_CAPACITY_KWH = "hyper_capacity_kwh"
-CONF_SOLARFLOW_CAPACITY_KWH = "solarflow_capacity_kwh"
-CONF_HYPER_MAX_POWER_W = "hyper_max_power_w"
-CONF_SOLARFLOW_MAX_POWER_W = "solarflow_max_power_w"
-CONF_MIN_SOC = "minimum_soc"
+
+CONF_HYPER_CAPACITY_ENTITY = "hyper_capacity_entity"
+CONF_SOLARFLOW_CAPACITY_ENTITY = "solarflow_capacity_entity"
+CONF_HYPER_MAX_POWER_ENTITY = "hyper_max_power_entity"
+CONF_SOLARFLOW_MAX_POWER_ENTITY = "solarflow_max_power_entity"
+CONF_HYPER_MIN_SOC_ENTITY = "hyper_min_soc_entity"
+CONF_HYPER_MAX_SOC_ENTITY = "hyper_max_soc_entity"
+CONF_SOLARFLOW_MIN_SOC_ENTITY = "solarflow_min_soc_entity"
+CONF_SOLARFLOW_MAX_SOC_ENTITY = "solarflow_max_soc_entity"
+
 CONF_GRID_TARGET = "grid_target"
 CONF_GRID_DEADBAND = "grid_deadband"
+CONF_RAMP_LIMIT_W = "ramp_limit_w"
 
-DEFAULT_HYPER_CAPACITY_KWH = 3.84
-DEFAULT_SOLARFLOW_CAPACITY_KWH = 5.28
-DEFAULT_HYPER_MAX_POWER_W = 1200.0
-DEFAULT_SOLARFLOW_MAX_POWER_W = 2400.0
-DEFAULT_MIN_SOC = 10.0
 DEFAULT_GRID_TARGET = 0.0
 DEFAULT_GRID_DEADBAND = 20.0
+DEFAULT_RAMP_LIMIT_W = 500.0
+
+CONF_FALLBACK_HYPER_CAPACITY = "fallback_hyper_capacity_kwh"
+CONF_FALLBACK_SOLARFLOW_CAPACITY = "fallback_solarflow_capacity_kwh"
+CONF_FALLBACK_HYPER_MAX_POWER = "fallback_hyper_max_power_w"
+CONF_FALLBACK_SOLARFLOW_MAX_POWER = "fallback_solarflow_max_power_w"
+CONF_FALLBACK_HYPER_MIN_SOC = "fallback_hyper_min_soc"
+CONF_FALLBACK_HYPER_MAX_SOC = "fallback_hyper_max_soc"
+CONF_FALLBACK_SOLARFLOW_MIN_SOC = "fallback_solarflow_min_soc"
+CONF_FALLBACK_SOLARFLOW_MAX_SOC = "fallback_solarflow_max_soc"
+
+CONF_BATTERIES = "batteries"
+CONF_BATTERY_SYSTEM = "system"
+CONF_BATTERY_TYPE = "type"
+CONF_BATTERY_SERIAL = "serial"
+CONF_BATTERY_ENTITIES = "entities"
+
+HYPER_PACK_NUM_ENTITY = "sensor.hyper_2000_pack_num"
+SOLARFLOW_PACK_NUM_ENTITY = "sensor.solarflow_2400_pro_pack_num"
 
 ATTR_GRID_POWER = "grid_power_w"
 ATTR_REQUESTED_DISCHARGE = "requested_discharge_w"
+ATTR_EFFECTIVE_REQUEST = "effective_request_w"
+ATTR_UNSERVED_POWER = "unserved_power_w"
 ATTR_HYPER_SOC = "hyper_soc_percent"
 ATTR_SOLARFLOW_SOC = "solarflow_soc_percent"
 ATTR_HYPER_PV = "hyper_pv_w"
@@ -46,15 +68,25 @@ ATTR_SYSTEM_STATUS = "system_status"
 ATTR_GRID_METER_AVAILABLE = "grid_meter_available"
 ATTR_HYPER_AVAILABLE = "hyper_available"
 ATTR_SOLARFLOW_AVAILABLE = "solarflow_available"
-ATTR_LAST_UPDATE_AGE = "last_update_age_seconds"
-
-CONF_RAMP_LIMIT_W = "ramp_limit_w"
-DEFAULT_RAMP_LIMIT_W = 500.0
-ATTR_EFFECTIVE_REQUEST = "effective_request_w"
-ATTR_UNSERVED_POWER = "unserved_power_w"
 ATTR_HYPER_AVAILABLE_POWER = "hyper_available_power_w"
 ATTR_SOLARFLOW_AVAILABLE_POWER = "solarflow_available_power_w"
 ATTR_TOTAL_AVAILABLE_POWER = "total_available_power_w"
 ATTR_ACTIVE_BATTERIES = "active_batteries"
+ATTR_TOTAL_BATTERIES = "total_batteries"
+ATTR_TOTAL_CAPACITY = "total_capacity_kwh"
+ATTR_AVERAGE_SOC = "average_soc_percent"
+ATTR_DATA_MODE = "data_mode"
+ATTR_FALLBACK_ACTIVE_COUNT = "fallback_active_count"
+ATTR_LAST_FALLBACK_SYNC = "last_fallback_sync"
 ATTR_DISPATCH_MODE = "dispatch_mode"
 ATTR_LIMIT_REASON = "limit_reason"
+ATTR_HYPER_CAPACITY = "hyper_capacity_kwh"
+ATTR_SOLARFLOW_CAPACITY = "solarflow_capacity_kwh"
+ATTR_HYPER_MAX_POWER = "hyper_max_power_w"
+ATTR_SOLARFLOW_MAX_POWER = "solarflow_max_power_w"
+ATTR_HYPER_MIN_SOC = "hyper_min_soc"
+ATTR_HYPER_MAX_SOC = "hyper_max_soc"
+ATTR_SOLARFLOW_MIN_SOC = "solarflow_min_soc"
+ATTR_SOLARFLOW_MAX_SOC = "solarflow_max_soc"
+ATTR_DYNAMIC_SOURCES = "dynamic_sources"
+ATTR_FALLBACKS = "fallbacks"

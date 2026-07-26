@@ -1,3 +1,16 @@
-# Full Sprint 4 Package
-Complete project package for `v0.4.0-alpha-sprint4`.
-Includes runtime integration, EMS Core Logic v2, dashboard, documentation, tests, GitHub templates/workflows, assets and release notes.
+# Carpiquet EMS — Full Sprint 4 Package
+
+Version: `0.4.1-alpha-sprint4`
+
+Complete project package including:
+- Home Assistant integration runtime
+- Config Flow / Options Flow
+- persistent auto-learning fallbacks
+- Zendure battery topology mapping
+- Premium Dashboard with Zendure view
+- dashboard generator
+- documentation
+- tests
+- GitHub workflow/templates
+- branding and screenshots
+- release notes

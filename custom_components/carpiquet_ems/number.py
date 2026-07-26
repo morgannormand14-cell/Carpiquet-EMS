@@ -5,9 +5,9 @@ from .const import *
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
     async_add_entities([
-        EMSNumber(coordinator, entry, CONF_MIN_SOC, "Minimum SOC", 0, 100, 1),
         EMSNumber(coordinator, entry, CONF_GRID_TARGET, "Grid Target", -5000, 5000, 1),
-        EMSNumber(coordinator, entry, CONF_GRID_DEADBAND, "Grid Deadband", 0, 500, 1),
+        EMSNumber(coordinator, entry, CONF_GRID_DEADBAND, "Grid Deadband", 0, 1000, 1),
+        EMSNumber(coordinator, entry, CONF_RAMP_LIMIT_W, "Ramp Limit", 0, 5000, 10),
     ])
 
 class EMSNumber(CoordinatorEntity, NumberEntity):

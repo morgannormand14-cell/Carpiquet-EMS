@@ -1,3 +1,15 @@
-# v0.4.0-alpha — Normandy / Sprint 4
-EMS Core Logic v2 adds availability-aware dispatch, SOC reserve protection, power ceilings, energy-weighted balancing, ramp limiting and transparent diagnostics.
-The release remains 100% simulation-only.
+# Carpiquet EMS v0.4.1-alpha — Sprint 4
+
+This Sprint 4 revision adds dynamic Zendure topology and persistent auto-learning fallbacks.
+
+Highlights:
+- 8 Zendure live entity sources;
+- persistent fallback auto-learning;
+- LIVE / FALLBACK ACTIF state;
+- automatic `pack_num` topology sizing;
+- battery type + serial onboarding;
+- automatic battery entity mapping;
+- Cockpit system summary;
+- fourth `Zendure` dashboard view;
+- generated per-battery BMS cards;
+- simulation-only safety preserved.

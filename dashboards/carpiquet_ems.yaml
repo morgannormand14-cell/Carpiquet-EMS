@@ -15,7 +15,7 @@ views:
 
               *Intelligent energy management for Zendure.*
 
-              **Mode : SIMULATION**  
+              **Mode : SIMULATION**
               **Sprint 4 — EMS Core Logic**
           - type: tile
             entity: sensor.carpiquet_ems_system_status
@@ -30,6 +30,29 @@ views:
               red: 0
               yellow: 67
               green: 100
+
+      - type: grid
+        title: Synthèse système
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_active_batteries
+                name: Batteries actives
+              - entity: sensor.carpiquet_ems_total_batteries
+                name: Batteries détectées
+              - entity: sensor.carpiquet_ems_total_battery_capacity
+                name: Capacité totale
+              - entity: sensor.carpiquet_ems_average_battery_soc
+                name: SOC moyen
+              - entity: sensor.carpiquet_ems_total_available_power
+                name: Puissance disponible
+              - entity: sensor.carpiquet_ems_system_status
+                name: État
+              - entity: sensor.carpiquet_ems_data_mode
+                name: État des données
+              - entity: sensor.carpiquet_ems_fallback_active_count
+                name: Fallbacks actifs
 
       - type: grid
         title: Réseau
@@ -64,6 +87,8 @@ views:
                 name: Cible réseau
               - entity: number.carpiquet_ems_grid_deadband
                 name: Bande morte
+              - entity: number.carpiquet_ems_ramp_limit
+                name: Rampe
 
       - type: grid
         title: Hyper 2000
@@ -73,18 +98,15 @@ views:
             name: SOC Hyper
             min: 0
             max: 100
-            severity:
-              red: 0
-              yellow: 10
-              green: 50
           - type: entities
             entities:
-              - entity: sensor.carpiquet_ems_hyper_2000_pv_power
-                name: Production PV
-              - entity: sensor.carpiquet_ems_hyper_2000_simulated_power
-                name: Sortie simulée
-              - entity: binary_sensor.carpiquet_ems_hyper_2000_health
-                name: Communication
+              - sensor.carpiquet_ems_hyper_2000_pv_power
+              - sensor.carpiquet_ems_hyper_2000_simulated_power
+              - sensor.carpiquet_ems_hyper_capacity
+              - sensor.carpiquet_ems_hyper_max_power
+              - sensor.carpiquet_ems_hyper_min_soc
+              - sensor.carpiquet_ems_hyper_max_soc
+              - binary_sensor.carpiquet_ems_hyper_2000_health
 
       - type: grid
         title: SolarFlow 2400 Pro
@@ -94,48 +116,15 @@ views:
             name: SOC SolarFlow
             min: 0
             max: 100
-            severity:
-              red: 0
-              yellow: 10
-              green: 50
           - type: entities
             entities:
-              - entity: sensor.carpiquet_ems_solarflow_2400_pro_pv_power
-                name: Production PV
-              - entity: sensor.carpiquet_ems_solarflow_2400_pro_simulated_power
-                name: Sortie simulée
-              - entity: binary_sensor.carpiquet_ems_solarflow_2400_pro_health
-                name: Communication
-
-      - type: grid
-        title: EMS
-        cards:
-          - type: gauge
-            entity: sensor.carpiquet_ems_battery_balance_index
-            name: Indice d'équilibrage
-            min: 0
-            max: 100
-            severity:
-              red: 0
-              yellow: 70
-              green: 90
-          - type: entities
-            title: Paramètres
-            entities:
-              - entity: switch.carpiquet_ems_simulation_mode
-                name: Mode simulation
-              - entity: number.carpiquet_ems_minimum_soc
-                name: SOC minimum
-              - entity: sensor.carpiquet_ems_total_available_power
-                name: Puissance disponible
-              - entity: sensor.carpiquet_ems_active_batteries
-                name: Batteries actives
-              - entity: sensor.carpiquet_ems_dispatch_mode
-                name: Stratégie de répartition
-              - entity: sensor.carpiquet_ems_limit_reason
-                name: Limitation
-              - entity: binary_sensor.carpiquet_ems_grid_meter_health
-                name: Shelly Pro 3EM
+              - sensor.carpiquet_ems_solarflow_2400_pro_pv_power
+              - sensor.carpiquet_ems_solarflow_2400_pro_simulated_power
+              - sensor.carpiquet_ems_solarflow_capacity
+              - sensor.carpiquet_ems_solarflow_max_power
+              - sensor.carpiquet_ems_solarflow_min_soc
+              - sensor.carpiquet_ems_solarflow_max_soc
+              - binary_sensor.carpiquet_ems_solarflow_2400_pro_health
 
   - title: Santé
     path: health
@@ -147,16 +136,12 @@ views:
           - type: markdown
             content: |
               # ❤️ EMS Health Center
-              Cette vue présente la disponibilité des sources utilisées par Carpiquet EMS.
+              Disponibilité des sources et état du fallback.
           - type: gauge
             entity: sensor.carpiquet_ems_health_score
             name: Score global
             min: 0
             max: 100
-            severity:
-              red: 0
-              yellow: 67
-              green: 100
           - type: entities
             title: Composants
             entities:
@@ -164,6 +149,8 @@ views:
               - binary_sensor.carpiquet_ems_hyper_2000_health
               - binary_sensor.carpiquet_ems_solarflow_2400_pro_health
               - sensor.carpiquet_ems_system_status
+              - sensor.carpiquet_ems_data_mode
+              - sensor.carpiquet_ems_last_fallback_sync
 
   - title: Historique
     path: history
@@ -177,7 +164,7 @@ views:
           - sensor.carpiquet_ems_total_simulated_battery_power
           - sensor.carpiquet_ems_simulated_grid_power
       - type: history-graph
-        title: SOC des batteries — 24 h
+        title: SOC — 24 h
         hours_to_show: 24
         entities:
           - sensor.carpiquet_ems_hyper_2000_soc
@@ -188,3 +175,67 @@ views:
         entities:
           - sensor.carpiquet_ems_hyper_2000_pv_power
           - sensor.carpiquet_ems_solarflow_2400_pro_pv_power
+
+  - title: Zendure
+    path: zendure
+    icon: mdi:battery-sync
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        title: Sources dynamiques
+        cards:
+          - type: entities
+            title: Live / Fallback
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_data_mode
+                name: Mode des données
+              - entity: sensor.carpiquet_ems_fallback_active_count
+                name: Fallbacks actifs
+              - entity: sensor.carpiquet_ems_last_fallback_sync
+                name: Dernière synchronisation
+
+      - type: grid
+        title: Hyper 2000 — Zendure
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - sensor.hyper_2000_electric_level
+              - sensor.hyper_2000_total_kwh
+              - sensor.hyper_2000_available_kwh
+              - sensor.hyper_2000_pack_num
+              - sensor.hyper_2000_inverse_max_power
+              - number.hyper_2000_min_soc
+              - number.hyper_2000_soc_set
+              - sensor.hyper_2000_solar_input_power
+              - sensor.hyper_2000_output_home_power
+              - sensor.hyper_2000_hyper_tmp
+              - sensor.hyper_2000_remaining_time
+              - sensor.hyper_2000_roundtrip_efficiency
+              - binary_sensor.hyper_2000_wifi_state
+              - binary_sensor.hyper_2000_hems_state
+
+      - type: grid
+        title: SolarFlow 2400 Pro — Zendure
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - sensor.solarflow_2400_pro_electric_level
+              - sensor.solarflow_2400_pro_total_kwh
+              - sensor.solarflow_2400_pro_available_kwh
+              - sensor.solarflow_2400_pro_pack_num
+              - sensor.solarflow_2400_pro_inverse_max_power
+              - number.solarflow_2400_pro_min_soc
+              - number.solarflow_2400_pro_soc_set
+              - sensor.solarflow_2400_pro_solar_input_power
+              - sensor.solarflow_2400_pro_output_home_power
+              - sensor.solarflow_2400_pro_hyper_tmp
+              - sensor.solarflow_2400_pro_remaining_time
+              - sensor.solarflow_2400_pro_roundtrip_efficiency
+              - sensor.solarflow_2400_pro_rssi
+              - binary_sensor.solarflow_2400_pro_hems_state
+
+      # __CARPIQUET_BATTERY_CARDS__

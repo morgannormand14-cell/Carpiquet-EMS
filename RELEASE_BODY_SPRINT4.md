@@ -1,27 +1,38 @@
 # 🏴 Carpiquet EMS
+
 > **Every watt counts.**
-# ⚡ Sprint 4 — EMS Core Logic
-- ✅ Availability-aware dispatch
-- ✅ Minimum SOC reserve protection
-- ✅ Device power limits
-- ✅ Energy-weighted Hyper / SolarFlow balancing
-- ✅ Ramp limiter
-- ✅ Effective request and unserved power
-- ✅ Available-power diagnostics
-- ✅ Active battery count
-- ✅ Dispatch mode and limit reason
-- ✅ Dashboard diagnostics
-- ✅ Expanded tests
+>
+> **Intelligent energy management for Zendure.**
+>
+> *Designed with ❤️ in Normandy.*
 
-## 🛡 Safety
+# ⚡ Sprint 4 — EMS Core Logic & Zendure Topology
+
+## Dynamic Zendure data
+- ✅ Capacity read live from Zendure
+- ✅ Maximum power read live from Zendure
+- ✅ Hyper / SolarFlow min SOC read live
+- ✅ Hyper / SolarFlow max SOC read live
+- ✅ Persistent auto-learning fallback
+- ✅ LIVE / FALLBACK ACTIF status
+
+## Battery topology
+- ✅ `pack_num` detection
+- ✅ Type + serial onboarding
+- ✅ Automatic BMS entity mapping
+- ✅ Dynamic battery blocks in generated dashboard
+
+## Dashboard
+- ✅ Cockpit system summary
+- ✅ Health Center
+- ✅ History
+- ✅ New Zendure view
+
+## Safety
 **100% simulation-only.**
+No real Zendure output limit is written.
 
-Never modified:
-- `number.hyper_2000_output_limit`
-- `number.solarflow_2400_pro_output_limit`
-
-Tag: `v0.4.0-alpha-sprint4`
+Tag: `v0.4.1-alpha-sprint4`
 Pre-release: **Yes**
-Discussion: **Announcements**
 
 🏴 **Carpiquet EMS — Every watt counts.**

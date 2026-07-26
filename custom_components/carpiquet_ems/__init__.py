@@ -27,6 +27,7 @@ async def async_setup(hass: HomeAssistant, config: dict) -> bool:
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
     coordinator = CarpiquetEMSCoordinator(hass, entry)
+    await coordinator.async_initialize()
     await coordinator.async_config_entry_first_refresh()
 
     hass.data.setdefault(DOMAIN, {})[entry.entry_id] = coordinator
@@ -51,7 +52,7 @@ def _register_services(hass: HomeAssistant) -> None:
         overwrite = bool(call.data.get(CONF_OVERWRITE, False))
         try:
             target = await hass.async_add_executor_job(
-                install_dashboard_file, hass, overwrite
+                install_dashboard_file, hass, entry, overwrite
             )
         except FileExistsError as err:
             raise HomeAssistantError(

@@ -1,28 +1,39 @@
 {
-  "title": "Carpiquet EMS",
   "config": {
     "step": {
       "user": {
-        "title": "Configurer Carpiquet EMS",
-        "description": "Sélectionnez les entités sources. Cette version reste en mode SIMULATION : aucune commande réelle n'est envoyée.",
+        "title": "Carpiquet EMS — Sources",
+        "description": "Sélectionnez les entités Home Assistant. Les 8 valeurs Zendure dynamiques deviennent automatiquement les valeurs de secours initiales.",
         "data": {
           "grid_power_entity": "Puissance réseau",
           "hyper_soc_entity": "SOC Hyper 2000",
-          "hyper_pv_entity": "Production PV Hyper 2000",
+          "hyper_pv_entity": "PV Hyper 2000",
           "hyper_output_entity": "Limite de sortie Hyper 2000",
           "solarflow_soc_entity": "SOC SolarFlow 2400 Pro",
-          "solarflow_pv_entity": "Production PV SolarFlow 2400 Pro",
+          "solarflow_pv_entity": "PV SolarFlow 2400 Pro",
           "solarflow_output_entity": "Limite de sortie SolarFlow 2400 Pro",
-          "hyper_capacity_kwh": "Capacité Hyper 2000 (kWh)",
-          "solarflow_capacity_kwh": "Capacité SolarFlow (kWh)",
-          "hyper_max_power_w": "Puissance maximale Hyper 2000 (W)",
-          "solarflow_max_power_w": "Puissance maximale SolarFlow (W)",
-          "minimum_soc": "SOC minimum (%)",
+          "hyper_capacity_entity": "Capacité totale Hyper 2000",
+          "solarflow_capacity_entity": "Capacité totale SolarFlow 2400 Pro",
+          "hyper_max_power_entity": "Puissance maximale Hyper 2000",
+          "solarflow_max_power_entity": "Puissance maximale SolarFlow 2400 Pro",
+          "hyper_min_soc_entity": "SOC minimum Hyper 2000",
+          "hyper_max_soc_entity": "SOC maximum Hyper 2000",
+          "solarflow_min_soc_entity": "SOC minimum SolarFlow 2400 Pro",
+          "solarflow_max_soc_entity": "SOC maximum SolarFlow 2400 Pro",
           "grid_target": "Cible réseau (W)",
           "grid_deadband": "Bande morte (W)",
           "ramp_limit_w": "Limite de variation par cycle (W)"
         }
+      },
+      "batteries": {
+        "title": "Carpiquet EMS — Batteries Zendure",
+        "description": "Hyper détecté : {hyper_count} batterie(s). SolarFlow détecté : {solarflow_count} batterie(s). Indiquez uniquement le type et le numéro de série ; Carpiquet EMS associe les entités automatiquement."
       }
+    },
+    "error": {
+      "dynamic_value_unavailable": "Une valeur Zendure dynamique est indisponible ou invalide. Elle doit être lisible lors de l'installation pour initialiser le fallback.",
+      "pack_count_unavailable": "Impossible de lire le nombre de batteries Hyper ou SolarFlow.",
+      "battery_not_found": "Une batterie n'a pas pu être validée à partir de son type et de son numéro de série."
     },
     "abort": {
       "already_configured": "Carpiquet EMS est déjà configuré."
@@ -31,38 +42,36 @@
   "options": {
     "step": {
       "init": {
-        "title": "Options Carpiquet EMS",
-        "description": "Modifiez les sources et paramètres sans supprimer l'intégration.",
+        "title": "Carpiquet EMS — Options",
         "data": {
           "grid_power_entity": "Puissance réseau",
           "hyper_soc_entity": "SOC Hyper 2000",
-          "hyper_pv_entity": "Production PV Hyper 2000",
+          "hyper_pv_entity": "PV Hyper 2000",
           "hyper_output_entity": "Limite de sortie Hyper 2000",
           "solarflow_soc_entity": "SOC SolarFlow 2400 Pro",
-          "solarflow_pv_entity": "Production PV SolarFlow 2400 Pro",
+          "solarflow_pv_entity": "PV SolarFlow 2400 Pro",
           "solarflow_output_entity": "Limite de sortie SolarFlow 2400 Pro",
-          "hyper_capacity_kwh": "Capacité Hyper 2000 (kWh)",
-          "solarflow_capacity_kwh": "Capacité SolarFlow (kWh)",
-          "hyper_max_power_w": "Puissance maximale Hyper 2000 (W)",
-          "solarflow_max_power_w": "Puissance maximale SolarFlow (W)",
-          "minimum_soc": "SOC minimum (%)",
+          "hyper_capacity_entity": "Capacité totale Hyper 2000",
+          "solarflow_capacity_entity": "Capacité totale SolarFlow 2400 Pro",
+          "hyper_max_power_entity": "Puissance maximale Hyper 2000",
+          "solarflow_max_power_entity": "Puissance maximale SolarFlow 2400 Pro",
+          "hyper_min_soc_entity": "SOC minimum Hyper 2000",
+          "hyper_max_soc_entity": "SOC maximum Hyper 2000",
+          "solarflow_min_soc_entity": "SOC minimum SolarFlow 2400 Pro",
+          "solarflow_max_soc_entity": "SOC maximum SolarFlow 2400 Pro",
           "grid_target": "Cible réseau (W)",
           "grid_deadband": "Bande morte (W)",
           "ramp_limit_w": "Limite de variation par cycle (W)"
         }
+      },
+      "batteries": {
+        "title": "Topologie batteries Zendure",
+        "description": "Mettez à jour type et numéro de série si le nombre de batteries a changé."
       }
-    }
-  },
-  "services": {
-    "install_dashboard": {
-      "name": "Installer le Premium Dashboard",
-      "description": "Copie le dashboard officiel dans /config/dashboards.",
-      "fields": {
-        "overwrite": {
-          "name": "Remplacer",
-          "description": "Remplace le fichier existant."
-        }
-      }
+    },
+    "error": {
+      "pack_count_unavailable": "Impossible de lire le nombre de batteries.",
+      "battery_not_found": "Une batterie n'a pas pu être validée."
     }
   }
 }

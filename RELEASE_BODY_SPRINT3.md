@@ -1,5 +1,7 @@
 # 🏴 Carpiquet EMS
 
+> **Hotfix v0.3.1:** corrige le chargement du Config Flow du premier package Sprint 3. `CONF_OVERWRITE` est maintenant géré localement par Carpiquet EMS.
+
 > **Every watt counts.**  
 > **Intelligent energy management for Zendure.**  
 > *Designed with ❤️ in Normandy.*
@@ -39,7 +41,7 @@ No command is sent to Zendure devices. Output-limit entities are never modified.
 
 ### 🏷️ Release
 
-- Tag: `v0.3.0-alpha-sprint3`
+- Tag: `v0.3.1-alpha-sprint3`
 - Pre-release: **Yes**
 - Latest release: **No**
 - Discussion category: **Announcements**

@@ -4,12 +4,11 @@ import logging
 
 import voluptuous as vol
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import CONF_OVERWRITE
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
 from homeassistant.helpers import config_validation as cv
 
-from .const import DOMAIN, SERVICE_INSTALL_DASHBOARD
+from .const import CONF_OVERWRITE, DOMAIN, SERVICE_INSTALL_DASHBOARD
 from .coordinator import CarpiquetEMSCoordinator
 from .dashboard import install_dashboard_file
 

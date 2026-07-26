@@ -1,8 +1,9 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.3.0-alpha-sprint3"
+VERSION = "0.3.1-alpha-sprint3"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
+CONF_OVERWRITE = "overwrite"
 DASHBOARD_FILENAME = "carpiquet_ems.yaml"
 DASHBOARD_RELATIVE_PATH = "dashboards/carpiquet_ems.yaml"
 

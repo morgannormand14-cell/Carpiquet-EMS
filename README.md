@@ -7,7 +7,7 @@
 
 ## Current milestone
 
-**v0.3.0-alpha — Normandy / Sprint 3 — Onboarding**
+**v0.3.1-alpha — Normandy / Sprint 3 — Onboarding**
 
 Carpiquet EMS is a Home Assistant custom integration for a Zendure Hyper 2000,
 a Zendure SolarFlow 2400 Pro and a Shelly Pro 3EM.

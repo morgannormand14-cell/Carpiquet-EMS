@@ -2,7 +2,7 @@
 
 ## Upgrade
 
-- [ ] HACS installs `v0.3.0-alpha-sprint3`
+- [ ] HACS installs `v0.3.1-alpha-sprint3`
 - [ ] Home Assistant restarts without integration errors
 - [ ] Existing config entry loads successfully
 - [ ] All expected entities remain available

@@ -300,19 +300,19 @@ views:
       # __CARPIQUET_BATTERY_CARDS__
 
 
-  - title: Automation
+  - title: Automatisation
     path: automation
     icon: mdi:robot-industrial
     type: sections
     max_columns: 4
     sections:
       - type: grid
-        title: Automation Engine
+        title: Moteur d'automatisation
         cards:
           - type: markdown
             content: |
-              # 🤖 Automation Engine
-              **Sprint 5 — Simulation Only**
+              # 🤖 Moteur d'automatisation
+              **Sprint 5 — Simulation uniquement**
 
               Le moteur décide quand l'EMS simulé doit rester inactif,
               passer en décharge ou se placer en sécurité.
@@ -367,7 +367,7 @@ views:
             show_header_toggle: false
             entities:
               - entity: switch.carpiquet_ems_simulation_mode
-                name: Simulation Only
+                name: Simulation uniquement
               - entity: sensor.carpiquet_ems_data_mode
                 name: Données
               - entity: sensor.carpiquet_ems_active_batteries
@@ -389,3 +389,93 @@ views:
               - sensor.carpiquet_ems_automation_state
               - sensor.carpiquet_ems_automation_request
               - sensor.carpiquet_ems_total_simulated_battery_power
+
+  - title: Jumeau numérique
+    path: digital-twin
+    icon: mdi:home-lightning-bolt-outline
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        title: Maison
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_house_load
+                name: Consommation reconstituée
+              - entity: sensor.carpiquet_ems_grid_power
+                name: Réseau réel
+              - entity: sensor.carpiquet_ems_sim_grid_final
+                name: Réseau simulé
+              - entity: sensor.carpiquet_ems_real_grid_error
+                name: Erreur réelle
+              - entity: sensor.carpiquet_ems_sim_grid_error
+                name: Erreur simulée
+              - entity: sensor.carpiquet_ems_operation_mode
+                name: Mode de fonctionnement
+      - type: grid
+        title: Hyper 2000
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_real_hyper_output
+                name: Sortie réelle vers maison
+              - entity: sensor.carpiquet_ems_sim_hyper_home
+                name: Sortie simulée vers maison
+              - entity: sensor.carpiquet_ems_hyper_2000_pv_power
+                name: Production solaire
+              - entity: sensor.carpiquet_ems_sim_hyper_charge
+                name: Charge simulée
+              - entity: sensor.carpiquet_ems_sim_hyper_export_pool
+                name: Surplus vers bus AC
+              - entity: sensor.carpiquet_ems_sim_cross_charge_hyper
+                name: Charge reçue du bus AC
+              - entity: sensor.carpiquet_ems_virtual_hyper_soc
+                name: SOC virtuel
+              - entity: sensor.carpiquet_ems_virtual_hyper_energy
+                name: Énergie virtuelle
+      - type: grid
+        title: SolarFlow 2400 Pro
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_real_solarflow_output
+                name: Sortie réelle vers maison
+              - entity: sensor.carpiquet_ems_sim_solarflow_home
+                name: Sortie simulée vers maison
+              - entity: sensor.carpiquet_ems_solarflow_2400_pro_pv_power
+                name: Production solaire
+              - entity: sensor.carpiquet_ems_sim_solarflow_charge
+                name: Charge simulée
+              - entity: sensor.carpiquet_ems_sim_solarflow_export_pool
+                name: Surplus vers bus AC
+              - entity: sensor.carpiquet_ems_sim_cross_charge_solarflow
+                name: Charge reçue du bus AC
+              - entity: sensor.carpiquet_ems_virtual_solarflow_soc
+                name: SOC virtuel
+              - entity: sensor.carpiquet_ems_virtual_solarflow_energy
+                name: Énergie virtuelle
+      - type: grid
+        title: Performance
+        cards:
+          - type: gauge
+            entity: sensor.carpiquet_ems_performance_score
+            name: Performance Carpiquet
+            min: 0
+            max: 100
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_zendure_reference_score
+                name: Référence Zendure
+              - entity: sensor.carpiquet_ems_performance_gain
+                name: Gain de performance
+              - entity: sensor.carpiquet_ems_performance_sample_count
+                name: Cycles analysés
+              - entity: sensor.carpiquet_ems_pv_total
+                name: Production solaire totale
+              - entity: sensor.carpiquet_ems_solar_surplus
+                name: Surplus solaire

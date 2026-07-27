@@ -1,38 +1,18 @@
-# RFC-0005 — Automation Engine
+# RFC-0005 — Moteur d'automatisation et jumeau numérique
 
-## Status
-Accepted for Sprint 5.
+## Objectif
+Valider l'algorithme EMS contre l'installation réelle avant tout pilotage matériel.
 
-## Goal
-Introduce a deterministic automation state machine between the EMS calculation and any future actuator layer.
+## Reconstitution maison
+`maison = Shelly + sortie Hyper + sortie SolarFlow`
 
-## Sprint 5 states
-- `disabled`
-- `safe_hold`
-- `idle`
-- `discharge`
+## Priorités
+1. alimenter la maison ;
+2. stocker le surplus PV localement ;
+3. exporter vers le bus AC le surplus local impossible à stocker ;
+4. redistribuer ce surplus vers l'autre batterie ;
+5. injecter seulement le reliquat impossible à stocker ;
+6. en déficit, décharger en respectant SOC minimum et limites.
 
-## Safety gates
-The engine enters `safe_hold` when:
-- the grid meter is unavailable;
-- no configured physical battery is active;
-- fallback data is active while fallback automation is disallowed.
-
-## Debounce
-Normal state transitions respect a configurable minimum hold duration.
-Safety transitions bypass the hold timer.
-
-## Output
-The engine produces:
-- state;
-- reason;
-- requested simulated power;
-- safety-gate state;
-- cycle counter;
-- last transition timestamp;
-- remaining hold time.
-
-## Critical boundary
-Sprint 5 remains 100% simulation-only.
-
-The automation engine is a decision layer only. It does not call Zendure control services and never writes output-limit entities.
+## Sécurité
+Aucune commande réelle Zendure n'est envoyée.

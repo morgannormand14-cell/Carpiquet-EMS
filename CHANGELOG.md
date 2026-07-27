@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.1-alpha — Sprint 5 Digital Twin
+
+- Interface francisée.
+- Garde-fou sécurité corrigé.
+- Jumeau numérique bidirectionnel.
+- Reconstitution de la consommation maison.
+- Stockage local prioritaire puis transfert inter-systèmes du surplus PV.
+- Comparaison réseau réel / simulé et indice de performance.
+- Simulation uniquement conservée.
+
 ## v0.5.0-alpha — Sprint 5 Automation Engine
 
 - Added deterministic automation state machine.

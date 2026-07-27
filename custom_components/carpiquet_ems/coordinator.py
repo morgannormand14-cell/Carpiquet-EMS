@@ -9,6 +9,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 
 from .algorithm import BatteryState, allocate_discharge_power
 from .automation_engine import AutomationInput, POLICY, STATE_IDLE, decide_automation
+from .digital_twin import TwinBattery, TwinInput, simulate_cycle
 from .const import *
 from .topology import valid_numeric
 
@@ -33,6 +34,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._automation_state = STATE_IDLE
         self._automation_cycle = 0
         self._automation_last_transition_dt = datetime.now(timezone.utc)
+        self._virtual_hyper_energy_kwh = None
+        self._virtual_solarflow_energy_kwh = None
+        self._perf_samples = 0
         self._fallbacks = {
             fallback_key: self.config.get(fallback_key)
             for _, fallback_key, _, _ in DYNAMIC.values()
@@ -151,6 +155,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             solar_soc = self._state_float(solar_soc_entity)
             hyper_pv = self._state_float(hyper_pv_entity)
             solar_pv = self._state_float(solar_pv_entity)
+            hyper_real_output = self._state_float(self.config[CONF_HYPER_REAL_OUTPUT_ENTITY])
+            solar_real_output = self._state_float(self.config[CONF_SOLARFLOW_REAL_OUTPUT_ENTITY])
+            real_zendure_total = max(0.0, hyper_real_output) + max(0.0, solar_real_output)
+            house_load = grid + real_zendure_total
 
             target = float(self.config.get(CONF_GRID_TARGET, DEFAULT_GRID_TARGET))
             deadband = float(self.config.get(CONF_GRID_DEADBAND, DEFAULT_GRID_DEADBAND))
@@ -231,6 +239,49 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 self._previous_simulated_power = 0.0
 
             total_capacity = dynamic["hyper_capacity"] + dynamic["solarflow_capacity"]
+
+            if self._virtual_hyper_energy_kwh is None:
+                self._virtual_hyper_energy_kwh = dynamic["hyper_capacity"] * hyper_soc / 100.0
+            if self._virtual_solarflow_energy_kwh is None:
+                self._virtual_solarflow_energy_kwh = dynamic["solarflow_capacity"] * solar_soc / 100.0
+
+            virtual_hyper_soc = 100.0 * self._virtual_hyper_energy_kwh / max(dynamic["hyper_capacity"], 0.001)
+            virtual_solar_soc = 100.0 * self._virtual_solarflow_energy_kwh / max(dynamic["solarflow_capacity"], 0.001)
+
+            twin = simulate_cycle(
+                TwinInput(
+                    house_load_w=house_load,
+                    grid_target_w=target,
+                    hyper_pv_w=hyper_pv,
+                    solarflow_pv_w=solar_pv,
+                    hyper=TwinBattery(virtual_hyper_soc, dynamic["hyper_min_soc"], dynamic["hyper_max_soc"],
+                                      dynamic["hyper_capacity"], dynamic["hyper_max_power"], dynamic["hyper_max_power"], hyper_ok),
+                    solarflow=TwinBattery(virtual_solar_soc, dynamic["solarflow_min_soc"], dynamic["solarflow_max_soc"],
+                                          dynamic["solarflow_capacity"], dynamic["solarflow_max_power"], dynamic["solarflow_max_power"], solar_ok),
+                )
+            )
+
+            dt_h = DEFAULT_SCAN_INTERVAL / 3600.0
+            hdelta = (twin.hyper_charge_w - max(0.0, twin.hyper_home_w - hyper_pv)) * dt_h / 1000.0
+            sdelta = (twin.solarflow_charge_w - max(0.0, twin.solarflow_home_w - solar_pv)) * dt_h / 1000.0
+
+            hmin = dynamic["hyper_capacity"] * dynamic["hyper_min_soc"] / 100.0
+            hmax = dynamic["hyper_capacity"] * dynamic["hyper_max_soc"] / 100.0
+            smin = dynamic["solarflow_capacity"] * dynamic["solarflow_min_soc"] / 100.0
+            smax = dynamic["solarflow_capacity"] * dynamic["solarflow_max_soc"] / 100.0
+
+            self._virtual_hyper_energy_kwh = max(hmin, min(hmax, self._virtual_hyper_energy_kwh + hdelta))
+            self._virtual_solarflow_energy_kwh = max(smin, min(smax, self._virtual_solarflow_energy_kwh + sdelta))
+
+            virtual_hyper_soc = 100.0 * self._virtual_hyper_energy_kwh / max(dynamic["hyper_capacity"], 0.001)
+            virtual_solar_soc = 100.0 * self._virtual_solarflow_energy_kwh / max(dynamic["solarflow_capacity"], 0.001)
+
+            real_grid_error = abs(grid-target)
+            sim_grid_error = abs(twin.grid_w-target)
+            scale=max(deadband,1.0)
+            perf_score=max(0.0,100.0-(sim_grid_error/scale)*100.0)
+            zendure_score=max(0.0,100.0-(real_grid_error/scale)*100.0)
+            self._perf_samples += 1
             if total_capacity > 0:
                 average_soc = (
                     hyper_soc * dynamic["hyper_capacity"]
@@ -295,6 +346,32 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_AUTOMATION_SAFETY_OK: automation.safety_ok,
                 ATTR_AUTOMATION_POLICY: POLICY,
                 ATTR_AUTOMATION_ENABLED: automation_enabled,
+                ATTR_HOUSE_LOAD: round(house_load,1),
+                ATTR_REAL_ZENDURE_TOTAL_OUTPUT: round(real_zendure_total,1),
+                ATTR_REAL_HYPER_OUTPUT: round(hyper_real_output,1),
+                ATTR_REAL_SOLARFLOW_OUTPUT: round(solar_real_output,1),
+                ATTR_SIM_HYPER_HOME: twin.hyper_home_w,
+                ATTR_SIM_SOLARFLOW_HOME: twin.solarflow_home_w,
+                ATTR_SIM_HYPER_CHARGE: twin.hyper_charge_w,
+                ATTR_SIM_SOLARFLOW_CHARGE: twin.solarflow_charge_w,
+                ATTR_SIM_HYPER_EXPORT_POOL: twin.hyper_export_pool_w,
+                ATTR_SIM_SOLARFLOW_EXPORT_POOL: twin.solarflow_export_pool_w,
+                ATTR_SIM_CROSS_CHARGE_HYPER: twin.cross_charge_hyper_w,
+                ATTR_SIM_CROSS_CHARGE_SOLARFLOW: twin.cross_charge_solarflow_w,
+                ATTR_SIM_GRID_FINAL: twin.grid_w,
+                ATTR_REAL_GRID_ERROR: round(real_grid_error,1),
+                ATTR_SIM_GRID_ERROR: round(sim_grid_error,1),
+                ATTR_PERFORMANCE_SCORE: round(perf_score,1),
+                ATTR_ZENDURE_REFERENCE_SCORE: round(zendure_score,1),
+                ATTR_PERFORMANCE_GAIN: round(perf_score-zendure_score,1),
+                ATTR_VIRTUAL_HYPER_ENERGY: round(self._virtual_hyper_energy_kwh,4),
+                ATTR_VIRTUAL_SOLARFLOW_ENERGY: round(self._virtual_solarflow_energy_kwh,4),
+                ATTR_VIRTUAL_HYPER_SOC: round(virtual_hyper_soc,1),
+                ATTR_VIRTUAL_SOLARFLOW_SOC: round(virtual_solar_soc,1),
+                ATTR_PV_TOTAL: round(hyper_pv+solar_pv,1),
+                ATTR_SOLAR_SURPLUS: twin.surplus_w,
+                ATTR_OPERATION_MODE: twin.mode,
+                ATTR_PERF_SAMPLE_COUNT: self._perf_samples,
                 ATTR_DYNAMIC_SOURCES: sources,
                 ATTR_FALLBACKS: dict(self._fallbacks),
             }

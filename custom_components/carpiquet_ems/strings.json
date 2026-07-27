@@ -25,7 +25,9 @@
           "ramp_limit_w": "Limite de variation par cycle (W)",
           "automation_enabled": "Moteur d'automatisation activé",
           "automation_min_hold_seconds": "Durée minimale d'un état (s)",
-          "automation_allow_fallback": "Autoriser l'automatisation en mode fallback"
+          "automation_allow_fallback": "Autoriser l'automatisation en mode secours",
+          "hyper_real_output_entity": "Puissance réelle Hyper vers la maison",
+          "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison"
         }
       },
       "batteries": {
@@ -69,7 +71,9 @@
           "ramp_limit_w": "Limite de variation par cycle (W)",
           "automation_enabled": "Moteur d'automatisation activé",
           "automation_min_hold_seconds": "Durée minimale d'un état (s)",
-          "automation_allow_fallback": "Autoriser l'automatisation en mode fallback"
+          "automation_allow_fallback": "Autoriser l'automatisation en mode secours",
+          "hyper_real_output_entity": "Puissance réelle Hyper vers la maison",
+          "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison"
         }
       },
       "batteries": {

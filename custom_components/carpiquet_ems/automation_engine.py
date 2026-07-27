@@ -2,20 +2,20 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 
-STATE_DISABLED = "disabled"
-STATE_SAFE_HOLD = "safe_hold"
-STATE_IDLE = "idle"
-STATE_DISCHARGE = "discharge"
+STATE_DISABLED = "désactivé"
+STATE_SAFE_HOLD = "maintien de sécurité"
+STATE_IDLE = "veille"
+STATE_DISCHARGE = "décharge"
 
-REASON_DISABLED = "automation_disabled"
-REASON_GRID_UNAVAILABLE = "grid_unavailable"
-REASON_NO_BATTERY = "no_battery_available"
-REASON_FALLBACK_BLOCKED = "fallback_blocked"
-REASON_MIN_HOLD = "minimum_hold"
-REASON_DEADBAND = "inside_deadband"
-REASON_DISCHARGE = "grid_import_above_target"
+REASON_DISABLED = "automatisation désactivée"
+REASON_GRID_UNAVAILABLE = "compteur réseau indisponible"
+REASON_NO_BATTERY = "aucune batterie disponible"
+REASON_FALLBACK_BLOCKED = "mode secours interdit"
+REASON_MIN_HOLD = "temporisation minimale"
+REASON_DEADBAND = "dans la bande morte"
+REASON_DISCHARGE = "import réseau au-dessus de la cible"
 
-POLICY = "grid_zero_discharge_v1"
+POLICY = "régulation réseau bidirectionnelle v1"
 
 @dataclass(frozen=True)
 class AutomationInput:

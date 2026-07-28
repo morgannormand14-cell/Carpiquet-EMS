@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.3-alpha — Sprint 5 session/report corrective
+
+- Automation switch moved to runtime state; no Config Entry reload on ON/OFF.
+- Recorder watchdog added.
+- Session finalized on integration unload.
+- House-load formula now subtracts Hyper/SolarFlow AC grid inputs.
+- Simulation report selector and prepare-download button added.
+- UI vocabulary changed to État du moteur / Plage de lissage.
+
 ## v0.5.2-alpha — Sprint 5 corrective + sessions
 
 - Stable technical entity IDs and dashboard alignment.

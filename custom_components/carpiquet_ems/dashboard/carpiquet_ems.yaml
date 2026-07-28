@@ -56,7 +56,7 @@ views:
               - entity: switch.carpiquet_ems_automation_engine
                 name: Moteur d'automatisation
               - entity: sensor.carpiquet_ems_automation_state
-                name: État automation
+                name: État du moteur
 
       - type: grid
         title: Réseau
@@ -90,7 +90,7 @@ views:
               - entity: number.carpiquet_ems_grid_target
                 name: Cible réseau
               - entity: number.carpiquet_ems_grid_deadband
-                name: Bande morte
+                name: Plage de lissage
               - entity: number.carpiquet_ems_ramp_limit
                 name: Rampe
 
@@ -223,7 +223,7 @@ views:
               - entity: switch.carpiquet_ems_automation_engine
                 name: Moteur d'automatisation
               - entity: sensor.carpiquet_ems_automation_state
-                name: État automation
+                name: État du moteur
               - entity: sensor.carpiquet_ems_last_fallback_sync
                 name: Dernière synchronisation
 
@@ -350,7 +350,7 @@ views:
               - entity: number.carpiquet_ems_grid_target
                 name: Cible réseau
               - entity: number.carpiquet_ems_grid_deadband
-                name: Bande morte
+                name: Plage de lissage
               - entity: sensor.carpiquet_ems_requested_discharge
                 name: Demande EMS
               - entity: sensor.carpiquet_ems_automation_request
@@ -398,9 +398,15 @@ views:
                 name: Cycles enregistrés
               - entity: sensor.carpiquet_ems_last_session_file
                 name: Dernier fichier sauvegardé
+              - entity: select.carpiquet_ems_simulation_report
+                name: Rapport sélectionné
+              - entity: button.carpiquet_ems_prepare_simulation_report
+                name: Préparer le téléchargement
+              - entity: sensor.carpiquet_ems_report_download_url
+                name: Lien du rapport préparé
 
       - type: grid
-        title: Historique automation
+        title: Historique du moteur
         cards:
           - type: history-graph
             title: Décisions — 24 h
@@ -442,6 +448,8 @@ views:
             entities:
               - entity: sensor.carpiquet_ems_real_hyper_output
                 name: Sortie réelle vers maison
+              - entity: sensor.carpiquet_ems_real_hyper_grid_input
+                name: Entrée AC réelle
               - entity: sensor.carpiquet_ems_sim_hyper_home
                 name: Sortie simulée vers maison
               - entity: sensor.carpiquet_ems_hyper_2000_pv_power
@@ -464,6 +472,8 @@ views:
             entities:
               - entity: sensor.carpiquet_ems_real_solarflow_output
                 name: Sortie réelle vers maison
+              - entity: sensor.carpiquet_ems_real_solarflow_grid_input
+                name: Entrée AC réelle
               - entity: sensor.carpiquet_ems_sim_solarflow_home
                 name: Sortie simulée vers maison
               - entity: sensor.carpiquet_ems_solarflow_2400_pro_pv_power

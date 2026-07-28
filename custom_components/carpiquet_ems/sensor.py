@@ -3,6 +3,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("real_hyper_grid_input", "Real Hyper Grid Input", ATTR_REAL_HYPER_GRID_INPUT, "W", "power"),
+    ("real_solarflow_grid_input", "Real SolarFlow Grid Input", ATTR_REAL_SOLARFLOW_GRID_INPUT, "W", "power"),
+    ("selected_report", "Selected Report", ATTR_SELECTED_REPORT, None, None),
+    ("report_download_url", "Report Download URL", ATTR_REPORT_DOWNLOAD_URL, None, None),
     ("session_id", "Session ID", ATTR_SESSION_ID, None, None),
     ("session_started_at", "Session Started At", ATTR_SESSION_STARTED_AT, None, None),
     ("session_duration", "Session Duration", ATTR_SESSION_DURATION, "s", "duration"),

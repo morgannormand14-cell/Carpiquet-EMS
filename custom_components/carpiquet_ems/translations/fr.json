@@ -21,13 +21,15 @@
           "solarflow_min_soc_entity": "SOC minimum SolarFlow 2400 Pro",
           "solarflow_max_soc_entity": "SOC maximum SolarFlow 2400 Pro",
           "grid_target": "Cible réseau (W)",
-          "grid_deadband": "Bande morte (W)",
+          "grid_deadband": "Plage de lissage (W)",
           "ramp_limit_w": "Limite de variation par cycle (W)",
           "automation_enabled": "Moteur d'automatisation activé",
           "automation_min_hold_seconds": "Durée minimale d'un état (s)",
           "automation_allow_secours": "Autoriser l'automatisation en mode secours",
           "hyper_real_output_entity": "Puissance réelle Hyper vers la maison",
-          "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison"
+          "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison",
+          "hyper_grid_input_entity": "Puissance réseau absorbée par Hyper 2000",
+          "solarflow_grid_input_entity": "Puissance réseau absorbée par SolarFlow 2400 Pro"
         }
       },
       "batteries": {
@@ -67,13 +69,15 @@
           "solarflow_min_soc_entity": "SOC minimum SolarFlow 2400 Pro",
           "solarflow_max_soc_entity": "SOC maximum SolarFlow 2400 Pro",
           "grid_target": "Cible réseau (W)",
-          "grid_deadband": "Bande morte (W)",
+          "grid_deadband": "Plage de lissage (W)",
           "ramp_limit_w": "Limite de variation par cycle (W)",
           "automation_enabled": "Moteur d'automatisation activé",
           "automation_min_hold_seconds": "Durée minimale d'un état (s)",
           "automation_allow_secours": "Autoriser l'automatisation en mode secours",
           "hyper_real_output_entity": "Puissance réelle Hyper vers la maison",
-          "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison"
+          "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison",
+          "hyper_grid_input_entity": "Puissance réseau absorbée par Hyper 2000",
+          "solarflow_grid_input_entity": "Puissance réseau absorbée par SolarFlow 2400 Pro"
         }
       },
       "batteries": {

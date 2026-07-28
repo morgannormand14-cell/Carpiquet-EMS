@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
 import logging
+from pathlib import Path
+import shutil
 
 from homeassistant.const import STATE_UNAVAILABLE, STATE_UNKNOWN
 from homeassistant.helpers.storage import Store
@@ -40,6 +42,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._virtual_solarflow_energy_kwh = None
         self._perf_samples = 0
         self._session = SimulationSessionRecorder(hass, VERSION)
+        self._automation_enabled_runtime = bool(self.config.get(CONF_AUTOMATION_ENABLED, DEFAULT_AUTOMATION_ENABLED))
+        self._selected_report = None
+        self._report_download_url = None
         self._fallbacks = {
             fallback_key: self.config.get(fallback_key)
             for _, fallback_key, _, _ in DYNAMIC.values()
@@ -54,6 +59,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         )
 
     async def async_initialize(self):
+        await self.hass.async_add_executor_job(self._session.finalize_orphaned_sessions)
         stored = await self._store.async_load()
         if isinstance(stored, dict):
             values = stored.get("values")
@@ -151,10 +157,44 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             "solarflow_real_output_w": self._state_float(self.config[CONF_SOLARFLOW_REAL_OUTPUT_ENTITY]),
         }
 
+    @property
+    def automation_enabled(self):
+        return bool(self._automation_enabled_runtime)
+
+    async def async_set_automation_enabled(self, enabled: bool):
+        enabled = bool(enabled)
+        if enabled == self._automation_enabled_runtime:
+            # Watchdog still ensures consistency if session was lost.
+            if enabled and not self._session.active:
+                await self.async_start_simulation_session()
+            elif not enabled and self._session.active:
+                await self.async_stop_simulation_session("runtime_reconcile")
+            await self.async_request_refresh()
+            return
+        if not enabled:
+            await self.async_stop_simulation_session("user_stop")
+            self._automation_enabled_runtime = False
+        else:
+            self._automation_enabled_runtime = True
+            await self.async_start_simulation_session()
+        await self.async_request_refresh()
+
+    def _session_initial_state(self):
+        return {
+            "hyper_soc_percent": self._state_float(self.config[CONF_HYPER_SOC_ENTITY]),
+            "solarflow_soc_percent": self._state_float(self.config[CONF_SOLARFLOW_SOC_ENTITY]),
+            "grid_power_w": self._state_float(self.config[CONF_GRID_POWER_ENTITY]),
+            "hyper_pv_w": self._state_float(self.config[CONF_HYPER_PV_ENTITY]),
+            "solarflow_pv_w": self._state_float(self.config[CONF_SOLARFLOW_PV_ENTITY]),
+            "hyper_real_output_w": self._state_float(self.config[CONF_HYPER_REAL_OUTPUT_ENTITY]),
+            "solarflow_real_output_w": self._state_float(self.config[CONF_SOLARFLOW_REAL_OUTPUT_ENTITY]),
+            "hyper_grid_input_w": self._state_float(self.config.get(CONF_HYPER_GRID_INPUT_ENTITY, DEFAULT_HYPER_GRID_INPUT_ENTITY)),
+            "solarflow_grid_input_w": self._state_float(self.config.get(CONF_SOLARFLOW_GRID_INPUT_ENTITY, DEFAULT_SOLARFLOW_GRID_INPUT_ENTITY)),
+        }
+
     async def async_start_simulation_session(self):
-        # New ON transition = new independent simulation baseline.
         if self._session.active:
-            self._session.stop(self._session_summary())
+            return
         self._virtual_hyper_energy_kwh = None
         self._virtual_solarflow_energy_kwh = None
         self._previous_simulated_power = 0.0
@@ -166,7 +206,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             key: value for key, value in self.config.items()
             if "token" not in key.lower() and "password" not in key.lower()
         }
-        self._session.start(self._session_initial_state(), safe_config)
+        await self.hass.async_add_executor_job(
+            self._session.start, self._session_initial_state(), safe_config
+        )
 
     def _session_summary(self):
         data = self.data or {}
@@ -181,8 +223,41 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             "performance_samples": data.get(ATTR_PERF_SAMPLE_COUNT),
         }
 
-    async def async_stop_simulation_session(self):
-        return self._session.stop(self._session_summary())
+    async def async_stop_simulation_session(self, termination="user_stop"):
+        if not self._session.active:
+            return self._session.last_file
+        return await self.hass.async_add_executor_job(
+            self._session.stop, self._session_summary(), termination
+        )
+
+    async def async_shutdown(self):
+        await self.async_stop_simulation_session("home_assistant_reload")
+
+    def list_reports(self):
+        return self._session.list_reports()
+
+    @property
+    def selected_report(self):
+        return self._selected_report
+
+    def set_selected_report(self, filename):
+        if filename in self.list_reports():
+            self._selected_report = filename
+
+    async def async_prepare_selected_report(self):
+        filename = self._selected_report
+        if not filename:
+            reports = self.list_reports()
+            filename = reports[0] if reports else None
+        if not filename:
+            return None
+        source = Path(self.hass.config.path("carpiquet_ems/simulations")) / filename
+        target_dir = Path(self.hass.config.path("www/carpiquet_ems_reports"))
+        await self.hass.async_add_executor_job(target_dir.mkdir, True, True)
+        target = target_dir / filename
+        await self.hass.async_add_executor_job(shutil.copy2, source, target)
+        self._report_download_url = f"/local/carpiquet_ems_reports/{filename}"
+        return self._report_download_url
 
     async def _async_update_data(self):
         try:
@@ -206,7 +281,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             hyper_real_output = self._state_float(self.config[CONF_HYPER_REAL_OUTPUT_ENTITY])
             solar_real_output = self._state_float(self.config[CONF_SOLARFLOW_REAL_OUTPUT_ENTITY])
             real_zendure_total = max(0.0, hyper_real_output) + max(0.0, solar_real_output)
-            house_load = grid + real_zendure_total
+            hyper_grid_input = self._state_float(
+                self.config.get(CONF_HYPER_GRID_INPUT_ENTITY, DEFAULT_HYPER_GRID_INPUT_ENTITY)
+            )
+            solar_grid_input = self._state_float(
+                self.config.get(CONF_SOLARFLOW_GRID_INPUT_ENTITY, DEFAULT_SOLARFLOW_GRID_INPUT_ENTITY)
+            )
+            # Exact reconstructed house load:
+            # Shelly + inverter outputs to house - inverter AC grid inputs.
+            house_load = (
+                grid
+                + real_zendure_total
+                - max(0.0, hyper_grid_input)
+                - max(0.0, solar_grid_input)
+            )
 
             target = float(self.config.get(CONF_GRID_TARGET, DEFAULT_GRID_TARGET))
             deadband = float(self.config.get(CONF_GRID_DEADBAND, DEFAULT_GRID_DEADBAND))
@@ -244,11 +332,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
             total_batteries, active_batteries, physical_socs = self._battery_status()
 
+            # Session watchdog: runtime engine ON <=> active recorder.
+            if self.automation_enabled and not self._session.active:
+                await self.async_start_simulation_session()
+            elif not self.automation_enabled and self._session.active:
+                await self.async_stop_simulation_session("runtime_reconcile")
+
             now = datetime.now(timezone.utc)
             elapsed = (now - self._automation_last_transition_dt).total_seconds()
-            automation_enabled = bool(
-                self.config.get(CONF_AUTOMATION_ENABLED, DEFAULT_AUTOMATION_ENABLED)
-            )
+            automation_enabled = self.automation_enabled
             allow_fallback = bool(
                 self.config.get(CONF_AUTOMATION_ALLOW_FALLBACK, DEFAULT_AUTOMATION_ALLOW_FALLBACK)
             )
@@ -398,6 +490,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_REAL_ZENDURE_TOTAL_OUTPUT: round(real_zendure_total,1),
                 ATTR_REAL_HYPER_OUTPUT: round(hyper_real_output,1),
                 ATTR_REAL_SOLARFLOW_OUTPUT: round(solar_real_output,1),
+                ATTR_REAL_HYPER_GRID_INPUT: round(hyper_grid_input,1),
+                ATTR_REAL_SOLARFLOW_GRID_INPUT: round(solar_grid_input,1),
                 ATTR_SIM_HYPER_HOME: twin.hyper_home_w,
                 ATTR_SIM_SOLARFLOW_HOME: twin.solarflow_home_w,
                 ATTR_SIM_HYPER_CHARGE: twin.hyper_charge_w,
@@ -426,6 +520,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_SESSION_DURATION: round((datetime.now(timezone.utc)-self._session.started_at).total_seconds(),1) if self._session.started_at else 0.0,
                 ATTR_SESSION_SAMPLE_COUNT: self._session.sample_count,
                 ATTR_LAST_SESSION_FILE: self._session.last_file or "Aucun",
+                ATTR_SELECTED_REPORT: self._selected_report or "Aucun",
+                ATTR_REPORT_DOWNLOAD_URL: self._report_download_url or "Aucun",
                 ATTR_DYNAMIC_SOURCES: sources,
                 ATTR_FALLBACKS: dict(self._fallbacks),
             }
@@ -437,6 +533,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "solarflow_pv_w": result_data.get(ATTR_SOLARFLOW_PV),
                 "hyper_real_output_w": result_data.get(ATTR_REAL_HYPER_OUTPUT),
                 "solarflow_real_output_w": result_data.get(ATTR_REAL_SOLARFLOW_OUTPUT),
+                "hyper_grid_input_w": result_data.get(ATTR_REAL_HYPER_GRID_INPUT),
+                "solarflow_grid_input_w": result_data.get(ATTR_REAL_SOLARFLOW_GRID_INPUT),
                 "hyper_simulated_home_w": result_data.get(ATTR_SIM_HYPER_HOME),
                 "solarflow_simulated_home_w": result_data.get(ATTR_SIM_SOLARFLOW_HOME),
                 "hyper_simulated_charge_w": result_data.get(ATTR_SIM_HYPER_CHARGE),

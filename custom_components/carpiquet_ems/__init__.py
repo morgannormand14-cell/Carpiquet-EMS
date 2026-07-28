@@ -14,7 +14,7 @@ from .dashboard import install_dashboard_file
 
 _LOGGER = logging.getLogger(__name__)
 
-PLATFORMS = ["sensor", "binary_sensor", "number", "switch"]
+PLATFORMS = ["sensor", "binary_sensor", "number", "switch", "select", "button"]
 
 INSTALL_DASHBOARD_SCHEMA = vol.Schema(
     {vol.Optional(CONF_OVERWRITE, default=False): cv.boolean}
@@ -79,6 +79,9 @@ def _register_services(hass: HomeAssistant) -> None:
 
 
 async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
+    coordinator = hass.data.get(DOMAIN, {}).get(entry.entry_id)
+    if coordinator is not None:
+        await coordinator.async_shutdown()
     ok = await hass.config_entries.async_unload_platforms(entry, PLATFORMS)
     if ok:
         hass.data[DOMAIN].pop(entry.entry_id, None)

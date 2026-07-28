@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.5.2-alpha-sprint5"
+VERSION = "0.5.3-alpha-sprint5"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -144,3 +144,13 @@ ATTR_SESSION_STARTED_AT = "simulation_session_started_at"
 ATTR_SESSION_DURATION = "simulation_session_duration_seconds"
 ATTR_SESSION_SAMPLE_COUNT = "simulation_session_sample_count"
 ATTR_LAST_SESSION_FILE = "last_simulation_session_file"
+
+CONF_HYPER_GRID_INPUT_ENTITY = "hyper_grid_input_entity"
+CONF_SOLARFLOW_GRID_INPUT_ENTITY = "solarflow_grid_input_entity"
+DEFAULT_HYPER_GRID_INPUT_ENTITY = "sensor.hyper_2000_grid_input_power"
+DEFAULT_SOLARFLOW_GRID_INPUT_ENTITY = "sensor.solarflow_2400_pro_grid_input_power"
+
+ATTR_REAL_HYPER_GRID_INPUT = "real_hyper_grid_input_w"
+ATTR_REAL_SOLARFLOW_GRID_INPUT = "real_solarflow_grid_input_w"
+ATTR_SELECTED_REPORT = "selected_report"
+ATTR_REPORT_DOWNLOAD_URL = "report_download_url"

@@ -1,23 +1,31 @@
 # 🏴 Carpiquet EMS
+
 > **Every watt counts.**
 
-# 🤖 Sprint 5 — Jumeau numérique & moteur de régulation
+# 🤖 Sprint 5 — v0.5.2 Corrective
 
-- ✅ Interface francisée
+## Corrections
+- ✅ Entités Dashboard corrigées
+- ✅ IDs techniques stabilisés
+- ✅ Centre de santé corrigé
 - ✅ Garde-fou sécurité corrigé
-- ✅ Consommation maison reconstituée
-- ✅ Sorties Zendure réelles comparées
-- ✅ Charge et décharge simulées
-- ✅ Stockage local prioritaire du surplus solaire
-- ✅ Transfert du surplus d'un système plein vers l'autre système
-- ✅ SOC et énergie virtuels
-- ✅ Réseau réel vs réseau simulé
-- ✅ Indice de performance Carpiquet
-- ✅ Référence Zendure
+- ✅ Interface visible francisée
+
+## Sessions de simulation
+- ✅ OFF → ON = nouvelle session
+- ✅ Réinitialisation du jumeau numérique
+- ✅ Réinitialisation cycles / performance
+- ✅ Enregistrement de chaque cycle
+- ✅ OFF = clôture de la session
+- ✅ Export JSON unique
+- ✅ Fichier prêt à être analysé
+
+Chemin :
+`/config/carpiquet_ems/simulations/`
 
 ## Sécurité
 **100 % simulation uniquement.**
 Aucune commande réelle Zendure n'est envoyée.
 
-Tag : `v0.5.1-alpha-sprint5`
+Tag : `v0.5.2-alpha-sprint5`
 Pré-release : **Oui**

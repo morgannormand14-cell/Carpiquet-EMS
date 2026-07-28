@@ -25,7 +25,7 @@
           "ramp_limit_w": "Limite de variation par cycle (W)",
           "automation_enabled": "Moteur d'automatisation activé",
           "automation_min_hold_seconds": "Durée minimale d'un état (s)",
-          "automation_allow_fallback": "Autoriser l'automatisation en mode secours",
+          "automation_allow_secours": "Autoriser l'automatisation en mode secours",
           "hyper_real_output_entity": "Puissance réelle Hyper vers la maison",
           "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison"
         }
@@ -36,7 +36,7 @@
       }
     },
     "error": {
-      "dynamic_value_unavailable": "Une valeur Zendure dynamique est indisponible ou invalide. Elle doit être lisible lors de l'installation pour initialiser le fallback.",
+      "dynamic_value_unavailable": "Une valeur Zendure dynamique est indisponible ou invalide. Elle doit être lisible lors de l'installation pour initialiser le secours.",
       "pack_count_unavailable": "Impossible de lire le nombre de batteries Hyper ou SolarFlow.",
       "battery_not_found": "Une batterie n'a pas pu être validée à partir de son type et de son numéro de série.",
       "serial_must_be_five_digits": "Le numéro de série doit contenir exactement 5 chiffres.",
@@ -71,7 +71,7 @@
           "ramp_limit_w": "Limite de variation par cycle (W)",
           "automation_enabled": "Moteur d'automatisation activé",
           "automation_min_hold_seconds": "Durée minimale d'un état (s)",
-          "automation_allow_fallback": "Autoriser l'automatisation en mode secours",
+          "automation_allow_secours": "Autoriser l'automatisation en mode secours",
           "hyper_real_output_entity": "Puissance réelle Hyper vers la maison",
           "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison"
         }

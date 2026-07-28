@@ -1,21 +1,29 @@
 from __future__ import annotations
-
 from dataclasses import dataclass
 
-STATE_DISABLED = "désactivé"
-STATE_SAFE_HOLD = "maintien de sécurité"
-STATE_IDLE = "veille"
-STATE_DISCHARGE = "décharge"
+STATE_DISABLED = "disabled"
+STATE_SAFE_HOLD = "safe_hold"
+STATE_IDLE = "idle"
+STATE_DISCHARGE = "discharge"
 
-REASON_DISABLED = "automatisation désactivée"
-REASON_GRID_UNAVAILABLE = "compteur réseau indisponible"
-REASON_NO_BATTERY = "aucune batterie disponible"
-REASON_FALLBACK_BLOCKED = "mode secours interdit"
-REASON_MIN_HOLD = "temporisation minimale"
-REASON_DEADBAND = "dans la bande morte"
-REASON_DISCHARGE = "import réseau au-dessus de la cible"
+POLICY = "grid_zero_bidirectional_v1"
 
-POLICY = "régulation réseau bidirectionnelle v1"
+DISPLAY_STATE = {
+    STATE_DISABLED: "Désactivé",
+    STATE_SAFE_HOLD: "Maintien de sécurité",
+    STATE_IDLE: "Veille",
+    STATE_DISCHARGE: "Décharge",
+}
+
+DISPLAY_REASON = {
+    "automation_disabled": "Automatisation désactivée",
+    "grid_unavailable": "Compteur réseau indisponible",
+    "no_battery_available": "Aucune batterie disponible",
+    "fallback_blocked": "Mode secours interdit",
+    "minimum_hold": "Temporisation minimale",
+    "inside_deadband": "Dans la bande morte",
+    "grid_import_above_target": "Import réseau au-dessus de la cible",
+}
 
 @dataclass(frozen=True)
 class AutomationInput:
@@ -43,63 +51,21 @@ class AutomationDecision:
 
 def decide_automation(data: AutomationInput) -> AutomationDecision:
     if not data.enabled:
-        desired = STATE_DISABLED
-        reason = REASON_DISABLED
-        request = 0.0
-        safety_ok = True
+        desired, reason, request, safety_ok = STATE_DISABLED, "automation_disabled", 0.0, True
     elif not data.grid_available:
-        desired = STATE_SAFE_HOLD
-        reason = REASON_GRID_UNAVAILABLE
-        request = 0.0
-        safety_ok = False
+        desired, reason, request, safety_ok = STATE_SAFE_HOLD, "grid_unavailable", 0.0, False
     elif data.active_batteries <= 0:
-        desired = STATE_SAFE_HOLD
-        reason = REASON_NO_BATTERY
-        request = 0.0
-        safety_ok = False
+        desired, reason, request, safety_ok = STATE_SAFE_HOLD, "no_battery_available", 0.0, False
     elif data.fallback_active and not data.allow_fallback:
-        desired = STATE_SAFE_HOLD
-        reason = REASON_FALLBACK_BLOCKED
-        request = 0.0
-        safety_ok = False
+        desired, reason, request, safety_ok = STATE_SAFE_HOLD, "fallback_blocked", 0.0, False
     elif data.grid_power_w - data.grid_target_w > data.deadband_w:
-        desired = STATE_DISCHARGE
-        reason = REASON_DISCHARGE
-        request = max(0.0, data.requested_discharge_w)
-        safety_ok = True
+        desired, reason, request, safety_ok = STATE_DISCHARGE, "grid_import_above_target", max(0.0, data.requested_discharge_w), True
     else:
-        desired = STATE_IDLE
-        reason = REASON_DEADBAND
-        request = 0.0
-        safety_ok = True
+        desired, reason, request, safety_ok = STATE_IDLE, "inside_deadband", 0.0, True
 
     transition = desired != data.previous_state
-    hold_remaining = max(
-        0.0,
-        float(data.minimum_hold_seconds) - float(data.seconds_since_transition),
-    )
+    hold_remaining = max(0.0, float(data.minimum_hold_seconds)-float(data.seconds_since_transition))
+    if transition and desired not in (STATE_SAFE_HOLD, STATE_DISABLED) and data.previous_state not in ("", STATE_SAFE_HOLD, STATE_DISABLED) and hold_remaining > 0:
+        return AutomationDecision(data.previous_state, "minimum_hold", 0.0 if data.previous_state == STATE_IDLE else request, safety_ok, False, round(hold_remaining,1))
 
-    # A safety state always bypasses hold. Normal state changes are debounced.
-    if (
-        transition
-        and desired not in (STATE_SAFE_HOLD, STATE_DISABLED)
-        and data.previous_state not in ("", STATE_SAFE_HOLD, STATE_DISABLED)
-        and hold_remaining > 0
-    ):
-        return AutomationDecision(
-            state=data.previous_state,
-            reason=REASON_MIN_HOLD,
-            request_w=0.0 if data.previous_state == STATE_IDLE else request,
-            safety_ok=safety_ok,
-            transition=False,
-            hold_remaining_seconds=round(hold_remaining, 1),
-        )
-
-    return AutomationDecision(
-        state=desired,
-        reason=reason,
-        request_w=round(request, 1),
-        safety_ok=safety_ok,
-        transition=transition,
-        hold_remaining_seconds=0.0,
-    )
+    return AutomationDecision(desired, reason, round(request,1), safety_ok, transition, 0.0)

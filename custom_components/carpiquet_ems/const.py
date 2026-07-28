@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.5.1-alpha-sprint5"
+VERSION = "0.5.2-alpha-sprint5"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -137,3 +137,10 @@ ATTR_PV_TOTAL = "pv_total_w"
 ATTR_SOLAR_SURPLUS = "solar_surplus_w"
 ATTR_OPERATION_MODE = "operation_mode"
 ATTR_PERF_SAMPLE_COUNT = "performance_sample_count"
+
+ATTR_SESSION_ID = "simulation_session_id"
+ATTR_SESSION_ACTIVE = "simulation_session_active"
+ATTR_SESSION_STARTED_AT = "simulation_session_started_at"
+ATTR_SESSION_DURATION = "simulation_session_duration_seconds"
+ATTR_SESSION_SAMPLE_COUNT = "simulation_session_sample_count"
+ATTR_LAST_SESSION_FILE = "last_simulation_session_file"

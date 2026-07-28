@@ -155,8 +155,8 @@ views:
         cards:
           - type: markdown
             content: |
-              # ❤️ EMS Health Center
-              Disponibilité des sources et état du fallback.
+              # ❤️ Centre de santé EMS
+              Disponibilité des sources et état du mode secours.
           - type: gauge
             entity: sensor.carpiquet_ems_health_score
             name: Score global
@@ -331,7 +331,7 @@ views:
               - entity: binary_sensor.carpiquet_ems_automation_safety_gate
                 name: Garde-fou sécurité
               - entity: sensor.carpiquet_ems_automation_policy
-                name: Politique
+                name: Stratégie
               - entity: sensor.carpiquet_ems_automation_cycle
                 name: Cycle
               - entity: sensor.carpiquet_ems_automation_last_transition
@@ -378,6 +378,26 @@ views:
                 name: Hyper 2000
               - entity: binary_sensor.carpiquet_ems_solarflow_2400_pro_health
                 name: SolarFlow 2400 Pro
+
+
+      - type: grid
+        title: Session de simulation
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.carpiquet_ems_simulation_session_active
+                name: Session active
+              - entity: sensor.carpiquet_ems_session_id
+                name: Identifiant
+              - entity: sensor.carpiquet_ems_session_started_at
+                name: Démarrée à
+              - entity: sensor.carpiquet_ems_session_duration
+                name: Durée
+              - entity: sensor.carpiquet_ems_session_sample_count
+                name: Cycles enregistrés
+              - entity: sensor.carpiquet_ems_last_session_file
+                name: Dernier fichier sauvegardé
 
       - type: grid
         title: Historique automation

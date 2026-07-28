@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.2-alpha — Sprint 5 corrective + sessions
+
+- Stable technical entity IDs and dashboard alignment.
+- Health / automation safety entities corrected.
+- Visible states fully localized in French.
+- Automation OFF→ON starts a fresh simulation session.
+- Previous session is finalized on OFF.
+- One JSON file per simulation session.
+- Virtual battery state, cycles and performance reset at session start.
+
 ## v0.5.1-alpha — Sprint 5 Digital Twin
 
 - Interface francisée.

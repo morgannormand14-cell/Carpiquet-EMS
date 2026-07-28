@@ -10,6 +10,8 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .algorithm import BatteryState, allocate_discharge_power
 from .automation_engine import AutomationInput, POLICY, STATE_IDLE, decide_automation
 from .digital_twin import TwinBattery, TwinInput, simulate_cycle
+from .session_recorder import SimulationSessionRecorder
+from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
 from .topology import valid_numeric
 
@@ -37,6 +39,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._virtual_hyper_energy_kwh = None
         self._virtual_solarflow_energy_kwh = None
         self._perf_samples = 0
+        self._session = SimulationSessionRecorder(hass, VERSION)
         self._fallbacks = {
             fallback_key: self.config.get(fallback_key)
             for _, fallback_key, _, _ in DYNAMIC.values()
@@ -135,6 +138,51 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 active += 1
                 soc_values.append(soc)
         return len(batteries), active, soc_values
+
+
+    def _session_initial_state(self):
+        return {
+            "hyper_soc_percent": self._state_float(self.config[CONF_HYPER_SOC_ENTITY]),
+            "solarflow_soc_percent": self._state_float(self.config[CONF_SOLARFLOW_SOC_ENTITY]),
+            "grid_power_w": self._state_float(self.config[CONF_GRID_POWER_ENTITY]),
+            "hyper_pv_w": self._state_float(self.config[CONF_HYPER_PV_ENTITY]),
+            "solarflow_pv_w": self._state_float(self.config[CONF_SOLARFLOW_PV_ENTITY]),
+            "hyper_real_output_w": self._state_float(self.config[CONF_HYPER_REAL_OUTPUT_ENTITY]),
+            "solarflow_real_output_w": self._state_float(self.config[CONF_SOLARFLOW_REAL_OUTPUT_ENTITY]),
+        }
+
+    async def async_start_simulation_session(self):
+        # New ON transition = new independent simulation baseline.
+        if self._session.active:
+            self._session.stop(self._session_summary())
+        self._virtual_hyper_energy_kwh = None
+        self._virtual_solarflow_energy_kwh = None
+        self._previous_simulated_power = 0.0
+        self._automation_cycle = 0
+        self._perf_samples = 0
+        self._automation_state = STATE_IDLE
+        self._automation_last_transition_dt = datetime.now(timezone.utc)
+        safe_config = {
+            key: value for key, value in self.config.items()
+            if "token" not in key.lower() and "password" not in key.lower()
+        }
+        self._session.start(self._session_initial_state(), safe_config)
+
+    def _session_summary(self):
+        data = self.data or {}
+        return {
+            "performance_score_percent": data.get(ATTR_PERFORMANCE_SCORE),
+            "zendure_reference_score_percent": data.get(ATTR_ZENDURE_REFERENCE_SCORE),
+            "performance_gain_points": data.get(ATTR_PERFORMANCE_GAIN),
+            "real_grid_error_w": data.get(ATTR_REAL_GRID_ERROR),
+            "sim_grid_error_w": data.get(ATTR_SIM_GRID_ERROR),
+            "virtual_hyper_energy_kwh": data.get(ATTR_VIRTUAL_HYPER_ENERGY),
+            "virtual_solarflow_energy_kwh": data.get(ATTR_VIRTUAL_SOLARFLOW_ENERGY),
+            "performance_samples": data.get(ATTR_PERF_SAMPLE_COUNT),
+        }
+
+    async def async_stop_simulation_session(self):
+        return self._session.stop(self._session_summary())
 
     async def _async_update_data(self):
         try:
@@ -293,9 +341,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 average_soc = 0.0
 
             health = round(sum([grid_ok, hyper_ok, solar_ok]) / 3 * 100)
-            status = "healthy" if health == 100 else "warning" if health >= 67 else "critical"
+            status = "Sain" if health == 100 else "Attention" if health >= 67 else "Critique"
 
-            return {
+            result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,
@@ -319,9 +367,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_TOTAL_BATTERIES: total_batteries,
                 ATTR_TOTAL_CAPACITY: round(total_capacity, 3),
                 ATTR_AVERAGE_SOC: round(average_soc, 1),
-                ATTR_DATA_MODE: "LIVE" if fallback_count == 0 else "FALLBACK ACTIF",
+                ATTR_DATA_MODE: "DIRECT" if fallback_count == 0 else "SECOURS ACTIF",
                 ATTR_FALLBACK_ACTIVE_COUNT: fallback_count,
-                ATTR_LAST_FALLBACK_SYNC: self._last_fallback_sync or "never",
+                ATTR_LAST_FALLBACK_SYNC: self._last_fallback_sync or "Jamais",
                 ATTR_DISPATCH_MODE: "energy_weighted_balanced",
                 ATTR_LIMIT_REASON: result.limit_reason,
                 ATTR_HEALTH_SCORE: health,
@@ -337,8 +385,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_HYPER_MAX_SOC: round(dynamic["hyper_max_soc"], 1),
                 ATTR_SOLARFLOW_MIN_SOC: round(dynamic["solarflow_min_soc"], 1),
                 ATTR_SOLARFLOW_MAX_SOC: round(dynamic["solarflow_max_soc"], 1),
-                ATTR_AUTOMATION_STATE: automation.state,
-                ATTR_AUTOMATION_REASON: automation.reason,
+                ATTR_AUTOMATION_STATE: DISPLAY_STATE.get(automation.state, automation.state),
+                ATTR_AUTOMATION_REASON: DISPLAY_REASON.get(automation.reason, automation.reason),
                 ATTR_AUTOMATION_REQUEST_W: automation.request_w,
                 ATTR_AUTOMATION_CYCLE: self._automation_cycle,
                 ATTR_AUTOMATION_LAST_TRANSITION: self._automation_last_transition_dt.isoformat(),
@@ -372,9 +420,37 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_SOLAR_SURPLUS: twin.surplus_w,
                 ATTR_OPERATION_MODE: twin.mode,
                 ATTR_PERF_SAMPLE_COUNT: self._perf_samples,
+                ATTR_SESSION_ID: self._session.session_id or "Aucune",
+                ATTR_SESSION_ACTIVE: self._session.active,
+                ATTR_SESSION_STARTED_AT: self._session.started_at.isoformat() if self._session.started_at else "Jamais",
+                ATTR_SESSION_DURATION: round((datetime.now(timezone.utc)-self._session.started_at).total_seconds(),1) if self._session.started_at else 0.0,
+                ATTR_SESSION_SAMPLE_COUNT: self._session.sample_count,
+                ATTR_LAST_SESSION_FILE: self._session.last_file or "Aucun",
                 ATTR_DYNAMIC_SOURCES: sources,
                 ATTR_FALLBACKS: dict(self._fallbacks),
             }
+            session_sample = {
+                "timestamp": datetime.now(timezone.utc).isoformat(),
+                "grid_real_w": result_data.get(ATTR_GRID_POWER),
+                "house_load_w": result_data.get(ATTR_HOUSE_LOAD),
+                "hyper_pv_w": result_data.get(ATTR_HYPER_PV),
+                "solarflow_pv_w": result_data.get(ATTR_SOLARFLOW_PV),
+                "hyper_real_output_w": result_data.get(ATTR_REAL_HYPER_OUTPUT),
+                "solarflow_real_output_w": result_data.get(ATTR_REAL_SOLARFLOW_OUTPUT),
+                "hyper_simulated_home_w": result_data.get(ATTR_SIM_HYPER_HOME),
+                "solarflow_simulated_home_w": result_data.get(ATTR_SIM_SOLARFLOW_HOME),
+                "hyper_simulated_charge_w": result_data.get(ATTR_SIM_HYPER_CHARGE),
+                "solarflow_simulated_charge_w": result_data.get(ATTR_SIM_SOLARFLOW_CHARGE),
+                "grid_simulated_w": result_data.get(ATTR_SIM_GRID_FINAL),
+                "virtual_hyper_soc_percent": result_data.get(ATTR_VIRTUAL_HYPER_SOC),
+                "virtual_solarflow_soc_percent": result_data.get(ATTR_VIRTUAL_SOLARFLOW_SOC),
+                "performance_score_percent": result_data.get(ATTR_PERFORMANCE_SCORE),
+                "zendure_reference_score_percent": result_data.get(ATTR_ZENDURE_REFERENCE_SCORE),
+                "operation_mode": result_data.get(ATTR_OPERATION_MODE),
+            }
+            self._session.append(session_sample)
+            result_data[ATTR_SESSION_SAMPLE_COUNT] = self._session.sample_count
+            return result_data
         except UpdateFailed:
             raise
         except Exception as err:

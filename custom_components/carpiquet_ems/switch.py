@@ -58,6 +58,9 @@ class AutomationEngineSwitch(CoordinatorEntity, SwitchEntity):
 
     async def async_turn_on(self, **kwargs):
         await self._set(True)
+        await self.coordinator.async_start_simulation_session()
+        await self.coordinator.async_request_refresh()
 
     async def async_turn_off(self, **kwargs):
+        await self.coordinator.async_stop_simulation_session()
         await self._set(False)

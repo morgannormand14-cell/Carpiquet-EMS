@@ -253,7 +253,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             return None
         source = Path(self.hass.config.path("carpiquet_ems/simulations")) / filename
         target_dir = Path(self.hass.config.path("www/carpiquet_ems_reports"))
-        await self.hass.async_add_executor_job(target_dir.mkdir, True, True)
+        await self.hass.async_add_executor_job(
+            lambda: target_dir.mkdir(parents=True, exist_ok=True)
+        )
         target = target_dir / filename
         await self.hass.async_add_executor_job(shutil.copy2, source, target)
         self._report_download_url = f"/local/carpiquet_ems_reports/{filename}"
@@ -493,7 +495,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_REAL_HYPER_GRID_INPUT: round(hyper_grid_input,1),
                 ATTR_REAL_SOLARFLOW_GRID_INPUT: round(solar_grid_input,1),
                 ATTR_SIM_HYPER_HOME: twin.hyper_home_w,
+                ATTR_HYPER_PV_TO_HOME: twin.hyper_pv_to_home_w,
+                ATTR_HYPER_BATTERY_DISCHARGE: twin.hyper_battery_discharge_w,
                 ATTR_SIM_SOLARFLOW_HOME: twin.solarflow_home_w,
+                ATTR_SOLARFLOW_PV_TO_HOME: twin.solarflow_pv_to_home_w,
+                ATTR_SOLARFLOW_BATTERY_DISCHARGE: twin.solarflow_battery_discharge_w,
                 ATTR_SIM_HYPER_CHARGE: twin.hyper_charge_w,
                 ATTR_SIM_SOLARFLOW_CHARGE: twin.solarflow_charge_w,
                 ATTR_SIM_HYPER_EXPORT_POOL: twin.hyper_export_pool_w,
@@ -512,6 +518,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_VIRTUAL_SOLARFLOW_SOC: round(virtual_solar_soc,1),
                 ATTR_PV_TOTAL: round(hyper_pv+solar_pv,1),
                 ATTR_SOLAR_SURPLUS: twin.surplus_w,
+                ATTR_PV_CURTAILED: twin.curtailed_pv_w,
+                ATTR_GRID_EXPORT_ALLOWED: twin.grid_export_allowed,
+                ATTR_GRID_EXPORT_BLOCK_REASON: twin.grid_export_block_reason,
+                ATTR_FULL_SYSTEMS_COUNT: twin.full_systems_count,
                 ATTR_OPERATION_MODE: twin.mode,
                 ATTR_PERF_SAMPLE_COUNT: self._perf_samples,
                 ATTR_SESSION_ID: self._session.session_id or "Aucune",
@@ -536,7 +546,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "hyper_grid_input_w": result_data.get(ATTR_REAL_HYPER_GRID_INPUT),
                 "solarflow_grid_input_w": result_data.get(ATTR_REAL_SOLARFLOW_GRID_INPUT),
                 "hyper_simulated_home_w": result_data.get(ATTR_SIM_HYPER_HOME),
+                "hyper_pv_to_home_w": result_data.get(ATTR_HYPER_PV_TO_HOME),
+                "hyper_battery_discharge_w": result_data.get(ATTR_HYPER_BATTERY_DISCHARGE),
                 "solarflow_simulated_home_w": result_data.get(ATTR_SIM_SOLARFLOW_HOME),
+                "solarflow_pv_to_home_w": result_data.get(ATTR_SOLARFLOW_PV_TO_HOME),
+                "solarflow_battery_discharge_w": result_data.get(ATTR_SOLARFLOW_BATTERY_DISCHARGE),
                 "hyper_simulated_charge_w": result_data.get(ATTR_SIM_HYPER_CHARGE),
                 "solarflow_simulated_charge_w": result_data.get(ATTR_SIM_SOLARFLOW_CHARGE),
                 "grid_simulated_w": result_data.get(ATTR_SIM_GRID_FINAL),
@@ -545,6 +559,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "performance_score_percent": result_data.get(ATTR_PERFORMANCE_SCORE),
                 "zendure_reference_score_percent": result_data.get(ATTR_ZENDURE_REFERENCE_SCORE),
                 "operation_mode": result_data.get(ATTR_OPERATION_MODE),
+                "pv_curtailed_w": result_data.get(ATTR_PV_CURTAILED),
+                "grid_export_allowed": result_data.get(ATTR_GRID_EXPORT_ALLOWED),
+                "grid_export_block_reason": result_data.get(ATTR_GRID_EXPORT_BLOCK_REASON),
+                "full_systems_count": result_data.get(ATTR_FULL_SYSTEMS_COUNT),
             }
             self._session.append(session_sample)
             result_data[ATTR_SESSION_SAMPLE_COUNT] = self._session.sample_count

@@ -452,6 +452,10 @@ views:
                 name: Entrée AC réelle
               - entity: sensor.carpiquet_ems_sim_hyper_home
                 name: Sortie simulée vers maison
+              - entity: sensor.carpiquet_ems_hyper_pv_to_home
+                name: Solaire vers maison
+              - entity: sensor.carpiquet_ems_hyper_battery_discharge
+                name: Batterie vers maison
               - entity: sensor.carpiquet_ems_hyper_2000_pv_power
                 name: Production solaire
               - entity: sensor.carpiquet_ems_sim_hyper_charge
@@ -476,6 +480,10 @@ views:
                 name: Entrée AC réelle
               - entity: sensor.carpiquet_ems_sim_solarflow_home
                 name: Sortie simulée vers maison
+              - entity: sensor.carpiquet_ems_solarflow_pv_to_home
+                name: Solaire vers maison
+              - entity: sensor.carpiquet_ems_solarflow_battery_discharge
+                name: Batterie vers maison
               - entity: sensor.carpiquet_ems_solarflow_2400_pro_pv_power
                 name: Production solaire
               - entity: sensor.carpiquet_ems_sim_solarflow_charge
@@ -509,3 +517,11 @@ views:
                 name: Production solaire totale
               - entity: sensor.carpiquet_ems_solar_surplus
                 name: Surplus solaire
+              - entity: binary_sensor.carpiquet_ems_grid_export_allowed
+                name: Export EDF autorisé
+              - entity: sensor.carpiquet_ems_grid_export_block_reason
+                name: Politique d'export
+              - entity: sensor.carpiquet_ems_full_systems_count
+                name: Systèmes pleins
+              - entity: sensor.carpiquet_ems_pv_curtailed
+                name: Production solaire écrêtée

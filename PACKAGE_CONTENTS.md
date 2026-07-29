@@ -1,6 +1,6 @@
 # Carpiquet EMS — Full Sprint 5 Package
 
-Version: `0.5.3-alpha-sprint5`
+Version: `0.5.4-alpha-sprint5`
 
 Complete project package including:
 - Home Assistant integration runtime

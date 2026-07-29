@@ -21,7 +21,7 @@ DISPLAY_REASON = {
     "no_battery_available": "Aucune batterie disponible",
     "fallback_blocked": "Mode secours interdit",
     "minimum_hold": "Temporisation minimale",
-    "inside_deadband": "Dans la bande morte",
+    "inside_deadband": "Dans la plage de lissage",
     "grid_import_above_target": "Import réseau au-dessus de la cible",
 }
 

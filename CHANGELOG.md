@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5.4-alpha — Sprint 5 solar priority and export policy
+
+- Fixed report preparation when the destination directory already exists.
+- Replaced the remaining visible deadband wording with Plage de lissage.
+- Full-battery systems' PV now supplies the house first.
+- Non-full systems preserve PV for charging until additional house supply is required.
+- EDF export is blocked when all batteries are full.
+- Non-storable surplus is reported as curtailed PV.
+- EDF export is automatically re-enabled when at least one battery falls below maximum SOC.
+- Added detailed solar-flow and export-policy diagnostics.
+
 ## v0.5.3-alpha — Sprint 5 session/report corrective
 
 - Automation switch moved to runtime state; no Config Entry reload on ON/OFF.

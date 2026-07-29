@@ -2,36 +2,36 @@
 
 > **Every watt counts.**
 
-# 🤖 Sprint 5 — v0.5.3 Corrective
+# ☀️ Sprint 5 — v0.5.4 Politique solaire & export EDF
 
-## Sessions
-- ✅ ON/OFF du moteur sans reload Home Assistant
-- ✅ Watchdog moteur ↔ session
-- ✅ Nouvelle session propre à chaque redémarrage du moteur
-- ✅ Clôture et sauvegarde JSON
-- ✅ Préservation des sessions interrompues
+## Correctifs
+- ✅ Bouton de préparation des rapports corrigé
+- ✅ Téléchargement répétable même si le dossier existe
+- ✅ « Dans la plage de lissage » appliqué au moteur
 
-## Modèle énergétique
-La consommation maison est désormais reconstruite avec :
+## Nouvelle stratégie solaire
+- ✅ Le PV des systèmes pleins alimente la maison en priorité
+- ✅ Les systèmes non pleins réservent leur PV à la recharge
+- ✅ Leur PV complète la maison uniquement si le PV des systèmes pleins est insuffisant
+- ✅ La batterie ne décharge que lorsque le PV total ne couvre plus la maison
 
-`Shelly + sorties maison Zendure - entrées AC Zendure`
+## Politique d'export
+- ✅ Toutes les batteries pleines : export EDF simulé interdit
+- ✅ Surplus non stockable : production simulée écrêtée
+- ✅ Une batterie sous son SOC maximum : export réautorisé
+- ✅ Stockage local et inter-systèmes toujours prioritaire
 
-- ✅ Hyper `grid_input_power`
-- ✅ SolarFlow `grid_input_power`
-
-## Rapports
-- ✅ Sélection du rapport dans le Dashboard
-- ✅ Bouton « Préparer le téléchargement »
-- ✅ JSON exposé via `/local/carpiquet_ems_reports/`
-
-## Interface
-- ✅ État du moteur
-- ✅ Plage de lissage
-- ✅ Dans la plage de lissage
+## Diagnostics
+- ✅ Export EDF autorisé
+- ✅ Motif de la politique d'export
+- ✅ Systèmes pleins
+- ✅ Production solaire écrêtée
+- ✅ PV vers maison par système
+- ✅ Batterie vers maison par système
 
 ## Sécurité
 **100 % simulation uniquement.**
 Aucune commande réelle Zendure n'est envoyée.
 
-Tag : `v0.5.3-alpha-sprint5`
+Tag : `v0.5.4-alpha-sprint5`
 Pré-release : **Oui**

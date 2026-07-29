@@ -3,6 +3,7 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("grid_export_allowed", "Grid Export Allowed", ATTR_GRID_EXPORT_ALLOWED),
     ("automation_safety_gate", "Automation Safety Gate", ATTR_AUTOMATION_SAFETY_OK),
     ("grid_meter_health", "Grid Meter Health", ATTR_GRID_METER_AVAILABLE),
     ("hyper_2000_health", "Hyper 2000 Health", ATTR_HYPER_AVAILABLE),

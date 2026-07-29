@@ -3,6 +3,13 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("pv_curtailed", "PV Curtailed", ATTR_PV_CURTAILED, "W", "power"),
+    ("grid_export_block_reason", "Grid Export Block Reason", ATTR_GRID_EXPORT_BLOCK_REASON, None, None),
+    ("full_systems_count", "Full Systems Count", ATTR_FULL_SYSTEMS_COUNT, None, None),
+    ("hyper_pv_to_home", "Hyper PV To Home", ATTR_HYPER_PV_TO_HOME, "W", "power"),
+    ("solarflow_pv_to_home", "SolarFlow PV To Home", ATTR_SOLARFLOW_PV_TO_HOME, "W", "power"),
+    ("hyper_battery_discharge", "Hyper Battery Discharge", ATTR_HYPER_BATTERY_DISCHARGE, "W", "power"),
+    ("solarflow_battery_discharge", "SolarFlow Battery Discharge", ATTR_SOLARFLOW_BATTERY_DISCHARGE, "W", "power"),
     ("real_hyper_grid_input", "Real Hyper Grid Input", ATTR_REAL_HYPER_GRID_INPUT, "W", "power"),
     ("real_solarflow_grid_input", "Real SolarFlow Grid Input", ATTR_REAL_SOLARFLOW_GRID_INPUT, "W", "power"),
     ("selected_report", "Selected Report", ATTR_SELECTED_REPORT, None, None),

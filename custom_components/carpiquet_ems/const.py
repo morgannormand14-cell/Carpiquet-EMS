@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.5.3-alpha-sprint5"
+VERSION = "0.5.4-alpha-sprint5"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -154,3 +154,12 @@ ATTR_REAL_HYPER_GRID_INPUT = "real_hyper_grid_input_w"
 ATTR_REAL_SOLARFLOW_GRID_INPUT = "real_solarflow_grid_input_w"
 ATTR_SELECTED_REPORT = "selected_report"
 ATTR_REPORT_DOWNLOAD_URL = "report_download_url"
+
+ATTR_PV_CURTAILED = "pv_curtailed_w"
+ATTR_GRID_EXPORT_ALLOWED = "grid_export_allowed"
+ATTR_GRID_EXPORT_BLOCK_REASON = "grid_export_block_reason"
+ATTR_FULL_SYSTEMS_COUNT = "full_systems_count"
+ATTR_HYPER_BATTERY_DISCHARGE = "hyper_battery_discharge_w"
+ATTR_SOLARFLOW_BATTERY_DISCHARGE = "solarflow_battery_discharge_w"
+ATTR_HYPER_PV_TO_HOME = "hyper_pv_to_home_w"
+ATTR_SOLARFLOW_PV_TO_HOME = "solarflow_pv_to_home_w"

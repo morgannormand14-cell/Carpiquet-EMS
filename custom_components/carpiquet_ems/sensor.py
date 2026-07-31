@@ -3,6 +3,15 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("house_load_raw", "House Load Raw", ATTR_HOUSE_LOAD_RAW, "W", "power"),
+    ("performance_average", "Performance Average", ATTR_PERFORMANCE_AVERAGE, "%", None),
+    ("zendure_average", "Zendure Average", ATTR_ZENDURE_AVERAGE, "%", None),
+    ("real_import_energy", "Real Import Energy", ATTR_REAL_IMPORT_ENERGY, "kWh", "energy"),
+    ("real_export_energy", "Real Export Energy", ATTR_REAL_EXPORT_ENERGY, "kWh", "energy"),
+    ("sim_import_energy", "Sim Import Energy", ATTR_SIM_IMPORT_ENERGY, "kWh", "energy"),
+    ("sim_export_energy", "Sim Export Energy", ATTR_SIM_EXPORT_ENERGY, "kWh", "energy"),
+    ("pv_charged_energy", "PV Charged Energy", ATTR_PV_CHARGED_ENERGY, "kWh", "energy"),
+    ("pv_curtailed_energy", "PV Curtailed Energy", ATTR_PV_CURTAILED_ENERGY, "kWh", "energy"),
     ("pv_curtailed", "PV Curtailed", ATTR_PV_CURTAILED, "W", "power"),
     ("grid_export_block_reason", "Grid Export Block Reason", ATTR_GRID_EXPORT_BLOCK_REASON, None, None),
     ("full_systems_count", "Full Systems Count", ATTR_FULL_SYSTEMS_COUNT, None, None),

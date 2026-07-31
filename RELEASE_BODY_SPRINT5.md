@@ -2,36 +2,37 @@
 
 > **Every watt counts.**
 
-# ☀️ Sprint 5 — v0.5.4 Politique solaire & export EDF
+# 🤖 Sprint 5 — v0.5.5 Jumeau numérique dynamique
 
 ## Correctifs
-- ✅ Bouton de préparation des rapports corrigé
-- ✅ Téléchargement répétable même si le dossier existe
-- ✅ « Dans la plage de lissage » appliqué au moteur
+- ✅ Préparation des rapports compatible Home Assistant
+- ✅ Notification découplée de la génération du fichier
+- ✅ Plage de lissage appliquée au jumeau numérique
 
-## Nouvelle stratégie solaire
-- ✅ Le PV des systèmes pleins alimente la maison en priorité
-- ✅ Les systèmes non pleins réservent leur PV à la recharge
-- ✅ Leur PV complète la maison uniquement si le PV des systèmes pleins est insuffisant
-- ✅ La batterie ne décharge que lorsque le PV total ne couvre plus la maison
+## Simulation dynamique
+- ✅ Mémoire des consignes précédentes
+- ✅ Rampe de puissance appliquée par cycle
+- ✅ SOC min/max et énergie disponible respectés
+- ✅ Réseau simulé calculé après les contraintes
+- ✅ La simulation n'est plus forcée mathématiquement à 0 W
 
-## Politique d'export
-- ✅ Toutes les batteries pleines : export EDF simulé interdit
-- ✅ Surplus non stockable : production simulée écrêtée
-- ✅ Une batterie sous son SOC maximum : export réautorisé
-- ✅ Stockage local et inter-systèmes toujours prioritaire
+## Performance
+- ✅ Score progressif
+- ✅ Moyenne Carpiquet sur la session
+- ✅ Moyenne de référence Zendure
+- ✅ Import/export réel cumulés
+- ✅ Import/export simulés cumulés
+- ✅ Énergie PV stockée
+- ✅ Énergie PV écrêtée
 
-## Diagnostics
-- ✅ Export EDF autorisé
-- ✅ Motif de la politique d'export
-- ✅ Systèmes pleins
-- ✅ Production solaire écrêtée
-- ✅ PV vers maison par système
-- ✅ Batterie vers maison par système
+## Stratégie solaire v0.5.4 conservée
+- ✅ PV des systèmes pleins prioritaire vers la maison
+- ✅ PV des systèmes non pleins réservé autant que possible à leur recharge
+- ✅ Export EDF simulé interdit lorsque toutes les batteries sont pleines
+- ✅ Export réautorisé dès qu'une batterie repasse sous son SOC maximum
 
 ## Sécurité
-**100 % simulation uniquement.**
-Aucune commande réelle Zendure n'est envoyée.
+**100 % simulation uniquement.** Aucune commande réelle Zendure n'est envoyée.
 
-Tag : `v0.5.4-alpha-sprint5`
+Tag : `v0.5.5-alpha-sprint5`
 Pré-release : **Oui**

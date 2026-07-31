@@ -511,6 +511,22 @@ views:
                 name: Référence Zendure
               - entity: sensor.carpiquet_ems_performance_gain
                 name: Gain de performance
+              - entity: sensor.carpiquet_ems_performance_average
+                name: Performance moyenne session
+              - entity: sensor.carpiquet_ems_zendure_average
+                name: Référence Zendure moyenne
+              - entity: sensor.carpiquet_ems_real_import_energy
+                name: Import réel cumulé
+              - entity: sensor.carpiquet_ems_real_export_energy
+                name: Export réel cumulé
+              - entity: sensor.carpiquet_ems_sim_import_energy
+                name: Import simulé cumulé
+              - entity: sensor.carpiquet_ems_sim_export_energy
+                name: Export simulé cumulé
+              - entity: sensor.carpiquet_ems_pv_charged_energy
+                name: Énergie PV stockée simulée
+              - entity: sensor.carpiquet_ems_pv_curtailed_energy
+                name: Énergie PV écrêtée simulée
               - entity: sensor.carpiquet_ems_performance_sample_count
                 name: Cycles analysés
               - entity: sensor.carpiquet_ems_pv_total

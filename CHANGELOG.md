@@ -1,5 +1,14 @@
 # Changelog
 
+## v0.5.5-alpha — Sprint 5 dynamic twin
+
+- Dynamic digital twin with deadband, ramping and previous-command memory.
+- Energy-limited charge/discharge based on virtual SOC.
+- Progressive performance scoring and session averages.
+- Cumulative real/sim import/export and PV storage/curtailment metrics.
+- Negative reconstructed house load guardrail with raw diagnostic value.
+- Home Assistant report button notification API fixed.
+
 ## v0.5.4-alpha — Sprint 5 solar priority and export policy
 
 - Fixed report preparation when the destination directory already exists.

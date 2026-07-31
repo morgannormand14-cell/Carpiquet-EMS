@@ -1,4 +1,5 @@
 from homeassistant.components.button import ButtonEntity
+from homeassistant.components import persistent_notification
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 
@@ -15,16 +16,22 @@ class PrepareReportButton(CoordinatorEntity, ButtonEntity):
 
     async def async_press(self):
         url = await self.coordinator.async_prepare_selected_report()
-        if url:
-            self.hass.components.persistent_notification.async_create(
-                f"Rapport prêt : `{url}`\\n\\nOuvrez cette adresse depuis Home Assistant pour télécharger le JSON.",
-                title="Carpiquet EMS — Rapport prêt",
-                notification_id="carpiquet_ems_report_ready",
-            )
-        else:
-            self.hass.components.persistent_notification.async_create(
-                "Aucun rapport de simulation n'est disponible.",
-                title="Carpiquet EMS — Aucun rapport",
-                notification_id="carpiquet_ems_report_ready",
-            )
+        # The report preparation must never depend on notifications.
+        try:
+            if url:
+                persistent_notification.async_create(
+                    self.hass,
+                    f"Rapport prêt : `{url}`\n\nOuvrez cette adresse depuis Home Assistant pour télécharger le JSON.",
+                    title="Carpiquet EMS — Rapport prêt",
+                    notification_id="carpiquet_ems_report_ready",
+                )
+            else:
+                persistent_notification.async_create(
+                    self.hass,
+                    "Aucun rapport de simulation n'est disponible.",
+                    title="Carpiquet EMS — Aucun rapport",
+                    notification_id="carpiquet_ems_report_ready",
+                )
+        except Exception:
+            pass
         await self.coordinator.async_request_refresh()

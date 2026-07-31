@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.5.4-alpha-sprint5"
+VERSION = "0.5.5-alpha-sprint5"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -163,3 +163,13 @@ ATTR_HYPER_BATTERY_DISCHARGE = "hyper_battery_discharge_w"
 ATTR_SOLARFLOW_BATTERY_DISCHARGE = "solarflow_battery_discharge_w"
 ATTR_HYPER_PV_TO_HOME = "hyper_pv_to_home_w"
 ATTR_SOLARFLOW_PV_TO_HOME = "solarflow_pv_to_home_w"
+
+ATTR_HOUSE_LOAD_RAW = "house_load_raw_w"
+ATTR_PERFORMANCE_AVERAGE = "performance_average_percent"
+ATTR_ZENDURE_AVERAGE = "zendure_average_percent"
+ATTR_REAL_IMPORT_ENERGY = "real_import_energy_kwh"
+ATTR_REAL_EXPORT_ENERGY = "real_export_energy_kwh"
+ATTR_SIM_IMPORT_ENERGY = "sim_import_energy_kwh"
+ATTR_SIM_EXPORT_ENERGY = "sim_export_energy_kwh"
+ATTR_PV_CHARGED_ENERGY = "pv_charged_energy_kwh"
+ATTR_PV_CURTAILED_ENERGY = "pv_curtailed_energy_kwh"

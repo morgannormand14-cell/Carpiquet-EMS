@@ -41,6 +41,19 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._virtual_hyper_energy_kwh = None
         self._virtual_solarflow_energy_kwh = None
         self._perf_samples = 0
+        self._perf_score_sum = 0.0
+        self._zendure_score_sum = 0.0
+        self._real_import_kwh = 0.0
+        self._real_export_kwh = 0.0
+        self._sim_import_kwh = 0.0
+        self._sim_export_kwh = 0.0
+        self._pv_charged_kwh = 0.0
+        self._pv_curtailed_kwh = 0.0
+        self._last_cycle_dt = None
+        self._twin_prev_hyper_discharge = 0.0
+        self._twin_prev_solar_discharge = 0.0
+        self._twin_prev_hyper_charge = 0.0
+        self._twin_prev_solar_charge = 0.0
         self._session = SimulationSessionRecorder(hass, VERSION)
         self._automation_enabled_runtime = bool(self.config.get(CONF_AUTOMATION_ENABLED, DEFAULT_AUTOMATION_ENABLED))
         self._selected_report = None
@@ -200,6 +213,19 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._previous_simulated_power = 0.0
         self._automation_cycle = 0
         self._perf_samples = 0
+        self._perf_score_sum = 0.0
+        self._zendure_score_sum = 0.0
+        self._real_import_kwh = 0.0
+        self._real_export_kwh = 0.0
+        self._sim_import_kwh = 0.0
+        self._sim_export_kwh = 0.0
+        self._pv_charged_kwh = 0.0
+        self._pv_curtailed_kwh = 0.0
+        self._last_cycle_dt = None
+        self._twin_prev_hyper_discharge = 0.0
+        self._twin_prev_solar_discharge = 0.0
+        self._twin_prev_hyper_charge = 0.0
+        self._twin_prev_solar_charge = 0.0
         self._automation_state = STATE_IDLE
         self._automation_last_transition_dt = datetime.now(timezone.utc)
         safe_config = {
@@ -221,6 +247,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             "virtual_hyper_energy_kwh": data.get(ATTR_VIRTUAL_HYPER_ENERGY),
             "virtual_solarflow_energy_kwh": data.get(ATTR_VIRTUAL_SOLARFLOW_ENERGY),
             "performance_samples": data.get(ATTR_PERF_SAMPLE_COUNT),
+            "performance_average_percent": round(self._perf_score_sum / self._perf_samples, 2) if self._perf_samples else None,
+            "zendure_average_percent": round(self._zendure_score_sum / self._perf_samples, 2) if self._perf_samples else None,
+            "real_import_energy_kwh": round(self._real_import_kwh, 4),
+            "real_export_energy_kwh": round(self._real_export_kwh, 4),
+            "sim_import_energy_kwh": round(self._sim_import_kwh, 4),
+            "sim_export_energy_kwh": round(self._sim_export_kwh, 4),
+            "pv_charged_energy_kwh": round(self._pv_charged_kwh, 4),
+            "pv_curtailed_energy_kwh": round(self._pv_curtailed_kwh, 4),
         }
 
     async def async_stop_simulation_session(self, termination="user_stop"):
@@ -291,12 +325,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             )
             # Exact reconstructed house load:
             # Shelly + inverter outputs to house - inverter AC grid inputs.
-            house_load = (
+            house_load_raw = (
                 grid
                 + real_zendure_total
                 - max(0.0, hyper_grid_input)
                 - max(0.0, solar_grid_input)
             )
+            # Guardrail against asynchronous sensor updates producing an impossible negative load.
+            house_load = max(0.0, house_load_raw)
 
             target = float(self.config.get(CONF_GRID_TARGET, DEFAULT_GRID_TARGET))
             deadband = float(self.config.get(CONF_GRID_DEADBAND, DEFAULT_GRID_DEADBAND))
@@ -390,6 +426,13 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             virtual_hyper_soc = 100.0 * self._virtual_hyper_energy_kwh / max(dynamic["hyper_capacity"], 0.001)
             virtual_solar_soc = 100.0 * self._virtual_solarflow_energy_kwh / max(dynamic["solarflow_capacity"], 0.001)
 
+            cycle_now = datetime.now(timezone.utc)
+            if self._last_cycle_dt is None:
+                cycle_seconds = float(DEFAULT_SCAN_INTERVAL)
+            else:
+                cycle_seconds = max(0.1, min(30.0, (cycle_now - self._last_cycle_dt).total_seconds()))
+            self._last_cycle_dt = cycle_now
+
             twin = simulate_cycle(
                 TwinInput(
                     house_load_w=house_load,
@@ -400,12 +443,23 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                                       dynamic["hyper_capacity"], dynamic["hyper_max_power"], dynamic["hyper_max_power"], hyper_ok),
                     solarflow=TwinBattery(virtual_solar_soc, dynamic["solarflow_min_soc"], dynamic["solarflow_max_soc"],
                                           dynamic["solarflow_capacity"], dynamic["solarflow_max_power"], dynamic["solarflow_max_power"], solar_ok),
+                    deadband_w=deadband,
+                    ramp_limit_w=ramp,
+                    cycle_seconds=cycle_seconds,
+                    previous_hyper_discharge_w=self._twin_prev_hyper_discharge,
+                    previous_solarflow_discharge_w=self._twin_prev_solar_discharge,
+                    previous_hyper_charge_w=self._twin_prev_hyper_charge,
+                    previous_solarflow_charge_w=self._twin_prev_solar_charge,
                 )
             )
+            self._twin_prev_hyper_discharge = twin.hyper_battery_discharge_w
+            self._twin_prev_solar_discharge = twin.solarflow_battery_discharge_w
+            self._twin_prev_hyper_charge = twin.hyper_charge_w
+            self._twin_prev_solar_charge = twin.solarflow_charge_w
 
-            dt_h = DEFAULT_SCAN_INTERVAL / 3600.0
-            hdelta = (twin.hyper_charge_w - max(0.0, twin.hyper_home_w - hyper_pv)) * dt_h / 1000.0
-            sdelta = (twin.solarflow_charge_w - max(0.0, twin.solarflow_home_w - solar_pv)) * dt_h / 1000.0
+            dt_h = cycle_seconds / 3600.0
+            hdelta = (twin.hyper_charge_w - twin.hyper_battery_discharge_w) * dt_h / 1000.0
+            sdelta = (twin.solarflow_charge_w - twin.solarflow_battery_discharge_w) * dt_h / 1000.0
 
             hmin = dynamic["hyper_capacity"] * dynamic["hyper_min_soc"] / 100.0
             hmax = dynamic["hyper_capacity"] * dynamic["hyper_max_soc"] / 100.0
@@ -420,10 +474,24 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
             real_grid_error = abs(grid-target)
             sim_grid_error = abs(twin.grid_w-target)
-            scale=max(deadband,1.0)
-            perf_score=max(0.0,100.0-(sim_grid_error/scale)*100.0)
-            zendure_score=max(0.0,100.0-(real_grid_error/scale)*100.0)
+            # Progressive score: full score inside the smoothing range, then gradual decay.
+            score_scale = max(100.0, deadband * 5.0)
+            def _score(error_w):
+                if error_w <= deadband:
+                    return 100.0
+                return 100.0 / (1.0 + ((error_w - deadband) / score_scale))
+            perf_score = _score(sim_grid_error)
+            zendure_score = _score(real_grid_error)
             self._perf_samples += 1
+            self._perf_score_sum += perf_score
+            self._zendure_score_sum += zendure_score
+            # Integrate energy using the actual coordinator interval.
+            self._real_import_kwh += max(0.0, grid) * dt_h / 1000.0
+            self._real_export_kwh += max(0.0, -grid) * dt_h / 1000.0
+            self._sim_import_kwh += max(0.0, twin.grid_w) * dt_h / 1000.0
+            self._sim_export_kwh += max(0.0, -twin.grid_w) * dt_h / 1000.0
+            self._pv_charged_kwh += max(0.0, twin.hyper_charge_w + twin.solarflow_charge_w) * dt_h / 1000.0
+            self._pv_curtailed_kwh += max(0.0, twin.curtailed_pv_w) * dt_h / 1000.0
             if total_capacity > 0:
                 average_soc = (
                     hyper_soc * dynamic["hyper_capacity"]
@@ -489,6 +557,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_AUTOMATION_POLICY: POLICY,
                 ATTR_AUTOMATION_ENABLED: automation_enabled,
                 ATTR_HOUSE_LOAD: round(house_load,1),
+                ATTR_HOUSE_LOAD_RAW: round(house_load_raw,1),
                 ATTR_REAL_ZENDURE_TOTAL_OUTPUT: round(real_zendure_total,1),
                 ATTR_REAL_HYPER_OUTPUT: round(hyper_real_output,1),
                 ATTR_REAL_SOLARFLOW_OUTPUT: round(solar_real_output,1),
@@ -524,6 +593,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_FULL_SYSTEMS_COUNT: twin.full_systems_count,
                 ATTR_OPERATION_MODE: twin.mode,
                 ATTR_PERF_SAMPLE_COUNT: self._perf_samples,
+                ATTR_PERFORMANCE_AVERAGE: round(self._perf_score_sum / self._perf_samples, 1) if self._perf_samples else 0.0,
+                ATTR_ZENDURE_AVERAGE: round(self._zendure_score_sum / self._perf_samples, 1) if self._perf_samples else 0.0,
+                ATTR_REAL_IMPORT_ENERGY: round(self._real_import_kwh, 4),
+                ATTR_REAL_EXPORT_ENERGY: round(self._real_export_kwh, 4),
+                ATTR_SIM_IMPORT_ENERGY: round(self._sim_import_kwh, 4),
+                ATTR_SIM_EXPORT_ENERGY: round(self._sim_export_kwh, 4),
+                ATTR_PV_CHARGED_ENERGY: round(self._pv_charged_kwh, 4),
+                ATTR_PV_CURTAILED_ENERGY: round(self._pv_curtailed_kwh, 4),
                 ATTR_SESSION_ID: self._session.session_id or "Aucune",
                 ATTR_SESSION_ACTIVE: self._session.active,
                 ATTR_SESSION_STARTED_AT: self._session.started_at.isoformat() if self._session.started_at else "Jamais",
@@ -539,6 +616,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "grid_real_w": result_data.get(ATTR_GRID_POWER),
                 "house_load_w": result_data.get(ATTR_HOUSE_LOAD),
+                "house_load_raw_w": result_data.get(ATTR_HOUSE_LOAD_RAW),
+                "cycle_seconds": cycle_seconds,
                 "hyper_pv_w": result_data.get(ATTR_HYPER_PV),
                 "solarflow_pv_w": result_data.get(ATTR_SOLARFLOW_PV),
                 "hyper_real_output_w": result_data.get(ATTR_REAL_HYPER_OUTPUT),
@@ -557,6 +636,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "virtual_hyper_soc_percent": result_data.get(ATTR_VIRTUAL_HYPER_SOC),
                 "virtual_solarflow_soc_percent": result_data.get(ATTR_VIRTUAL_SOLARFLOW_SOC),
                 "performance_score_percent": result_data.get(ATTR_PERFORMANCE_SCORE),
+                "performance_average_percent": result_data.get(ATTR_PERFORMANCE_AVERAGE),
                 "zendure_reference_score_percent": result_data.get(ATTR_ZENDURE_REFERENCE_SCORE),
                 "operation_mode": result_data.get(ATTR_OPERATION_MODE),
                 "pv_curtailed_w": result_data.get(ATTR_PV_CURTAILED),

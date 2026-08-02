@@ -1,4 +1,4 @@
-# Sprint 3 Hotfix — v0.5.5-alpha-sprint5
+# Sprint 3 Hotfix — v0.5.6-alpha-sprint5
 
 ## Correctif
 
@@ -27,4 +27,4 @@ Le composant n'importe plus ce symbole depuis `homeassistant.const`.
 
 ## Release
 
-`v0.5.5-alpha-sprint5`
+`v0.5.6-alpha-sprint5`

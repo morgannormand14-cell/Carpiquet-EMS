@@ -3,6 +3,7 @@ from __future__ import annotations
 import logging
 
 import voluptuous as vol
+from homeassistant.components import persistent_notification
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import HomeAssistantError
@@ -52,7 +53,7 @@ def _register_services(hass: HomeAssistant) -> None:
         overwrite = bool(call.data.get(CONF_OVERWRITE, False))
         try:
             target = await hass.async_add_executor_job(
-                install_dashboard_file, hass, entry, overwrite
+                install_dashboard_file, hass, None, overwrite
             )
         except FileExistsError as err:
             raise HomeAssistantError(
@@ -60,7 +61,8 @@ def _register_services(hass: HomeAssistant) -> None:
                 "pour le remplacer."
             ) from err
 
-        hass.components.persistent_notification.async_create(
+        persistent_notification.async_create(
+            hass,
             (
                 "Le fichier Premium Dashboard a été installé dans "
                 f"`{target}`. Consultez docs/DASHBOARD_INSTALLATION.md "

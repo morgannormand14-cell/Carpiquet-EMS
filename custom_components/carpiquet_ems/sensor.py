@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("session_recording_state", "Recording State", ATTR_SESSION_RECORDING_STATE, None, None),
+    ("session_save_error", "Session Save Error", ATTR_SESSION_SAVE_ERROR, None, None),
+    ("last_session_ended_at", "Last Session Ended At", ATTR_LAST_SESSION_ENDED_AT, None, None),
     ("house_load_raw", "House Load Raw", ATTR_HOUSE_LOAD_RAW, "W", "power"),
     ("performance_average", "Performance Average", ATTR_PERFORMANCE_AVERAGE, "%", None),
     ("zendure_average", "Zendure Average", ATTR_ZENDURE_AVERAGE, "%", None),

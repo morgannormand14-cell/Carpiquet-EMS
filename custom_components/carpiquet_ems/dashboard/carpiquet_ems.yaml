@@ -388,6 +388,14 @@ views:
             entities:
               - entity: binary_sensor.carpiquet_ems_simulation_session_active
                 name: Session active
+              - entity: sensor.carpiquet_ems_recording_state
+                name: État de l'enregistrement
+              - entity: binary_sensor.carpiquet_ems_simulation_session_finalizing
+                name: Finalisation en cours
+              - entity: sensor.carpiquet_ems_session_save_error
+                name: Erreur de sauvegarde
+              - entity: sensor.carpiquet_ems_last_session_ended_at
+                name: Dernière fin de session
               - entity: sensor.carpiquet_ems_session_id
                 name: Identifiant
               - entity: sensor.carpiquet_ems_session_started_at

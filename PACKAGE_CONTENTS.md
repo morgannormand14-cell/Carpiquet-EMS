@@ -1,16 +1,11 @@
-# Carpiquet EMS — Full Sprint 5 Package
+# Package contents — v0.5.6-alpha-sprint5
 
-Version: `0.5.5-alpha-sprint5`
+Full Home Assistant custom integration package including:
 
-Complete project package including:
-- Home Assistant integration runtime
-- EMS Core Logic
-- Automation Engine
-- Config Flow / Options Flow
-- persistent Zendure fallback logic
-- battery topology mapping
-- Premium Dashboard with Automation view
-- documentation / RFC-0005
+- custom_components/carpiquet_ems
+- dashboards
+- documentation
 - tests
-- GitHub workflows/templates
-- branding and release notes
+- GitHub workflows and templates
+- release notes
+- atomic session finalization and recovery

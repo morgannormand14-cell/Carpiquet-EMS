@@ -1,5 +1,16 @@
 # Changelog
 
+## v0.5.6-alpha — Atomic session finalization
+
+- Disable the runtime engine before session finalization.
+- Reject samples after the stop boundary.
+- Add a thread-safe recorder lock.
+- Capture `ended_at` after the last accepted sample.
+- Write final reports atomically through a temporary file.
+- Preserve JSONL recovery data when finalization fails.
+- Add recording/finalization/error diagnostics.
+- Fix the dashboard installation notification path.
+
 ## v0.5.5-alpha — Sprint 5 dynamic twin
 
 - Dynamic digital twin with deadband, ramping and previous-command memory.

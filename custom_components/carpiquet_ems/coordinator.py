@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timedelta, timezone
+import asyncio
 import logging
 from pathlib import Path
 import shutil
@@ -55,6 +56,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._twin_prev_hyper_charge = 0.0
         self._twin_prev_solar_charge = 0.0
         self._session = SimulationSessionRecorder(hass, VERSION)
+        self._session_stop_lock = asyncio.Lock()
+        self._session_stopping = False
         self._automation_enabled_runtime = bool(self.config.get(CONF_AUTOMATION_ENABLED, DEFAULT_AUTOMATION_ENABLED))
         self._selected_report = None
         self._report_download_url = None
@@ -176,20 +179,28 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
     async def async_set_automation_enabled(self, enabled: bool):
         enabled = bool(enabled)
+
         if enabled == self._automation_enabled_runtime:
-            # Watchdog still ensures consistency if session was lost.
-            if enabled and not self._session.active:
+            if enabled and not self._session.active and not self._session_stopping:
                 await self.async_start_simulation_session()
-            elif not enabled and self._session.active:
+            elif not enabled and (self._session.active or self._session.finalizing):
                 await self.async_stop_simulation_session("runtime_reconcile")
             await self.async_request_refresh()
             return
+
         if not enabled:
-            await self.async_stop_simulation_session("user_stop")
+            # Stop the simulated engine immediately. No later coordinator cycle
+            # may append a sample after this boundary.
             self._automation_enabled_runtime = False
+            self._session_stopping = True
+            try:
+                await self.async_stop_simulation_session("user_stop")
+            finally:
+                self._session_stopping = False
         else:
             self._automation_enabled_runtime = True
             await self.async_start_simulation_session()
+
         await self.async_request_refresh()
 
     def _session_initial_state(self):
@@ -258,13 +269,26 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         }
 
     async def async_stop_simulation_session(self, termination="user_stop"):
-        if not self._session.active:
-            return self._session.last_file
-        return await self.hass.async_add_executor_job(
-            self._session.stop, self._session_summary(), termination
-        )
+        async with self._session_stop_lock:
+            if not self._session.active and not self._session.finalizing:
+                return self._session.last_file
+
+            self._session_stopping = True
+            try:
+                result = await self.hass.async_add_executor_job(
+                    self._session.stop,
+                    self._session_summary(),
+                    termination,
+                )
+                return result
+            except Exception as err:
+                _LOGGER.exception("Unable to finalize simulation session")
+                return None
+            finally:
+                self._session_stopping = False
 
     async def async_shutdown(self):
+        self._automation_enabled_runtime = False
         await self.async_stop_simulation_session("home_assistant_reload")
 
     def list_reports(self):
@@ -607,6 +631,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_SESSION_DURATION: round((datetime.now(timezone.utc)-self._session.started_at).total_seconds(),1) if self._session.started_at else 0.0,
                 ATTR_SESSION_SAMPLE_COUNT: self._session.sample_count,
                 ATTR_LAST_SESSION_FILE: self._session.last_file or "Aucun",
+                ATTR_SESSION_RECORDING_STATE: self._session.recording_state,
+                ATTR_SESSION_FINALIZING: self._session.finalizing or self._session_stopping,
+                ATTR_SESSION_SAVE_ERROR: self._session.last_error or "Aucune",
+                ATTR_LAST_SESSION_ENDED_AT: self._session.last_ended_at or "Jamais",
                 ATTR_SELECTED_REPORT: self._selected_report or "Aucun",
                 ATTR_REPORT_DOWNLOAD_URL: self._report_download_url or "Aucun",
                 ATTR_DYNAMIC_SOURCES: sources,
@@ -644,7 +672,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "grid_export_block_reason": result_data.get(ATTR_GRID_EXPORT_BLOCK_REASON),
                 "full_systems_count": result_data.get(ATTR_FULL_SYSTEMS_COUNT),
             }
-            self._session.append(session_sample)
+            if self._automation_enabled_runtime and not self._session_stopping:
+                self._session.append(session_sample)
             result_data[ATTR_SESSION_SAMPLE_COUNT] = self._session.sample_count
             return result_data
         except UpdateFailed:

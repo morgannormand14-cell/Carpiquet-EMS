@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.5.5-alpha-sprint5"
+VERSION = "0.5.6-alpha-sprint5"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -173,3 +173,8 @@ ATTR_SIM_IMPORT_ENERGY = "sim_import_energy_kwh"
 ATTR_SIM_EXPORT_ENERGY = "sim_export_energy_kwh"
 ATTR_PV_CHARGED_ENERGY = "pv_charged_energy_kwh"
 ATTR_PV_CURTAILED_ENERGY = "pv_curtailed_energy_kwh"
+
+ATTR_SESSION_RECORDING_STATE = "simulation_recording_state"
+ATTR_SESSION_FINALIZING = "simulation_session_finalizing"
+ATTR_SESSION_SAVE_ERROR = "simulation_session_save_error"
+ATTR_LAST_SESSION_ENDED_AT = "last_simulation_session_ended_at"

@@ -1,5 +1,15 @@
 # Changelog
 
+## v0.5.7 — Sprint 5 release
+
+- Added guarded engine initialization.
+- Wait up to 30 seconds for valid SOC and essential entity data.
+- Refuse zero or unavailable SOC values.
+- Start the simulation session only after a valid real snapshot.
+- Return the runtime engine to OFF when initialization fails.
+- Expose initialization state, readiness and error diagnostics.
+- Keep atomic report finalization from v0.5.6.
+
 ## v0.5.6-alpha — Atomic session finalization
 
 - Disable the runtime engine before session finalization.

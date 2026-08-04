@@ -3,6 +3,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("engine_initialization_state", "Engine Initialization State", ATTR_ENGINE_INITIALIZATION_STATE, None, None),
+    ("engine_initialization_error", "Engine Initialization Error", ATTR_ENGINE_INITIALIZATION_ERROR, None, None),
     ("session_recording_state", "Recording State", ATTR_SESSION_RECORDING_STATE, None, None),
     ("session_save_error", "Session Save Error", ATTR_SESSION_SAVE_ERROR, None, None),
     ("last_session_ended_at", "Last Session Ended At", ATTR_LAST_SESSION_ENDED_AT, None, None),

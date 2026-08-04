@@ -2,25 +2,31 @@
 
 > **Every watt counts.**
 
-# Sprint 5 — v0.5.6 Finalisation atomique
+# Sprint 5 — Release v0.5.7
 
-## Correctif principal
-- ✅ Le moteur passe immédiatement sur OFF
-- ✅ Aucun nouvel échantillon n'est accepté pendant la finalisation
-- ✅ `ended_at` correspond au dernier cycle réellement enregistré
-- ✅ Rapport écrit de manière atomique
-- ✅ Fichier de secours conservé en cas d'échec
-- ✅ Récupération automatique après interruption Home Assistant
+## Initialisation fiable
+- ✅ Attente des SOC et données essentielles
+- ✅ Refus des valeurs nulles ou indisponibles
+- ✅ Snapshot réel avant création de session
+- ✅ Retour automatique sur OFF si les données ne sont pas valides
+- ✅ Maintien de sécurité avec diagnostic visible
 
-## Diagnostics
-- État de l'enregistrement
-- Finalisation en cours
-- Erreur de sauvegarde
-- Dernière fin de session
+## Fonctions validées
+- ✅ Jumeau numérique dynamique
+- ✅ Plage de lissage
+- ✅ Rampe de puissance
+- ✅ Priorité solaire des systèmes pleins
+- ✅ Recharge prioritaire des systèmes non pleins
+- ✅ Transfert inter-systèmes
+- ✅ Blocage de l'export EDF lorsque toutes les batteries sont pleines
+- ✅ Écrêtage simulé du surplus
+- ✅ Rapports JSON
+- ✅ Finalisation atomique des sessions
 
 ## Sécurité
 **100 % simulation uniquement.**
 Aucune commande réelle Zendure n'est envoyée.
 
-Tag : `v0.5.6-alpha-sprint5`
-Pré-release : **Oui**
+Tag : `v0.5.7`
+Release : **Oui**
+Pré-release : **Non**

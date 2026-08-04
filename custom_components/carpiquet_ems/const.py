@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.5.6-alpha-sprint5"
+VERSION = "0.5.7"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -178,3 +178,8 @@ ATTR_SESSION_RECORDING_STATE = "simulation_recording_state"
 ATTR_SESSION_FINALIZING = "simulation_session_finalizing"
 ATTR_SESSION_SAVE_ERROR = "simulation_session_save_error"
 ATTR_LAST_SESSION_ENDED_AT = "last_simulation_session_ended_at"
+
+ATTR_ENGINE_INITIALIZATION_STATE = "engine_initialization_state"
+ATTR_ENGINE_INITIALIZATION_ERROR = "engine_initialization_error"
+ATTR_ENGINE_INITIALIZATION_READY = "engine_initialization_ready"
+DEFAULT_INITIALIZATION_TIMEOUT_SECONDS = 30.0

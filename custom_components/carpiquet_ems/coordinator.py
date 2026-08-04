@@ -58,6 +58,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._session = SimulationSessionRecorder(hass, VERSION)
         self._session_stop_lock = asyncio.Lock()
         self._session_stopping = False
+        self._initialization_state = "En attente"
+        self._initialization_error = None
+        self._initialization_ready = False
         self._automation_enabled_runtime = bool(self.config.get(CONF_AUTOMATION_ENABLED, DEFAULT_AUTOMATION_ENABLED))
         self._selected_report = None
         self._report_download_url = None
@@ -197,9 +200,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 await self.async_stop_simulation_session("user_stop")
             finally:
                 self._session_stopping = False
+            self._initialization_state = "En attente"
+            self._initialization_error = None
+            self._initialization_ready = False
         else:
             self._automation_enabled_runtime = True
-            await self.async_start_simulation_session()
+            started = await self.async_start_simulation_session()
+            if not started:
+                self._automation_enabled_runtime = False
 
         await self.async_request_refresh()
 
@@ -216,36 +224,90 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             "solarflow_grid_input_w": self._state_float(self.config.get(CONF_SOLARFLOW_GRID_INPUT_ENTITY, DEFAULT_SOLARFLOW_GRID_INPUT_ENTITY)),
         }
 
+
+    def _initialization_snapshot_is_valid(self, snapshot):
+        required_positive = (
+            snapshot.get("hyper_soc_percent"),
+            snapshot.get("solarflow_soc_percent"),
+        )
+        if any(value is None for value in required_positive):
+            return False, "SOC indisponible"
+        if any(float(value) <= 0.0 for value in required_positive):
+            return False, "SOC invalide ou nul"
+
+        required_entities = (
+            self.config.get(CONF_HYPER_CAPACITY_ENTITY),
+            self.config.get(CONF_SOLARFLOW_CAPACITY_ENTITY),
+            self.config.get(CONF_HYPER_MAX_POWER_ENTITY),
+            self.config.get(CONF_SOLARFLOW_MAX_POWER_ENTITY),
+            self.config.get(CONF_GRID_POWER_ENTITY),
+        )
+        missing = [
+            entity_id
+            for entity_id in required_entities
+            if entity_id and self.hass.states.get(entity_id) is None
+        ]
+        if missing:
+            return False, "Entités initiales indisponibles"
+
+        return True, None
+
+    async def _async_wait_for_valid_initialization(self, timeout_seconds=DEFAULT_INITIALIZATION_TIMEOUT_SECONDS):
+        self._initialization_state = "Initialisation du moteur"
+        self._initialization_error = None
+        self._initialization_ready = False
+
+        deadline = self.hass.loop.time() + float(timeout_seconds)
+        last_snapshot = None
+        last_error = "Données initiales indisponibles"
+
+        while self.hass.loop.time() < deadline:
+            last_snapshot = self._session_initial_state()
+            valid, error = self._initialization_snapshot_is_valid(last_snapshot)
+            if valid:
+                self._initialization_state = "Prêt"
+                self._initialization_ready = True
+                self._initialization_error = None
+                return last_snapshot
+            last_error = error or last_error
+            await asyncio.sleep(1)
+
+        self._initialization_state = "Maintien de sécurité"
+        self._initialization_ready = False
+        self._initialization_error = last_error
+        return None
+
     async def async_start_simulation_session(self):
-        if self._session.active:
-            return
+        if self._session.active or self._session.finalizing:
+            return True
+
+        initial_state = await self._async_wait_for_valid_initialization()
+        if initial_state is None:
+            self._automation_enabled_runtime = False
+            return False
+
         self._virtual_hyper_energy_kwh = None
         self._virtual_solarflow_energy_kwh = None
         self._previous_simulated_power = 0.0
         self._automation_cycle = 0
         self._perf_samples = 0
-        self._perf_score_sum = 0.0
-        self._zendure_score_sum = 0.0
-        self._real_import_kwh = 0.0
-        self._real_export_kwh = 0.0
-        self._sim_import_kwh = 0.0
-        self._sim_export_kwh = 0.0
-        self._pv_charged_kwh = 0.0
-        self._pv_curtailed_kwh = 0.0
-        self._last_cycle_dt = None
-        self._twin_prev_hyper_discharge = 0.0
-        self._twin_prev_solar_discharge = 0.0
-        self._twin_prev_hyper_charge = 0.0
-        self._twin_prev_solar_charge = 0.0
         self._automation_state = STATE_IDLE
         self._automation_last_transition_dt = datetime.now(timezone.utc)
+
         safe_config = {
-            key: value for key, value in self.config.items()
+            key: value
+            for key, value in self.config.items()
             if "token" not in key.lower() and "password" not in key.lower()
         }
+
         await self.hass.async_add_executor_job(
-            self._session.start, self._session_initial_state(), safe_config
+            self._session.start,
+            initial_state,
+            safe_config,
         )
+        self._initialization_state = "Enregistrement actif"
+        self._initialization_ready = True
+        return True
 
     def _session_summary(self):
         data = self.data or {}
@@ -286,6 +348,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 return None
             finally:
                 self._session_stopping = False
+        self._initialization_state = "En attente"
+        self._initialization_error = None
+        self._initialization_ready = False
 
     async def async_shutdown(self):
         self._automation_enabled_runtime = False
@@ -635,6 +700,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_SESSION_FINALIZING: self._session.finalizing or self._session_stopping,
                 ATTR_SESSION_SAVE_ERROR: self._session.last_error or "Aucune",
                 ATTR_LAST_SESSION_ENDED_AT: self._session.last_ended_at or "Jamais",
+                ATTR_ENGINE_INITIALIZATION_STATE: self._initialization_state,
+                ATTR_ENGINE_INITIALIZATION_ERROR: self._initialization_error or "Aucune",
+                ATTR_ENGINE_INITIALIZATION_READY: self._initialization_ready,
                 ATTR_SELECTED_REPORT: self._selected_report or "Aucun",
                 ATTR_REPORT_DOWNLOAD_URL: self._report_download_url or "Aucun",
                 ATTR_DYNAMIC_SOURCES: sources,

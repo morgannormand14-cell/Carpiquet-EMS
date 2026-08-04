@@ -390,6 +390,12 @@ views:
                 name: Session active
               - entity: sensor.carpiquet_ems_recording_state
                 name: État de l'enregistrement
+              - entity: sensor.carpiquet_ems_engine_initialization_state
+                name: Initialisation du moteur
+              - entity: binary_sensor.carpiquet_ems_engine_initialization_ready
+                name: Données initiales valides
+              - entity: sensor.carpiquet_ems_engine_initialization_error
+                name: Erreur d'initialisation
               - entity: binary_sensor.carpiquet_ems_simulation_session_finalizing
                 name: Finalisation en cours
               - entity: sensor.carpiquet_ems_session_save_error

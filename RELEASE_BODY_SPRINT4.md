@@ -32,7 +32,7 @@
 **100 % simulation-only.**
 Aucune commande réelle de limite de sortie Zendure n'est envoyée.
 
-Tag : `v0.5.7`
+Tag : `v0.5.8`
 Pré-release : **Oui**
 
 🏴 **Carpiquet EMS — Every watt counts.**

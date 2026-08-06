@@ -1,6 +1,13 @@
 # Changelog
 
-## v0.5.7 — Sprint 5 release
+## v0.5.8 — Corrective finale Sprint 5
+
+- Reset all session performance and energy accumulators.
+- Rebuild complete summaries for orphaned/interrupted sessions.
+- Add collection-gap statistics to recovered reports.
+- Preserve initialization guard and atomic finalization.
+
+## v0.5.8 — Sprint 5 release
 
 - Added guarded engine initialization.
 - Wait up to 30 seconds for valid SOC and essential entity data.

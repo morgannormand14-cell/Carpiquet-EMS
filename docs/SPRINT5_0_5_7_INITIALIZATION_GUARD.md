@@ -1,4 +1,4 @@
-# v0.5.7 — Garde d'initialisation du moteur
+# v0.5.8 — Garde d'initialisation du moteur
 
 Cette version finale du Sprint 5 empêche une session de démarrer avec des
 valeurs de SOC nulles ou indisponibles.

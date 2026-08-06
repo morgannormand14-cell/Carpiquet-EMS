@@ -286,11 +286,26 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._automation_enabled_runtime = False
             return False
 
+        # Reset every session-scoped accumulator together. Keeping any value
+        # from a previous session corrupts averages and energy totals.
         self._virtual_hyper_energy_kwh = None
         self._virtual_solarflow_energy_kwh = None
         self._previous_simulated_power = 0.0
         self._automation_cycle = 0
         self._perf_samples = 0
+        self._perf_score_sum = 0.0
+        self._zendure_score_sum = 0.0
+        self._real_import_kwh = 0.0
+        self._real_export_kwh = 0.0
+        self._sim_import_kwh = 0.0
+        self._sim_export_kwh = 0.0
+        self._pv_charged_kwh = 0.0
+        self._pv_curtailed_kwh = 0.0
+        self._last_cycle_dt = None
+        self._twin_prev_hyper_discharge = 0.0
+        self._twin_prev_solar_discharge = 0.0
+        self._twin_prev_hyper_charge = 0.0
+        self._twin_prev_solar_charge = 0.0
         self._automation_state = STATE_IDLE
         self._automation_last_transition_dt = datetime.now(timezone.utc)
 
@@ -348,9 +363,6 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 return None
             finally:
                 self._session_stopping = False
-        self._initialization_state = "En attente"
-        self._initialization_error = None
-        self._initialization_ready = False
 
     async def async_shutdown(self):
         self._automation_enabled_runtime = False

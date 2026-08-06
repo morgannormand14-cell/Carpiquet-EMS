@@ -10,7 +10,7 @@ class Hass:
     def __init__(self, root): self.config = Config(root)
 
 def test_session_file(tmp_path):
-    recorder = SimulationSessionRecorder(Hass(tmp_path), "0.5.7")
+    recorder = SimulationSessionRecorder(Hass(tmp_path), "0.5.8")
     recorder.start({"soc": 50}, {"grid_target": 0})
     recorder.append({"timestamp": "t1", "grid_real_w": 100})
     result = recorder.stop({"performance_score_percent": 95})

@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.5.7 — Release Sprint 5
+# Carpiquet EMS v0.5.8 — Release Sprint 5
 
 - Protection contre les SOC nuls ou indisponibles au démarrage.
 - Attente des données essentielles pendant 30 secondes maximum.

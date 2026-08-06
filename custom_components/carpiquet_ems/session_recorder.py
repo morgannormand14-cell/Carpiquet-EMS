@@ -168,6 +168,93 @@ class SimulationSessionRecorder:
                 self.sample_count = 0
                 self.finalizing = False
 
+
+    @staticmethod
+    def _rebuild_summary(samples: list[dict[str, Any]]) -> dict[str, Any]:
+        """Rebuild the normal summary from recovered JSONL samples."""
+        if not samples:
+            return {
+                "status": "session interrompue",
+                "performance_samples": 0,
+                "recorded_duration_seconds": 0.0,
+                "missing_data_intervals": 0,
+                "longest_interval_seconds": 0.0,
+            }
+
+        perf_sum = 0.0
+        zendure_sum = 0.0
+        perf_count = 0
+        real_import = real_export = 0.0
+        sim_import = sim_export = 0.0
+        pv_charged = pv_curtailed = 0.0
+        recorded_seconds = 0.0
+        missing_intervals = 0
+        longest_interval = 0.0
+
+        for sample in samples:
+            try:
+                dt = max(0.0, float(sample.get("cycle_seconds", 0.0)))
+            except (TypeError, ValueError):
+                dt = 0.0
+            recorded_seconds += dt
+            longest_interval = max(longest_interval, dt)
+            if dt > 10.0:
+                missing_intervals += 1
+            dt_h = dt / 3600.0
+
+            def number(key: str) -> float:
+                try:
+                    return float(sample.get(key, 0.0) or 0.0)
+                except (TypeError, ValueError):
+                    return 0.0
+
+            perf = sample.get("performance_score_percent")
+            zendure = sample.get("zendure_reference_score_percent")
+            try:
+                perf_value = float(perf)
+                zendure_value = float(zendure)
+            except (TypeError, ValueError):
+                pass
+            else:
+                perf_sum += perf_value
+                zendure_sum += zendure_value
+                perf_count += 1
+
+            real_grid = number("grid_real_w")
+            sim_grid = number("grid_simulated_w")
+            real_import += max(0.0, real_grid) * dt_h / 1000.0
+            real_export += max(0.0, -real_grid) * dt_h / 1000.0
+            sim_import += max(0.0, sim_grid) * dt_h / 1000.0
+            sim_export += max(0.0, -sim_grid) * dt_h / 1000.0
+            pv_charged += max(
+                0.0,
+                number("hyper_simulated_charge_w")
+                + number("solarflow_simulated_charge_w"),
+            ) * dt_h / 1000.0
+            pv_curtailed += max(0.0, number("pv_curtailed_w")) * dt_h / 1000.0
+
+        last = samples[-1]
+        return {
+            "status": "session interrompue — résumé recalculé",
+            "performance_score_percent": last.get("performance_score_percent"),
+            "zendure_reference_score_percent": last.get("zendure_reference_score_percent"),
+            "virtual_hyper_energy_kwh": None,
+            "virtual_solarflow_energy_kwh": None,
+            "performance_samples": perf_count,
+            "performance_average_percent": round(perf_sum / perf_count, 2) if perf_count else None,
+            "zendure_average_percent": round(zendure_sum / perf_count, 2) if perf_count else None,
+            "real_import_energy_kwh": round(real_import, 4),
+            "real_export_energy_kwh": round(real_export, 4),
+            "sim_import_energy_kwh": round(sim_import, 4),
+            "sim_export_energy_kwh": round(sim_export, 4),
+            "pv_charged_energy_kwh": round(pv_charged, 4),
+            "pv_curtailed_energy_kwh": round(pv_curtailed, 4),
+            "recorded_duration_seconds": round(recorded_seconds, 1),
+            "missing_data_intervals": missing_intervals,
+            "longest_interval_seconds": round(longest_interval, 3),
+            "last_sample_timestamp": last.get("timestamp"),
+        }
+
     def finalize_orphaned_sessions(self) -> None:
         for temp in self._base_dir().glob(".SIM-*.jsonl"):
             try:
@@ -203,7 +290,7 @@ class SimulationSessionRecorder:
                         "initial_state": header.get("initial_state", {}),
                         "configuration": header.get("configuration", {}),
                         "samples": samples,
-                        "summary": {"status": "session interrompue"},
+                        "summary": self._rebuild_summary(samples),
                     }
                     atomic = self._base_dir() / f".{sid}.json.tmp"
                     atomic.write_text(

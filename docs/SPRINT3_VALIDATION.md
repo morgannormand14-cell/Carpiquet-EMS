@@ -2,7 +2,7 @@
 
 ## Upgrade
 
-- [ ] HACS installs `v0.5.7`
+- [ ] HACS installs `v0.5.8`
 - [ ] Home Assistant restarts without integration errors
 - [ ] Existing config entry loads successfully
 - [ ] All expected entities remain available

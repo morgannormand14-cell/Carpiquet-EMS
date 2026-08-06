@@ -1,4 +1,4 @@
-# v0.5.7 — Config Flow Hotfix
+# v0.5.8 — Config Flow Hotfix
 
 ## Symptom
 

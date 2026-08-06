@@ -1,4 +1,4 @@
-# Package contents — v0.5.7
+# Package contents — v0.5.8
 
 Full Home Assistant custom integration package including:
 

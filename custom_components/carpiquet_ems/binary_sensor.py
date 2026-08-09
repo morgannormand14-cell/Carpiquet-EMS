@@ -3,6 +3,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("command_write_locked", "Command Write Locked", ATTR_COMMAND_WRITE_LOCKED),
+    ("command_safety_ok", "Command Safety OK", ATTR_COMMAND_SAFETY_OK),
+    ("command_safety_limited", "Command Safety Limited", ATTR_COMMAND_SAFETY_LIMITED),
+    ("would_send_command", "Would Send Command", ATTR_WOULD_SEND_COMMAND),
     ("engine_initialization_ready", "Engine Initialization Ready", ATTR_ENGINE_INITIALIZATION_READY),
     ("simulation_session_finalizing", "Simulation Session Finalizing", ATTR_SESSION_FINALIZING),
     ("grid_export_allowed", "Grid Export Allowed", ATTR_GRID_EXPORT_ALLOWED),

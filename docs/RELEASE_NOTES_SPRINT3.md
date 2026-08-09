@@ -24,4 +24,4 @@ Carpiquet EMS remains 100% simulation-only. The integration never writes to:
 
 ### Tag
 
-`v0.5.8`
+`v0.6.0-alpha-sprint6`

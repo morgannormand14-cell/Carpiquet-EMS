@@ -13,6 +13,7 @@ from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, Upda
 from .algorithm import BatteryState, allocate_discharge_power
 from .automation_engine import AutomationInput, POLICY, STATE_IDLE, decide_automation
 from .digital_twin import TwinBattery, TwinInput, simulate_cycle
+from .command_pipeline import CommandRequest, SafetyContext, evaluate_command
 from .session_recorder import SimulationSessionRecorder
 from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
@@ -36,6 +37,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self.entry = config_entry
         self.config = config_entry.data | config_entry.options
         self._previous_simulated_power = 0.0
+        self._shadow_cycle = 0
+        self._shadow_accepted = 0
+        self._shadow_rejected = 0
         self._automation_state = STATE_IDLE
         self._automation_cycle = 0
         self._automation_last_transition_dt = datetime.now(timezone.utc)
@@ -62,6 +66,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._initialization_error = None
         self._initialization_ready = False
         self._automation_enabled_runtime = bool(self.config.get(CONF_AUTOMATION_ENABLED, DEFAULT_AUTOMATION_ENABLED))
+        # Safety: every Home Assistant reload returns command control to Simulation.
+        self._control_mode = CONTROL_MODE_SIMULATION
+        self._shadow_cycle = 0
+        self._shadow_accepted = 0
+        self._shadow_rejected = 0
         self._selected_report = None
         self._report_download_url = None
         self._fallbacks = {
@@ -365,8 +374,34 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 self._session_stopping = False
 
     async def async_shutdown(self):
+        self._control_mode = CONTROL_MODE_SIMULATION
         self._automation_enabled_runtime = False
         await self.async_stop_simulation_session("home_assistant_reload")
+
+    @property
+    def control_mode(self):
+        return self._control_mode
+
+    async def async_set_control_mode(self, mode: str):
+        if mode not in CONTROL_MODE_OPTIONS:
+            raise ValueError(f"Unsupported control mode: {mode}")
+        # No Live mode and no real-write path exist in v0.6.0.
+        self._control_mode = mode
+        await self.async_request_refresh()
+
+    def _max_source_age_seconds(self, entity_ids):
+        now = datetime.now(timezone.utc)
+        ages = []
+        for entity_id in entity_ids:
+            if not entity_id:
+                continue
+            state = self._state(entity_id)
+            if state is None:
+                return 999999.0
+            updated = getattr(state, "last_updated", None)
+            if updated is not None:
+                ages.append(max(0.0, (now - updated).total_seconds()))
+        return max(ages) if ages else 999999.0
 
     def list_reports(self):
         return self._session.list_reports()
@@ -558,6 +593,57 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._twin_prev_hyper_charge = twin.hyper_charge_w
             self._twin_prev_solar_charge = twin.solarflow_charge_w
 
+            command_source_age = self._max_source_age_seconds(
+                (
+                    grid_entity,
+                    hyper_soc_entity,
+                    solar_soc_entity,
+                    hyper_pv_entity,
+                    solar_pv_entity,
+                    self.config.get(CONF_HYPER_REAL_OUTPUT_ENTITY),
+                    self.config.get(CONF_SOLARFLOW_REAL_OUTPUT_ENTITY),
+                )
+            )
+            command_request = CommandRequest(
+                hyper_output_w=max(0.0, twin.hyper_home_w),
+                solarflow_output_w=max(0.0, twin.solarflow_home_w),
+            )
+            command_decision = evaluate_command(
+                self._control_mode,
+                command_request,
+                SafetyContext(
+                    grid_available=grid_ok,
+                    hyper_available=hyper_ok,
+                    solarflow_available=solar_ok,
+                    initialization_ready=self._initialization_ready,
+                    fallback_active=fallback_count > 0,
+                    allow_fallback=bool(
+                        self.config.get(CONF_AUTOMATION_ALLOW_FALLBACK, DEFAULT_AUTOMATION_ALLOW_FALLBACK)
+                    ),
+                    hyper_soc=hyper_soc,
+                    solarflow_soc=solar_soc,
+                    hyper_min_soc=dynamic["hyper_min_soc"],
+                    solarflow_min_soc=dynamic["solarflow_min_soc"],
+                    hyper_pv_w=hyper_pv,
+                    solarflow_pv_w=solar_pv,
+                    hyper_max_power_w=dynamic["hyper_max_power"],
+                    solarflow_max_power_w=dynamic["solarflow_max_power"],
+                    source_age_seconds=command_source_age,
+                ),
+            )
+            self._shadow_cycle += 1
+            if command_decision.safety_ok:
+                self._shadow_accepted += 1
+            else:
+                self._shadow_rejected += 1
+
+            actual_hyper_output_limit = self._state_float(
+                self.config.get(CONF_HYPER_OUTPUT_ENTITY), default=0.0
+            )
+            actual_solar_output_limit = self._state_float(
+                self.config.get(CONF_SOLARFLOW_OUTPUT_ENTITY), default=0.0
+            )
+
             dt_h = cycle_seconds / 3600.0
             hdelta = (twin.hyper_charge_w - twin.hyper_battery_discharge_w) * dt_h / 1000.0
             sdelta = (twin.solarflow_charge_w - twin.solarflow_battery_discharge_w) * dt_h / 1000.0
@@ -702,6 +788,30 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_SIM_EXPORT_ENERGY: round(self._sim_export_kwh, 4),
                 ATTR_PV_CHARGED_ENERGY: round(self._pv_charged_kwh, 4),
                 ATTR_PV_CURTAILED_ENERGY: round(self._pv_curtailed_kwh, 4),
+                ATTR_CONTROL_MODE: self._control_mode,
+                ATTR_COMMAND_PIPELINE_STATE: (
+                    "Shadow actif" if self._control_mode == CONTROL_MODE_SHADOW
+                    else "Armed verrouillé" if self._control_mode == CONTROL_MODE_ARMED
+                    else "Simulation"
+                ),
+                ATTR_COMMAND_WRITE_LOCKED: command_decision.write_locked,
+                ATTR_COMMAND_SAFETY_OK: command_decision.safety_ok,
+                ATTR_COMMAND_SAFETY_LIMITED: command_decision.safety_limited,
+                ATTR_COMMAND_SAFETY_REASON: command_decision.safety_reason,
+                ATTR_WOULD_SEND_COMMAND: command_decision.would_send_command,
+                ATTR_REQUESTED_HYPER_OUTPUT: round(command_decision.requested.hyper_output_w, 1),
+                ATTR_VALIDATED_HYPER_OUTPUT: round(command_decision.validated.hyper_output_w, 1),
+                ATTR_REQUESTED_SOLARFLOW_OUTPUT: round(command_decision.requested.solarflow_output_w, 1),
+                ATTR_VALIDATED_SOLARFLOW_OUTPUT: round(command_decision.validated.solarflow_output_w, 1),
+                ATTR_ACTUAL_HYPER_OUTPUT_LIMIT: round(actual_hyper_output_limit, 1),
+                ATTR_ACTUAL_SOLARFLOW_OUTPUT_LIMIT: round(actual_solar_output_limit, 1),
+                ATTR_HYPER_COMMAND_DELTA: round(command_decision.validated.hyper_output_w - actual_hyper_output_limit, 1),
+                ATTR_SOLARFLOW_COMMAND_DELTA: round(command_decision.validated.solarflow_output_w - actual_solar_output_limit, 1),
+                ATTR_COMMAND_EVALUATION_AT: command_decision.evaluated_at,
+                ATTR_COMMAND_SOURCE_AGE: round(command_source_age, 1),
+                ATTR_SHADOW_CYCLE: self._shadow_cycle,
+                ATTR_SHADOW_ACCEPTED: self._shadow_accepted,
+                ATTR_SHADOW_REJECTED: self._shadow_rejected,
                 ATTR_SESSION_ID: self._session.session_id or "Aucune",
                 ATTR_SESSION_ACTIVE: self._session.active,
                 ATTR_SESSION_STARTED_AT: self._session.started_at.isoformat() if self._session.started_at else "Jamais",
@@ -751,6 +861,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "grid_export_allowed": result_data.get(ATTR_GRID_EXPORT_ALLOWED),
                 "grid_export_block_reason": result_data.get(ATTR_GRID_EXPORT_BLOCK_REASON),
                 "full_systems_count": result_data.get(ATTR_FULL_SYSTEMS_COUNT),
+                "control_mode": result_data.get(ATTR_CONTROL_MODE),
+                "command_pipeline_state": result_data.get(ATTR_COMMAND_PIPELINE_STATE),
+                "command_safety_ok": result_data.get(ATTR_COMMAND_SAFETY_OK),
+                "command_safety_limited": result_data.get(ATTR_COMMAND_SAFETY_LIMITED),
+                "command_safety_reason": result_data.get(ATTR_COMMAND_SAFETY_REASON),
+                "would_send_command": result_data.get(ATTR_WOULD_SEND_COMMAND),
+                "requested_hyper_output_w": result_data.get(ATTR_REQUESTED_HYPER_OUTPUT),
+                "validated_hyper_output_w": result_data.get(ATTR_VALIDATED_HYPER_OUTPUT),
+                "requested_solarflow_output_w": result_data.get(ATTR_REQUESTED_SOLARFLOW_OUTPUT),
+                "validated_solarflow_output_w": result_data.get(ATTR_VALIDATED_SOLARFLOW_OUTPUT),
+                "actual_hyper_output_limit_w": result_data.get(ATTR_ACTUAL_HYPER_OUTPUT_LIMIT),
+                "actual_solarflow_output_limit_w": result_data.get(ATTR_ACTUAL_SOLARFLOW_OUTPUT_LIMIT),
+                "hyper_command_delta_w": result_data.get(ATTR_HYPER_COMMAND_DELTA),
+                "solarflow_command_delta_w": result_data.get(ATTR_SOLARFLOW_COMMAND_DELTA),
+                "command_source_age_seconds": result_data.get(ATTR_COMMAND_SOURCE_AGE),
             }
             if self._automation_enabled_runtime and not self._session_stopping:
                 self._session.append(session_sample)

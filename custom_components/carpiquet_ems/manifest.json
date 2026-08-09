@@ -1,7 +1,7 @@
 {
   "domain": "carpiquet_ems",
   "name": "Carpiquet EMS",
-  "version": "0.5.8",
+  "version": "0.6.0-alpha-sprint6",
   "documentation": "https://github.com/morgannormand14-cell/Carpiquet-EMS",
   "issue_tracker": "https://github.com/morgannormand14-cell/Carpiquet-EMS/issues",
   "codeowners": [],

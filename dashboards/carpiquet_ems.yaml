@@ -312,7 +312,7 @@ views:
           - type: markdown
             content: |
               # 🤖 Moteur d'automatisation
-              **Sprint 5 — Simulation uniquement**
+              **Sprint 6 — Command Pipeline & Shadow Mode**
 
               Le moteur décide quand l'EMS simulé doit rester inactif,
               passer en décharge ou se placer en sécurité.
@@ -379,6 +379,60 @@ views:
               - entity: binary_sensor.carpiquet_ems_solarflow_2400_pro_health
                 name: SolarFlow 2400 Pro
 
+
+
+      - type: grid
+        title: Pipeline de commande
+        cards:
+          - type: markdown
+            content: |
+              # 🛡️ Command Pipeline
+              **v0.6.0 — Shadow Mode**
+
+              Les consignes sont calculées puis validées par les garde-fous.
+
+              **Écritures Zendure : VERROUILLÉES**
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: select.carpiquet_ems_control_mode
+                name: Mode de contrôle
+              - entity: sensor.carpiquet_ems_command_pipeline_state
+                name: État du pipeline
+              - entity: binary_sensor.carpiquet_ems_command_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_command_safety_ok
+                name: Validation sécurité
+              - entity: binary_sensor.carpiquet_ems_would_send_command
+                name: Commande qui serait envoyée
+              - entity: sensor.carpiquet_ems_command_safety_reason
+                name: Motif sécurité
+              - entity: sensor.carpiquet_ems_command_source_age
+                name: Âge des données
+          - type: entities
+            title: Hyper 2000 — Shadow
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_requested_hyper_output
+                name: Demandé
+              - entity: sensor.carpiquet_ems_validated_hyper_output
+                name: Validé
+              - entity: sensor.carpiquet_ems_actual_hyper_output_limit
+                name: Réglage Zendure observé
+              - entity: sensor.carpiquet_ems_hyper_command_delta
+                name: Écart
+          - type: entities
+            title: SolarFlow 2400 Pro — Shadow
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_requested_solarflow_output
+                name: Demandé
+              - entity: sensor.carpiquet_ems_validated_solarflow_output
+                name: Validé
+              - entity: sensor.carpiquet_ems_actual_solarflow_output_limit
+                name: Réglage Zendure observé
+              - entity: sensor.carpiquet_ems_solarflow_command_delta
+                name: Écart
 
       - type: grid
         title: Session de simulation

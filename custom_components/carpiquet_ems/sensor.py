@@ -3,6 +3,20 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("command_pipeline_state", "Command Pipeline State", ATTR_COMMAND_PIPELINE_STATE, None, None),
+    ("command_safety_reason", "Command Safety Reason", ATTR_COMMAND_SAFETY_REASON, None, None),
+    ("requested_hyper_output", "Requested Hyper Output", ATTR_REQUESTED_HYPER_OUTPUT, "W", "power"),
+    ("validated_hyper_output", "Validated Hyper Output", ATTR_VALIDATED_HYPER_OUTPUT, "W", "power"),
+    ("requested_solarflow_output", "Requested SolarFlow Output", ATTR_REQUESTED_SOLARFLOW_OUTPUT, "W", "power"),
+    ("validated_solarflow_output", "Validated SolarFlow Output", ATTR_VALIDATED_SOLARFLOW_OUTPUT, "W", "power"),
+    ("actual_hyper_output_limit", "Actual Hyper Output Limit", ATTR_ACTUAL_HYPER_OUTPUT_LIMIT, "W", "power"),
+    ("actual_solarflow_output_limit", "Actual SolarFlow Output Limit", ATTR_ACTUAL_SOLARFLOW_OUTPUT_LIMIT, "W", "power"),
+    ("hyper_command_delta", "Hyper Command Delta", ATTR_HYPER_COMMAND_DELTA, "W", "power"),
+    ("solarflow_command_delta", "SolarFlow Command Delta", ATTR_SOLARFLOW_COMMAND_DELTA, "W", "power"),
+    ("command_source_age", "Command Source Age", ATTR_COMMAND_SOURCE_AGE, "s", "duration"),
+    ("shadow_cycle", "Shadow Cycle", ATTR_SHADOW_CYCLE, None, None),
+    ("shadow_accepted", "Shadow Accepted", ATTR_SHADOW_ACCEPTED, None, None),
+    ("shadow_rejected", "Shadow Rejected", ATTR_SHADOW_REJECTED, None, None),
     ("engine_initialization_state", "Engine Initialization State", ATTR_ENGINE_INITIALIZATION_STATE, None, None),
     ("engine_initialization_error", "Engine Initialization Error", ATTR_ENGINE_INITIALIZATION_ERROR, None, None),
     ("session_recording_state", "Recording State", ATTR_SESSION_RECORDING_STATE, None, None),

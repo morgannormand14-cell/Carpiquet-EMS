@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.5.8"
+VERSION = "0.6.0-alpha-sprint6"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -183,3 +183,31 @@ ATTR_ENGINE_INITIALIZATION_STATE = "engine_initialization_state"
 ATTR_ENGINE_INITIALIZATION_ERROR = "engine_initialization_error"
 ATTR_ENGINE_INITIALIZATION_READY = "engine_initialization_ready"
 DEFAULT_INITIALIZATION_TIMEOUT_SECONDS = 30.0
+
+
+# Sprint 6 — Command Pipeline & Shadow Mode
+CONTROL_MODE_SIMULATION = "Simulation"
+CONTROL_MODE_SHADOW = "Shadow"
+CONTROL_MODE_ARMED = "Armed"
+CONTROL_MODE_OPTIONS = [CONTROL_MODE_SIMULATION, CONTROL_MODE_SHADOW, CONTROL_MODE_ARMED]
+
+ATTR_CONTROL_MODE = "control_mode"
+ATTR_COMMAND_PIPELINE_STATE = "command_pipeline_state"
+ATTR_COMMAND_WRITE_LOCKED = "command_write_locked"
+ATTR_COMMAND_SAFETY_OK = "command_safety_ok"
+ATTR_COMMAND_SAFETY_LIMITED = "command_safety_limited"
+ATTR_COMMAND_SAFETY_REASON = "command_safety_reason"
+ATTR_WOULD_SEND_COMMAND = "would_send_command"
+ATTR_REQUESTED_HYPER_OUTPUT = "requested_hyper_output_w"
+ATTR_VALIDATED_HYPER_OUTPUT = "validated_hyper_output_w"
+ATTR_REQUESTED_SOLARFLOW_OUTPUT = "requested_solarflow_output_w"
+ATTR_VALIDATED_SOLARFLOW_OUTPUT = "validated_solarflow_output_w"
+ATTR_ACTUAL_HYPER_OUTPUT_LIMIT = "actual_hyper_output_limit_w"
+ATTR_ACTUAL_SOLARFLOW_OUTPUT_LIMIT = "actual_solarflow_output_limit_w"
+ATTR_HYPER_COMMAND_DELTA = "hyper_command_delta_w"
+ATTR_SOLARFLOW_COMMAND_DELTA = "solarflow_command_delta_w"
+ATTR_COMMAND_EVALUATION_AT = "command_evaluation_at"
+ATTR_COMMAND_SOURCE_AGE = "command_source_age_seconds"
+ATTR_SHADOW_CYCLE = "shadow_cycle"
+ATTR_SHADOW_ACCEPTED = "shadow_accepted_commands"
+ATTR_SHADOW_REJECTED = "shadow_rejected_commands"

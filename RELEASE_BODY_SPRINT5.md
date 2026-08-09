@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.5.8 — Sprint 5 Final
+# Carpiquet EMS v0.6.0-alpha-sprint6 — Sprint 5 Final
 
 > **Every watt counts.**  
 > Intelligent energy management for Zendure.  
@@ -20,6 +20,6 @@ Cette version reste **100 % simulation**. Aucune commande réelle n’est envoy�
 
 **Safety before performance. Always.**
 
-Tag : `v0.5.8`  
+Tag : `v0.6.0-alpha-sprint6`  
 Pré-release : Non  
 Latest release : Oui

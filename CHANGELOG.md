@@ -1,13 +1,24 @@
 # Changelog
 
-## v0.5.8 — Corrective finale Sprint 5
+## v0.6.0-alpha-sprint6 — Command Pipeline & Shadow Mode
+
+- Opened Sprint 6.
+- Added isolated command pipeline and safety validation.
+- Added Simulation, Shadow and Armed runtime control modes.
+- Added hard write lock; no real Zendure write path exists.
+- Added requested/validated command telemetry and Zendure-setting comparison.
+- Added source-age safety guard and shadow counters.
+- Added command fields to simulation reports and dashboard.
+
+
+## v0.6.0-alpha-sprint6 — Corrective finale Sprint 5
 
 - Reset all session performance and energy accumulators.
 - Rebuild complete summaries for orphaned/interrupted sessions.
 - Add collection-gap statistics to recovered reports.
 - Preserve initialization guard and atomic finalization.
 
-## v0.5.8 — Sprint 5 release
+## v0.6.0-alpha-sprint6 — Sprint 5 release
 
 - Added guarded engine initialization.
 - Wait up to 30 seconds for valid SOC and essential entity data.

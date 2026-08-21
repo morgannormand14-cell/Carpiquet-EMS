@@ -1,4 +1,4 @@
-# Package contents — v0.6.0-alpha-sprint6
+# Package contents — v0.6.1-alpha-sprint6
 
 Full Home Assistant custom integration package including:
 

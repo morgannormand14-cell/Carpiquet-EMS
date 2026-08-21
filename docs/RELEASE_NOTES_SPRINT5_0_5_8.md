@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.6.0-alpha-sprint6 — Corrective finale Sprint 5
+# Carpiquet EMS v0.6.1-alpha-sprint6 — Corrective finale Sprint 5
 
 - Réinitialisation complète des compteurs de performance à chaque session.
 - Réinitialisation des compteurs énergétiques, du temps de cycle et des rampes du jumeau numérique.

@@ -387,7 +387,7 @@ views:
           - type: markdown
             content: |
               # 🛡️ Command Pipeline
-              **v0.6.0 — Shadow Mode**
+              **v0.6.1 — Source Freshness & Safety Watchdog**
 
               Les consignes sont calculées puis validées par les garde-fous.
 
@@ -407,8 +407,20 @@ views:
                 name: Commande qui serait envoyée
               - entity: sensor.carpiquet_ems_command_safety_reason
                 name: Motif sécurité
-              - entity: sensor.carpiquet_ems_command_source_age
-                name: Âge des données
+              - entity: sensor.carpiquet_ems_command_watchdog_state
+                name: État watchdog
+              - entity: binary_sensor.carpiquet_ems_grid_source_fresh
+                name: Shelly frais
+              - entity: sensor.carpiquet_ems_grid_source_age
+                name: Âge Shelly
+              - entity: sensor.carpiquet_ems_hyper_soc_source_age
+                name: Âge SOC Hyper (diagnostic)
+              - entity: sensor.carpiquet_ems_solarflow_soc_source_age
+                name: Âge SOC SolarFlow (diagnostic)
+              - entity: sensor.carpiquet_ems_hyper_pv_source_age
+                name: Âge PV Hyper (diagnostic)
+              - entity: sensor.carpiquet_ems_solarflow_pv_source_age
+                name: Âge PV SolarFlow (diagnostic)
           - type: entities
             title: Hyper 2000 — Shadow
             show_header_toggle: false

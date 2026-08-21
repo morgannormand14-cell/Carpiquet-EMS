@@ -1,4 +1,4 @@
-# v0.6.0-alpha-sprint6 — Garde d'initialisation du moteur
+# v0.6.1-alpha-sprint6 — Garde d'initialisation du moteur
 
 Cette version finale du Sprint 5 empêche une session de démarrer avec des
 valeurs de SOC nulles ou indisponibles.

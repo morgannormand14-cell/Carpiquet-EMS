@@ -235,14 +235,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
 
     def _initialization_snapshot_is_valid(self, snapshot):
-        required_positive = (
-            snapshot.get("hyper_soc_percent"),
-            snapshot.get("solarflow_soc_percent"),
+        # A real numeric 0% SOC is physically valid. Availability must be checked
+        # from the Home Assistant states instead of inferring it from a 0.0 fallback.
+        soc_entities = (
+            self.config.get(CONF_HYPER_SOC_ENTITY),
+            self.config.get(CONF_SOLARFLOW_SOC_ENTITY),
         )
-        if any(value is None for value in required_positive):
-            return False, "SOC indisponible"
-        if any(float(value) <= 0.0 for value in required_positive):
-            return False, "SOC invalide ou nul"
+        if not all(self._source_numeric_available(entity_id, 0.0, 100.0) for entity_id in soc_entities):
+            return False, "SOC indisponible ou invalide"
 
         required_entities = (
             self.config.get(CONF_HYPER_CAPACITY_ENTITY),
@@ -389,19 +389,37 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._control_mode = mode
         await self.async_request_refresh()
 
-    def _max_source_age_seconds(self, entity_ids):
+    def _source_age_seconds(self, entity_id):
+        """Return source report age for diagnostics.
+
+        Home Assistant's last_reported is preferred because it can advance even
+        when the state value itself does not change. Older HA versions fall back
+        to last_updated.
+        """
+        if not entity_id:
+            return 999999.0
+        state = self._state(entity_id)
+        if state is None:
+            return 999999.0
+        timestamp = getattr(state, "last_reported", None) or getattr(state, "last_updated", None)
+        if timestamp is None:
+            return 999999.0
         now = datetime.now(timezone.utc)
-        ages = []
-        for entity_id in entity_ids:
-            if not entity_id:
-                continue
-            state = self._state(entity_id)
-            if state is None:
-                return 999999.0
-            updated = getattr(state, "last_updated", None)
-            if updated is not None:
-                ages.append(max(0.0, (now - updated).total_seconds()))
-        return max(ages) if ages else 999999.0
+        return max(0.0, (now - timestamp).total_seconds())
+
+    def _source_numeric_available(self, entity_id, minimum=None, maximum=None):
+        state = self._state(entity_id)
+        if not state or state.state in (STATE_UNKNOWN, STATE_UNAVAILABLE, "", None):
+            return False
+        try:
+            value = float(state.state)
+        except (TypeError, ValueError):
+            return False
+        if minimum is not None and value < minimum:
+            return False
+        if maximum is not None and value > maximum:
+            return False
+        return True
 
     def list_reports(self):
         return self._session.list_reports()
@@ -593,17 +611,38 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._twin_prev_hyper_charge = twin.hyper_charge_w
             self._twin_prev_solar_charge = twin.solarflow_charge_w
 
-            command_source_age = self._max_source_age_seconds(
-                (
-                    grid_entity,
-                    hyper_soc_entity,
-                    solar_soc_entity,
-                    hyper_pv_entity,
-                    solar_pv_entity,
-                    self.config.get(CONF_HYPER_REAL_OUTPUT_ENTITY),
-                    self.config.get(CONF_SOLARFLOW_REAL_OUTPUT_ENTITY),
-                )
+            # v0.6.1 freshness model:
+            # - the grid meter is command-critical and must be fresh;
+            # - SOC/PV/output entities must be available and numeric, but a stable
+            #   value is not considered stale merely because it has not changed.
+            hyper_output_entity = self.config.get(CONF_HYPER_REAL_OUTPUT_ENTITY)
+            solar_output_entity = self.config.get(CONF_SOLARFLOW_REAL_OUTPUT_ENTITY)
+
+            grid_source_age = self._source_age_seconds(grid_entity)
+            hyper_soc_source_age = self._source_age_seconds(hyper_soc_entity)
+            solar_soc_source_age = self._source_age_seconds(solar_soc_entity)
+            hyper_pv_source_age = self._source_age_seconds(hyper_pv_entity)
+            solar_pv_source_age = self._source_age_seconds(solar_pv_entity)
+            hyper_output_source_age = self._source_age_seconds(hyper_output_entity)
+            solar_output_source_age = self._source_age_seconds(solar_output_entity)
+
+            grid_source_fresh = (
+                grid_ok
+                and grid_source_age <= DEFAULT_GRID_SOURCE_MAX_AGE_SECONDS
             )
+
+            # Explicit numeric validation avoids treating unknown/unavailable as 0.
+            hyper_command_sources_ok = (
+                self._source_numeric_available(hyper_soc_entity, 0.0, 100.0)
+                and self._source_numeric_available(hyper_pv_entity, 0.0)
+                and self._source_numeric_available(hyper_output_entity, 0.0)
+            )
+            solar_command_sources_ok = (
+                self._source_numeric_available(solar_soc_entity, 0.0, 100.0)
+                and self._source_numeric_available(solar_pv_entity, 0.0)
+                and self._source_numeric_available(solar_output_entity, 0.0)
+            )
+
             command_request = CommandRequest(
                 hyper_output_w=max(0.0, twin.hyper_home_w),
                 solarflow_output_w=max(0.0, twin.solarflow_home_w),
@@ -613,8 +652,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 command_request,
                 SafetyContext(
                     grid_available=grid_ok,
-                    hyper_available=hyper_ok,
-                    solarflow_available=solar_ok,
+                    grid_fresh=grid_source_fresh,
+                    hyper_available=hyper_ok and hyper_command_sources_ok,
+                    solarflow_available=solar_ok and solar_command_sources_ok,
                     initialization_ready=self._initialization_ready,
                     fallback_active=fallback_count > 0,
                     allow_fallback=bool(
@@ -628,7 +668,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     solarflow_pv_w=solar_pv,
                     hyper_max_power_w=dynamic["hyper_max_power"],
                     solarflow_max_power_w=dynamic["solarflow_max_power"],
-                    source_age_seconds=command_source_age,
+                    grid_source_age_seconds=grid_source_age,
+                    grid_max_age_seconds=DEFAULT_GRID_SOURCE_MAX_AGE_SECONDS,
                 ),
             )
             self._shadow_cycle += 1
@@ -808,7 +849,17 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_HYPER_COMMAND_DELTA: round(command_decision.validated.hyper_output_w - actual_hyper_output_limit, 1),
                 ATTR_SOLARFLOW_COMMAND_DELTA: round(command_decision.validated.solarflow_output_w - actual_solar_output_limit, 1),
                 ATTR_COMMAND_EVALUATION_AT: command_decision.evaluated_at,
-                ATTR_COMMAND_SOURCE_AGE: round(command_source_age, 1),
+                ATTR_COMMAND_WATCHDOG_STATE: command_decision.watchdog_state,
+                ATTR_COMMAND_SOURCE_AGE: round(grid_source_age, 1),
+                ATTR_GRID_SOURCE_AGE: round(grid_source_age, 1),
+                ATTR_HYPER_SOC_SOURCE_AGE: round(hyper_soc_source_age, 1),
+                ATTR_SOLARFLOW_SOC_SOURCE_AGE: round(solar_soc_source_age, 1),
+                ATTR_HYPER_PV_SOURCE_AGE: round(hyper_pv_source_age, 1),
+                ATTR_SOLARFLOW_PV_SOURCE_AGE: round(solar_pv_source_age, 1),
+                ATTR_HYPER_OUTPUT_SOURCE_AGE: round(hyper_output_source_age, 1),
+                ATTR_SOLARFLOW_OUTPUT_SOURCE_AGE: round(solar_output_source_age, 1),
+                ATTR_GRID_SOURCE_FRESH: grid_source_fresh,
+                ATTR_SOURCE_FRESHNESS_MODEL: "grid_strict_other_sources_availability",
                 ATTR_SHADOW_CYCLE: self._shadow_cycle,
                 ATTR_SHADOW_ACCEPTED: self._shadow_accepted,
                 ATTR_SHADOW_REJECTED: self._shadow_rejected,
@@ -876,6 +927,16 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "hyper_command_delta_w": result_data.get(ATTR_HYPER_COMMAND_DELTA),
                 "solarflow_command_delta_w": result_data.get(ATTR_SOLARFLOW_COMMAND_DELTA),
                 "command_source_age_seconds": result_data.get(ATTR_COMMAND_SOURCE_AGE),
+                "command_watchdog_state": result_data.get(ATTR_COMMAND_WATCHDOG_STATE),
+                "grid_source_age_seconds": result_data.get(ATTR_GRID_SOURCE_AGE),
+                "hyper_soc_source_age_seconds": result_data.get(ATTR_HYPER_SOC_SOURCE_AGE),
+                "solarflow_soc_source_age_seconds": result_data.get(ATTR_SOLARFLOW_SOC_SOURCE_AGE),
+                "hyper_pv_source_age_seconds": result_data.get(ATTR_HYPER_PV_SOURCE_AGE),
+                "solarflow_pv_source_age_seconds": result_data.get(ATTR_SOLARFLOW_PV_SOURCE_AGE),
+                "hyper_output_source_age_seconds": result_data.get(ATTR_HYPER_OUTPUT_SOURCE_AGE),
+                "solarflow_output_source_age_seconds": result_data.get(ATTR_SOLARFLOW_OUTPUT_SOURCE_AGE),
+                "grid_source_fresh": result_data.get(ATTR_GRID_SOURCE_FRESH),
+                "source_freshness_model": result_data.get(ATTR_SOURCE_FRESHNESS_MODEL),
             }
             if self._automation_enabled_runtime and not self._session_stopping:
                 self._session.append(session_sample)

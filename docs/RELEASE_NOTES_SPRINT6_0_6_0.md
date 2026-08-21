@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.6.0-alpha-sprint6
+# Carpiquet EMS v0.6.1-alpha-sprint6
 
 ## Sprint 6 starts here
 

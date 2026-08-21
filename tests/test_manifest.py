@@ -3,5 +3,5 @@ from pathlib import Path
 
 def test_manifest_version():
     manifest = json.loads(Path('custom_components/carpiquet_ems/manifest.json').read_text())
-    assert manifest['version'] == '0.6.0-alpha-sprint6'
+    assert manifest['version'] == '0.6.1-alpha-sprint6'
     assert manifest['config_flow'] is True

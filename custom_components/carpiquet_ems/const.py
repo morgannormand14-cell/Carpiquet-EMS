@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.0-alpha-sprint6"
+VERSION = "0.6.1-alpha-sprint6"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -211,3 +211,18 @@ ATTR_COMMAND_SOURCE_AGE = "command_source_age_seconds"
 ATTR_SHADOW_CYCLE = "shadow_cycle"
 ATTR_SHADOW_ACCEPTED = "shadow_accepted_commands"
 ATTR_SHADOW_REJECTED = "shadow_rejected_commands"
+
+
+# Sprint 6.1 — Source Freshness & Safety Watchdog
+ATTR_COMMAND_WATCHDOG_STATE = "command_watchdog_state"
+ATTR_GRID_SOURCE_AGE = "grid_source_age_seconds"
+ATTR_HYPER_SOC_SOURCE_AGE = "hyper_soc_source_age_seconds"
+ATTR_SOLARFLOW_SOC_SOURCE_AGE = "solarflow_soc_source_age_seconds"
+ATTR_HYPER_PV_SOURCE_AGE = "hyper_pv_source_age_seconds"
+ATTR_SOLARFLOW_PV_SOURCE_AGE = "solarflow_pv_source_age_seconds"
+ATTR_HYPER_OUTPUT_SOURCE_AGE = "hyper_output_source_age_seconds"
+ATTR_SOLARFLOW_OUTPUT_SOURCE_AGE = "solarflow_output_source_age_seconds"
+ATTR_GRID_SOURCE_FRESH = "grid_source_fresh"
+ATTR_SOURCE_FRESHNESS_MODEL = "source_freshness_model"
+
+DEFAULT_GRID_SOURCE_MAX_AGE_SECONDS = 60.0

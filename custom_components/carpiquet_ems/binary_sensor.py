@@ -6,6 +6,7 @@ BINARY_SENSORS = [
     ("command_write_locked", "Command Write Locked", ATTR_COMMAND_WRITE_LOCKED),
     ("command_safety_ok", "Command Safety OK", ATTR_COMMAND_SAFETY_OK),
     ("command_safety_limited", "Command Safety Limited", ATTR_COMMAND_SAFETY_LIMITED),
+    ("grid_source_fresh", "Grid Source Fresh", ATTR_GRID_SOURCE_FRESH),
     ("would_send_command", "Would Send Command", ATTR_WOULD_SEND_COMMAND),
     ("engine_initialization_ready", "Engine Initialization Ready", ATTR_ENGINE_INITIALIZATION_READY),
     ("simulation_session_finalizing", "Simulation Session Finalizing", ATTR_SESSION_FINALIZING),

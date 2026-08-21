@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.6.0-alpha-sprint6 — Command Pipeline & Shadow Mode
+# Carpiquet EMS v0.6.1-alpha-sprint6 — Command Pipeline & Shadow Mode
 
 > **Every watt counts.**  
 > Intelligent energy management for Zendure.  
@@ -35,5 +35,5 @@ The v0.6.0 package contains no real Zendure command path.
 
 > **Safety before performance. Always.**
 
-Tag: `v0.6.0-alpha-sprint6`
+Tag: `v0.6.1-alpha-sprint6`
 Pre-release: **Yes**

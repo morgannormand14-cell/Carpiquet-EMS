@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.6.1-alpha-sprint6 — Source Freshness & Safety Watchdog
+# Carpiquet EMS v0.6.2-alpha-sprint6 — Source Freshness & Safety Watchdog
 
 > **Every watt counts.**  
 > Intelligent energy management for Zendure.  
@@ -48,5 +48,5 @@ non-numeric SOC values remain rejected.
 
 > **Safety before performance. Always.**
 
-Tag: `v0.6.1-alpha-sprint6`  
+Tag: `v0.6.2-alpha-sprint6`  
 Pre-release: **Yes**

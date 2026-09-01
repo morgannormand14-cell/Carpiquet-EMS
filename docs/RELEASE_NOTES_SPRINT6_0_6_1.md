@@ -1,4 +1,4 @@
-# Carpiquet EMS v0.6.1-alpha-sprint6
+# Carpiquet EMS v0.6.2-alpha-sprint6
 
 ## Corrective: Shadow source freshness
 

@@ -3,6 +3,18 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("safety_state", "Safety State", ATTR_SAFETY_STATE, None, None),
+    ("safety_state_reason", "Safety State Reason", ATTR_SAFETY_STATE_REASON, None, None),
+    ("safety_state_since", "Safety State Since", ATTR_SAFETY_STATE_SINCE, None, None),
+    ("safety_state_seconds", "Safety State Seconds", ATTR_SAFETY_STATE_SECONDS, "s", "duration"),
+    ("safety_transition_count", "Safety Transition Count", ATTR_SAFETY_TRANSITIONS, None, None),
+    ("safety_hold_count", "Safety Hold Count", ATTR_SAFETY_HOLD_COUNT, None, None),
+    ("safety_fault_count", "Safety Fault Count", ATTR_SAFETY_FAULT_COUNT, None, None),
+    ("safety_recovery_count", "Safety Recovery Count", ATTR_SAFETY_RECOVERY_COUNT, None, None),
+    ("safety_last_fault", "Safety Last Fault", ATTR_SAFETY_LAST_FAULT, None, None),
+    ("safety_recovery_remaining", "Safety Recovery Remaining", ATTR_SAFETY_RECOVERY_REMAINING, "s", "duration"),
+    ("safety_fault_escalation_remaining", "Safety Fault Escalation Remaining", ATTR_SAFETY_FAULT_ESCALATION_REMAINING, "s", "duration"),
+    ("raw_command_safety_reason", "Raw Command Safety Reason", ATTR_RAW_COMMAND_SAFETY_REASON, None, None),
     ("command_pipeline_state", "Command Pipeline State", ATTR_COMMAND_PIPELINE_STATE, None, None),
     ("command_safety_reason", "Command Safety Reason", ATTR_COMMAND_SAFETY_REASON, None, None),
     ("requested_hyper_output", "Requested Hyper Output", ATTR_REQUESTED_HYPER_OUTPUT, "W", "power"),

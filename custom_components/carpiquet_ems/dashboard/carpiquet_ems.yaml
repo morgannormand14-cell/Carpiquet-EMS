@@ -387,7 +387,7 @@ views:
           - type: markdown
             content: |
               # 🛡️ Command Pipeline
-              **v0.6.1 — Source Freshness & Safety Watchdog**
+              **v0.6.2 — Safety State Machine & Recovery Watchdog**
 
               Les consignes sont calculées puis validées par les garde-fous.
 
@@ -409,6 +409,22 @@ views:
                 name: Motif sécurité
               - entity: sensor.carpiquet_ems_command_watchdog_state
                 name: État watchdog
+              - entity: sensor.carpiquet_ems_safety_state
+                name: État sécurité global
+              - entity: sensor.carpiquet_ems_safety_state_reason
+                name: Motif état sécurité
+              - entity: binary_sensor.carpiquet_ems_shadow_authorized
+                name: Shadow autorisé
+              - entity: sensor.carpiquet_ems_safety_recovery_remaining
+                name: Recovery restante
+              - entity: sensor.carpiquet_ems_safety_fault_escalation_remaining
+                name: Escalade vers FAULT
+              - entity: sensor.carpiquet_ems_safety_hold_count
+                name: HOLD cumulés
+              - entity: sensor.carpiquet_ems_safety_fault_count
+                name: FAULT cumulés
+              - entity: sensor.carpiquet_ems_safety_recovery_count
+                name: RECOVERY cumulés
               - entity: binary_sensor.carpiquet_ems_grid_source_fresh
                 name: Shelly frais
               - entity: sensor.carpiquet_ems_grid_source_age

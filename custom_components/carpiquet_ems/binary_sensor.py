@@ -3,6 +3,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("shadow_authorized", "Shadow Authorized", ATTR_SHADOW_AUTHORIZED),
+    ("raw_command_safety_ok", "Raw Command Safety OK", ATTR_RAW_COMMAND_SAFETY_OK),
     ("command_write_locked", "Command Write Locked", ATTR_COMMAND_WRITE_LOCKED),
     ("command_safety_ok", "Command Safety OK", ATTR_COMMAND_SAFETY_OK),
     ("command_safety_limited", "Command Safety Limited", ATTR_COMMAND_SAFETY_LIMITED),

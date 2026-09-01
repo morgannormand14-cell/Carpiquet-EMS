@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.1-alpha-sprint6"
+VERSION = "0.6.2-alpha-sprint6"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -226,3 +226,23 @@ ATTR_GRID_SOURCE_FRESH = "grid_source_fresh"
 ATTR_SOURCE_FRESHNESS_MODEL = "source_freshness_model"
 
 DEFAULT_GRID_SOURCE_MAX_AGE_SECONDS = 60.0
+
+
+# Sprint 6.2 — Safety State Machine & Recovery Watchdog
+ATTR_SAFETY_STATE = "safety_state"
+ATTR_SAFETY_STATE_REASON = "safety_state_reason"
+ATTR_SAFETY_STATE_SINCE = "safety_state_since"
+ATTR_SAFETY_STATE_SECONDS = "safety_state_seconds"
+ATTR_SHADOW_AUTHORIZED = "shadow_authorized"
+ATTR_SAFETY_TRANSITIONS = "safety_transition_count"
+ATTR_SAFETY_HOLD_COUNT = "safety_hold_count"
+ATTR_SAFETY_FAULT_COUNT = "safety_fault_count"
+ATTR_SAFETY_RECOVERY_COUNT = "safety_recovery_count"
+ATTR_SAFETY_LAST_FAULT = "safety_last_fault"
+ATTR_SAFETY_RECOVERY_REMAINING = "safety_recovery_remaining_seconds"
+ATTR_SAFETY_FAULT_ESCALATION_REMAINING = "safety_fault_escalation_remaining_seconds"
+ATTR_RAW_COMMAND_SAFETY_OK = "raw_command_safety_ok"
+ATTR_RAW_COMMAND_SAFETY_REASON = "raw_command_safety_reason"
+
+DEFAULT_SAFETY_HOLD_TO_FAULT_SECONDS = 30.0
+DEFAULT_SAFETY_RECOVERY_SECONDS = 10.0

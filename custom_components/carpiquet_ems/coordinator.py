@@ -14,6 +14,7 @@ from .algorithm import BatteryState, allocate_discharge_power
 from .automation_engine import AutomationInput, POLICY, STATE_IDLE, decide_automation
 from .digital_twin import TwinBattery, TwinInput, simulate_cycle
 from .command_pipeline import CommandRequest, SafetyContext, evaluate_command
+from .safety_state_machine import SafetyStateMachine, STATE_SHADOW_ACTIVE
 from .session_recorder import SimulationSessionRecorder
 from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
@@ -68,6 +69,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._automation_enabled_runtime = bool(self.config.get(CONF_AUTOMATION_ENABLED, DEFAULT_AUTOMATION_ENABLED))
         # Safety: every Home Assistant reload returns command control to Simulation.
         self._control_mode = CONTROL_MODE_SIMULATION
+        self._safety_state_machine = SafetyStateMachine(
+            hold_to_fault_seconds=DEFAULT_SAFETY_HOLD_TO_FAULT_SECONDS,
+            recovery_seconds=DEFAULT_SAFETY_RECOVERY_SECONDS,
+        )
         self._shadow_cycle = 0
         self._shadow_accepted = 0
         self._shadow_rejected = 0
@@ -317,6 +322,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._twin_prev_solar_charge = 0.0
         self._automation_state = STATE_IDLE
         self._automation_last_transition_dt = datetime.now(timezone.utc)
+        self._safety_state_machine.reset(datetime.now(timezone.utc))
 
         safe_config = {
             key: value
@@ -352,6 +358,12 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             "sim_export_energy_kwh": round(self._sim_export_kwh, 4),
             "pv_charged_energy_kwh": round(self._pv_charged_kwh, 4),
             "pv_curtailed_energy_kwh": round(self._pv_curtailed_kwh, 4),
+            "safety_state": data.get(ATTR_SAFETY_STATE),
+            "safety_transition_count": data.get(ATTR_SAFETY_TRANSITIONS),
+            "safety_hold_count": data.get(ATTR_SAFETY_HOLD_COUNT),
+            "safety_fault_count": data.get(ATTR_SAFETY_FAULT_COUNT),
+            "safety_recovery_count": data.get(ATTR_SAFETY_RECOVERY_COUNT),
+            "safety_last_fault": data.get(ATTR_SAFETY_LAST_FAULT),
         }
 
     async def async_stop_simulation_session(self, termination="user_stop"):
@@ -375,6 +387,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
     async def async_shutdown(self):
         self._control_mode = CONTROL_MODE_SIMULATION
+        self._safety_state_machine.reset(datetime.now(timezone.utc))
         self._automation_enabled_runtime = False
         await self.async_stop_simulation_session("home_assistant_reload")
 
@@ -385,7 +398,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
     async def async_set_control_mode(self, mode: str):
         if mode not in CONTROL_MODE_OPTIONS:
             raise ValueError(f"Unsupported control mode: {mode}")
-        # No Live mode and no real-write path exist in v0.6.0.
+        # No Live mode and no real-write path exist in v0.6.2.
         self._control_mode = mode
         await self.async_request_refresh()
 
@@ -672,6 +685,31 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     grid_max_age_seconds=DEFAULT_GRID_SOURCE_MAX_AGE_SECONDS,
                 ),
             )
+            raw_command_decision = command_decision
+            safety_state = self._safety_state_machine.update(
+                self._control_mode,
+                raw_command_decision.safety_ok,
+                raw_command_decision.watchdog_state,
+                raw_command_decision.safety_reason,
+                datetime.now(timezone.utc),
+            )
+
+            # In Shadow mode, a valid raw command is exposed as `would_send` only
+            # after the safety state machine reaches SHADOW_ACTIVE. During HOLD,
+            # FAULT and RECOVERY, validated outputs are intentionally gated to 0 W.
+            if self._control_mode == CONTROL_MODE_SHADOW and not safety_state.shadow_authorized:
+                command_decision = type(raw_command_decision)(
+                    requested=raw_command_decision.requested,
+                    validated=CommandRequest(0.0, 0.0, 0.0, 0.0),
+                    safety_ok=False,
+                    safety_limited=True,
+                    safety_reason=safety_state.reason,
+                    watchdog_state=raw_command_decision.watchdog_state,
+                    would_send_command=False,
+                    write_locked=True,
+                    evaluated_at=raw_command_decision.evaluated_at,
+                )
+
             self._shadow_cycle += 1
             if command_decision.safety_ok:
                 self._shadow_accepted += 1
@@ -831,8 +869,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_PV_CURTAILED_ENERGY: round(self._pv_curtailed_kwh, 4),
                 ATTR_CONTROL_MODE: self._control_mode,
                 ATTR_COMMAND_PIPELINE_STATE: (
-                    "Shadow actif" if self._control_mode == CONTROL_MODE_SHADOW
-                    else "Armed verrouillé" if self._control_mode == CONTROL_MODE_ARMED
+                    safety_state.state if self._control_mode in (CONTROL_MODE_SHADOW, CONTROL_MODE_ARMED)
                     else "Simulation"
                 ),
                 ATTR_COMMAND_WRITE_LOCKED: command_decision.write_locked,
@@ -860,6 +897,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_SOLARFLOW_OUTPUT_SOURCE_AGE: round(solar_output_source_age, 1),
                 ATTR_GRID_SOURCE_FRESH: grid_source_fresh,
                 ATTR_SOURCE_FRESHNESS_MODEL: "grid_strict_other_sources_availability",
+                ATTR_SAFETY_STATE: safety_state.state,
+                ATTR_SAFETY_STATE_REASON: safety_state.reason,
+                ATTR_SAFETY_STATE_SINCE: safety_state.since,
+                ATTR_SAFETY_STATE_SECONDS: safety_state.seconds_in_state,
+                ATTR_SHADOW_AUTHORIZED: safety_state.shadow_authorized,
+                ATTR_SAFETY_TRANSITIONS: safety_state.transition_count,
+                ATTR_SAFETY_HOLD_COUNT: safety_state.hold_count,
+                ATTR_SAFETY_FAULT_COUNT: safety_state.fault_count,
+                ATTR_SAFETY_RECOVERY_COUNT: safety_state.recovery_count,
+                ATTR_SAFETY_LAST_FAULT: safety_state.last_fault or "Aucune",
+                ATTR_SAFETY_RECOVERY_REMAINING: safety_state.recovery_remaining_seconds,
+                ATTR_SAFETY_FAULT_ESCALATION_REMAINING: safety_state.fault_escalation_remaining_seconds,
+                ATTR_RAW_COMMAND_SAFETY_OK: raw_command_decision.safety_ok,
+                ATTR_RAW_COMMAND_SAFETY_REASON: raw_command_decision.safety_reason,
                 ATTR_SHADOW_CYCLE: self._shadow_cycle,
                 ATTR_SHADOW_ACCEPTED: self._shadow_accepted,
                 ATTR_SHADOW_REJECTED: self._shadow_rejected,
@@ -937,6 +988,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "solarflow_output_source_age_seconds": result_data.get(ATTR_SOLARFLOW_OUTPUT_SOURCE_AGE),
                 "grid_source_fresh": result_data.get(ATTR_GRID_SOURCE_FRESH),
                 "source_freshness_model": result_data.get(ATTR_SOURCE_FRESHNESS_MODEL),
+                "safety_state": result_data.get(ATTR_SAFETY_STATE),
+                "safety_state_reason": result_data.get(ATTR_SAFETY_STATE_REASON),
+                "safety_state_since": result_data.get(ATTR_SAFETY_STATE_SINCE),
+                "safety_state_seconds": result_data.get(ATTR_SAFETY_STATE_SECONDS),
+                "shadow_authorized": result_data.get(ATTR_SHADOW_AUTHORIZED),
+                "safety_transition_count": result_data.get(ATTR_SAFETY_TRANSITIONS),
+                "safety_hold_count": result_data.get(ATTR_SAFETY_HOLD_COUNT),
+                "safety_fault_count": result_data.get(ATTR_SAFETY_FAULT_COUNT),
+                "safety_recovery_count": result_data.get(ATTR_SAFETY_RECOVERY_COUNT),
+                "safety_last_fault": result_data.get(ATTR_SAFETY_LAST_FAULT),
+                "safety_recovery_remaining_seconds": result_data.get(ATTR_SAFETY_RECOVERY_REMAINING),
+                "safety_fault_escalation_remaining_seconds": result_data.get(ATTR_SAFETY_FAULT_ESCALATION_REMAINING),
+                "raw_command_safety_ok": result_data.get(ATTR_RAW_COMMAND_SAFETY_OK),
+                "raw_command_safety_reason": result_data.get(ATTR_RAW_COMMAND_SAFETY_REASON),
             }
             if self._automation_enabled_runtime and not self._session_stopping:
                 self._session.append(session_sample)

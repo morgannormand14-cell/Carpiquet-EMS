@@ -1,7 +1,17 @@
 # Changelog
 
+## v0.6.2-alpha-sprint6 — Safety State Machine & Recovery Watchdog
 
-## v0.6.1-alpha-sprint6 — Source Freshness & Safety Watchdog
+- Added six-state safety machine.
+- Added HOLD-to-FAULT escalation and RECOVERY stabilization.
+- Added command gating during HOLD/FAULT/RECOVERY.
+- Added raw safety decision telemetry and state-transition counters.
+- Preserved v0.6.1 source freshness model.
+- Real Zendure writes remain hard locked.
+
+
+
+## v0.6.2-alpha-sprint6 — Source Freshness & Safety Watchdog
 
 - Fixed false stale-data rejection in Shadow Mode.
 - Added strict freshness monitoring for the Shelly grid source only.
@@ -12,7 +22,7 @@
 - Real Zendure writes remain hard locked.
 
 
-## v0.6.1-alpha-sprint6 — Command Pipeline & Shadow Mode
+## v0.6.2-alpha-sprint6 — Command Pipeline & Shadow Mode
 
 - Opened Sprint 6.
 - Added isolated command pipeline and safety validation.
@@ -23,14 +33,14 @@
 - Added command fields to simulation reports and dashboard.
 
 
-## v0.6.1-alpha-sprint6 — Corrective finale Sprint 5
+## v0.6.2-alpha-sprint6 — Corrective finale Sprint 5
 
 - Reset all session performance and energy accumulators.
 - Rebuild complete summaries for orphaned/interrupted sessions.
 - Add collection-gap statistics to recovered reports.
 - Preserve initialization guard and atomic finalization.
 
-## v0.6.1-alpha-sprint6 — Sprint 5 release
+## v0.6.2-alpha-sprint6 — Sprint 5 release
 
 - Added guarded engine initialization.
 - Wait up to 30 seconds for valid SOC and essential entity data.

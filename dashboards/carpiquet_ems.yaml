@@ -438,6 +438,26 @@ views:
               - entity: sensor.carpiquet_ems_solarflow_pv_source_age
                 name: Âge PV SolarFlow (diagnostic)
           - type: entities
+            title: Zendure Command Adapter — DRY-RUN 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_command_adapter_state
+                name: État adaptateur
+              - entity: binary_sensor.carpiquet_ems_command_adapter_write_locked
+                name: Verrou écriture
+              - entity: sensor.carpiquet_ems_adapter_hyper_prepared
+                name: Hyper préparé
+              - entity: sensor.carpiquet_ems_adapter_hyper_action
+                name: Hyper action
+              - entity: binary_sensor.carpiquet_ems_adapter_hyper_would_execute
+                name: Hyper serait exécuté
+              - entity: sensor.carpiquet_ems_adapter_solarflow_prepared
+                name: SolarFlow préparé
+              - entity: sensor.carpiquet_ems_adapter_solarflow_action
+                name: SolarFlow action
+              - entity: binary_sensor.carpiquet_ems_adapter_solarflow_would_execute
+                name: SolarFlow serait exécuté
+          - type: entities
             title: Hyper 2000 — Shadow
             show_header_toggle: false
             entities:

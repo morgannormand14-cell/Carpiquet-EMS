@@ -15,6 +15,7 @@ from .automation_engine import AutomationInput, POLICY, STATE_IDLE, decide_autom
 from .digital_twin import TwinBattery, TwinInput, simulate_cycle
 from .command_pipeline import CommandRequest, SafetyContext, evaluate_command
 from .safety_state_machine import SafetyStateMachine, STATE_SHADOW_ACTIVE
+from .zendure_command_adapter import prepare_commands
 from .session_recorder import SimulationSessionRecorder
 from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
@@ -76,6 +77,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._shadow_cycle = 0
         self._shadow_accepted = 0
         self._shadow_rejected = 0
+        self._adapter_sequence = 0
+        self._adapter_previous_hyper_w = None
+        self._adapter_previous_solarflow_w = None
         self._selected_report = None
         self._report_download_url = None
         self._fallbacks = {
@@ -716,12 +720,33 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             else:
                 self._shadow_rejected += 1
 
+            # Observed Zendure output: Hyper uses the real output sensor validated
+            # during the v0.6.2 72 h run. SolarFlow keeps its configured observed
+            # output entity, which was confirmed to track the real Zendure setting.
             actual_hyper_output_limit = self._state_float(
-                self.config.get(CONF_HYPER_OUTPUT_ENTITY), default=0.0
+                self.config.get(CONF_HYPER_REAL_OUTPUT_ENTITY), default=0.0
             )
             actual_solar_output_limit = self._state_float(
                 self.config.get(CONF_SOLARFLOW_OUTPUT_ENTITY), default=0.0
             )
+
+            self._adapter_sequence += 1
+            adapter = prepare_commands(
+                hyper_entity=self.config.get(CONF_HYPER_OUTPUT_ENTITY, ""),
+                solarflow_entity=self.config.get(CONF_SOLARFLOW_OUTPUT_ENTITY, ""),
+                hyper_requested_w=command_decision.validated.hyper_output_w,
+                solarflow_requested_w=command_decision.validated.solarflow_output_w,
+                hyper_observed_w=actual_hyper_output_limit,
+                solarflow_observed_w=actual_solar_output_limit,
+                previous_hyper_w=self._adapter_previous_hyper_w,
+                previous_solarflow_w=self._adapter_previous_solarflow_w,
+                ramp_limit_w=float(self.config.get(CONF_RAMP_LIMIT_W, DEFAULT_RAMP_LIMIT_W)),
+                deadband_w=DEFAULT_ADAPTER_DEADBAND_W,
+                authorized=bool(safety_state.shadow_authorized and command_decision.safety_ok),
+                sequence=self._adapter_sequence,
+            )
+            self._adapter_previous_hyper_w = adapter.hyper.prepared_w
+            self._adapter_previous_solarflow_w = adapter.solarflow.prepared_w
 
             dt_h = cycle_seconds / 3600.0
             hdelta = (twin.hyper_charge_w - twin.hyper_battery_discharge_w) * dt_h / 1000.0
@@ -911,6 +936,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_SAFETY_FAULT_ESCALATION_REMAINING: safety_state.fault_escalation_remaining_seconds,
                 ATTR_RAW_COMMAND_SAFETY_OK: raw_command_decision.safety_ok,
                 ATTR_RAW_COMMAND_SAFETY_REASON: raw_command_decision.safety_reason,
+                ATTR_ADAPTER_STATE: "DRY_RUN_LOCKED",
+                ATTR_ADAPTER_SEQUENCE: adapter.sequence,
+                ATTR_ADAPTER_PREPARED_AT: adapter.prepared_at,
+                ATTR_ADAPTER_WRITE_LOCKED: adapter.write_locked,
+                ATTR_ADAPTER_HYPER_TARGET: adapter.hyper.target_entity,
+                ATTR_ADAPTER_SOLARFLOW_TARGET: adapter.solarflow.target_entity,
+                ATTR_ADAPTER_HYPER_PREPARED: adapter.hyper.prepared_w,
+                ATTR_ADAPTER_SOLARFLOW_PREPARED: adapter.solarflow.prepared_w,
+                ATTR_ADAPTER_HYPER_ACTION: adapter.hyper.action,
+                ATTR_ADAPTER_SOLARFLOW_ACTION: adapter.solarflow.action,
+                ATTR_ADAPTER_HYPER_REASON: adapter.hyper.reason,
+                ATTR_ADAPTER_SOLARFLOW_REASON: adapter.solarflow.reason,
+                ATTR_ADAPTER_HYPER_WOULD_EXECUTE: adapter.hyper.would_execute,
+                ATTR_ADAPTER_SOLARFLOW_WOULD_EXECUTE: adapter.solarflow.would_execute,
                 ATTR_SHADOW_CYCLE: self._shadow_cycle,
                 ATTR_SHADOW_ACCEPTED: self._shadow_accepted,
                 ATTR_SHADOW_REJECTED: self._shadow_rejected,
@@ -1002,6 +1041,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "safety_fault_escalation_remaining_seconds": result_data.get(ATTR_SAFETY_FAULT_ESCALATION_REMAINING),
                 "raw_command_safety_ok": result_data.get(ATTR_RAW_COMMAND_SAFETY_OK),
                 "raw_command_safety_reason": result_data.get(ATTR_RAW_COMMAND_SAFETY_REASON),
+                "command_adapter_state": result_data.get(ATTR_ADAPTER_STATE),
+                "command_adapter_sequence": result_data.get(ATTR_ADAPTER_SEQUENCE),
+                "command_adapter_write_locked": result_data.get(ATTR_ADAPTER_WRITE_LOCKED),
+                "adapter_hyper_prepared_w": result_data.get(ATTR_ADAPTER_HYPER_PREPARED),
+                "adapter_solarflow_prepared_w": result_data.get(ATTR_ADAPTER_SOLARFLOW_PREPARED),
+                "adapter_hyper_action": result_data.get(ATTR_ADAPTER_HYPER_ACTION),
+                "adapter_solarflow_action": result_data.get(ATTR_ADAPTER_SOLARFLOW_ACTION),
+                "adapter_hyper_would_execute": result_data.get(ATTR_ADAPTER_HYPER_WOULD_EXECUTE),
+                "adapter_solarflow_would_execute": result_data.get(ATTR_ADAPTER_SOLARFLOW_WOULD_EXECUTE),
             }
             if self._automation_enabled_runtime and not self._session_stopping:
                 self._session.append(session_sample)

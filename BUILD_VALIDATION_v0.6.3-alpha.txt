@@ -1,0 +1,7 @@
+Carpiquet EMS v0.6.3-alpha-sprint6 — static build validation
+- Python compileall: PASS
+- JSON parse: PASS
+- Zendure Command Adapter standalone contract: PASS
+- Forbidden write scan (async_set_value / number.set_value / direct number service): PASS — zero matches
+- Hard write lock retained: PASS
+- Runtime Home Assistant validation: NOT YET PERFORMED

@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.2-alpha-sprint6"
+VERSION = "0.6.3-alpha-sprint6"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -246,3 +246,21 @@ ATTR_RAW_COMMAND_SAFETY_REASON = "raw_command_safety_reason"
 
 DEFAULT_SAFETY_HOLD_TO_FAULT_SECONDS = 30.0
 DEFAULT_SAFETY_RECOVERY_SECONDS = 10.0
+
+
+# Sprint 6.3 — Zendure Command Adapter (DRY-RUN / HARD WRITE LOCK)
+ATTR_ADAPTER_STATE = "command_adapter_state"
+ATTR_ADAPTER_SEQUENCE = "command_adapter_sequence"
+ATTR_ADAPTER_PREPARED_AT = "command_adapter_prepared_at"
+ATTR_ADAPTER_WRITE_LOCKED = "command_adapter_write_locked"
+ATTR_ADAPTER_HYPER_TARGET = "adapter_hyper_target_entity"
+ATTR_ADAPTER_SOLARFLOW_TARGET = "adapter_solarflow_target_entity"
+ATTR_ADAPTER_HYPER_PREPARED = "adapter_hyper_prepared_w"
+ATTR_ADAPTER_SOLARFLOW_PREPARED = "adapter_solarflow_prepared_w"
+ATTR_ADAPTER_HYPER_ACTION = "adapter_hyper_action"
+ATTR_ADAPTER_SOLARFLOW_ACTION = "adapter_solarflow_action"
+ATTR_ADAPTER_HYPER_REASON = "adapter_hyper_reason"
+ATTR_ADAPTER_SOLARFLOW_REASON = "adapter_solarflow_reason"
+ATTR_ADAPTER_HYPER_WOULD_EXECUTE = "adapter_hyper_would_execute"
+ATTR_ADAPTER_SOLARFLOW_WOULD_EXECUTE = "adapter_solarflow_would_execute"
+DEFAULT_ADAPTER_DEADBAND_W = 5.0

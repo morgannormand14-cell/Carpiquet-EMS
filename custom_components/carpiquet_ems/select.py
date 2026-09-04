@@ -50,5 +50,5 @@ class ControlModeSelect(CoordinatorEntity, SelectEntity):
         return {
             "real_writes_enabled": False,
             "restart_default": "Simulation",
-            "safety_note": "v0.6.2-alpha-sprint6 never writes to Zendure",
+            "safety_note": "v0.6.3-alpha-sprint6 never writes to Zendure",
         }

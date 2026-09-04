@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("command_adapter_write_locked", "Command Adapter Write Locked", ATTR_ADAPTER_WRITE_LOCKED),
+    ("adapter_hyper_would_execute", "Adapter Hyper Would Execute", ATTR_ADAPTER_HYPER_WOULD_EXECUTE),
+    ("adapter_solarflow_would_execute", "Adapter SolarFlow Would Execute", ATTR_ADAPTER_SOLARFLOW_WOULD_EXECUTE),
     ("shadow_authorized", "Shadow Authorized", ATTR_SHADOW_AUTHORIZED),
     ("raw_command_safety_ok", "Raw Command Safety OK", ATTR_RAW_COMMAND_SAFETY_OK),
     ("command_write_locked", "Command Write Locked", ATTR_COMMAND_WRITE_LOCKED),

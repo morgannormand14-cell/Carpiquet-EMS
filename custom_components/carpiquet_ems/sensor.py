@@ -3,6 +3,17 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("command_adapter_state", "Command Adapter State", ATTR_ADAPTER_STATE, None, None),
+    ("command_adapter_sequence", "Command Adapter Sequence", ATTR_ADAPTER_SEQUENCE, None, None),
+    ("command_adapter_prepared_at", "Command Adapter Prepared At", ATTR_ADAPTER_PREPARED_AT, None, None),
+    ("adapter_hyper_target", "Adapter Hyper Target", ATTR_ADAPTER_HYPER_TARGET, None, None),
+    ("adapter_solarflow_target", "Adapter SolarFlow Target", ATTR_ADAPTER_SOLARFLOW_TARGET, None, None),
+    ("adapter_hyper_prepared", "Adapter Hyper Prepared", ATTR_ADAPTER_HYPER_PREPARED, "W", "power"),
+    ("adapter_solarflow_prepared", "Adapter SolarFlow Prepared", ATTR_ADAPTER_SOLARFLOW_PREPARED, "W", "power"),
+    ("adapter_hyper_action", "Adapter Hyper Action", ATTR_ADAPTER_HYPER_ACTION, None, None),
+    ("adapter_solarflow_action", "Adapter SolarFlow Action", ATTR_ADAPTER_SOLARFLOW_ACTION, None, None),
+    ("adapter_hyper_reason", "Adapter Hyper Reason", ATTR_ADAPTER_HYPER_REASON, None, None),
+    ("adapter_solarflow_reason", "Adapter SolarFlow Reason", ATTR_ADAPTER_SOLARFLOW_REASON, None, None),
     ("safety_state", "Safety State", ATTR_SAFETY_STATE, None, None),
     ("safety_state_reason", "Safety State Reason", ATTR_SAFETY_STATE_REASON, None, None),
     ("safety_state_since", "Safety State Since", ATTR_SAFETY_STATE_SINCE, None, None),

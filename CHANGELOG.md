@@ -1,3 +1,9 @@
+## 0.6.3-alpha-sprint6
+- Zendure Command Adapter (DRY-RUN, hard write lock).
+- Secondary ramp limiter and command deduplication.
+- Adapter diagnostics and session telemetry.
+- Correct Hyper observed-output mapping.
+
 # Changelog
 
 ## v0.6.2-alpha-sprint6 — Safety State Machine & Recovery Watchdog

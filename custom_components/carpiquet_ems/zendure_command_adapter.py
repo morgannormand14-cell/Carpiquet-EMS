@@ -79,7 +79,7 @@ def prepare_commands(*, hyper_entity: str, solarflow_entity: str,
                      authorized: bool = False, sequence: int = 0) -> AdapterResult:
     """Translate validated EMS outputs into dry-run Zendure commands.
 
-    v0.6.3-alpha is deliberately non-executable: this module never calls Home
+    v0.6.4-alpha is deliberately non-executable: this module never calls Home
     Assistant services and every result carries write_locked=True.
     """
     hyper = _prepare_device("Hyper 2000", hyper_entity, hyper_requested_w,

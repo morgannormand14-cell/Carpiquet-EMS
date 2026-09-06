@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.3-alpha-sprint6"
+VERSION = "0.6.4-alpha-sprint6"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"

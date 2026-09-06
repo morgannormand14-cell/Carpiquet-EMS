@@ -402,7 +402,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
     async def async_set_control_mode(self, mode: str):
         if mode not in CONTROL_MODE_OPTIONS:
             raise ValueError(f"Unsupported control mode: {mode}")
-        # No Live mode and no real-write path exist in v0.6.2.
+        # No Live mode and no real-write path exist in v0.6.4.
         self._control_mode = mode
         await self.async_request_refresh()
 
@@ -628,7 +628,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._twin_prev_hyper_charge = twin.hyper_charge_w
             self._twin_prev_solar_charge = twin.solarflow_charge_w
 
-            # v0.6.1 freshness model:
+            # v0.6.4 freshness model (retained from Sprint 6.1):
             # - the grid meter is command-critical and must be fresh;
             # - SOC/PV/output entities must be available and numeric, but a stable
             #   value is not considered stale merely because it has not changed.
@@ -721,7 +721,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 self._shadow_rejected += 1
 
             # Observed Zendure output: Hyper uses the real output sensor validated
-            # during the v0.6.2 72 h run. SolarFlow keeps its configured observed
+            # during the validated pre-v0.6.4 72 h run. SolarFlow keeps its configured observed
             # output entity, which was confirmed to track the real Zendure setting.
             actual_hyper_output_limit = self._state_float(
                 self.config.get(CONF_HYPER_REAL_OUTPUT_ENTITY), default=0.0

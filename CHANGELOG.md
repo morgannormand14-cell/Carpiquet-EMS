@@ -1,3 +1,10 @@
+## 0.6.4-alpha-sprint6
+- Nouveau moteur de décharge équilibrée par énergie exploitable restante.
+- Convergence Hyper/SolarFlow vers leur SOC minimum respectif.
+- Redistribution sous contraintes 1200 W / 2400 W pour préserver 3600 W combinés.
+- Ajout de tests de non-régression v0.6.4.
+- Sécurité, watchdog, charge et write-lock inchangés.
+
 ## 0.6.3-alpha-sprint6
 - Zendure Command Adapter (DRY-RUN, hard write lock).
 - Secondary ramp limiter and command deduplication.

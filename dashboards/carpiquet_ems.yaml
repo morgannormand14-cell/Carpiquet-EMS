@@ -312,10 +312,11 @@ views:
           - type: markdown
             content: |
               # 🤖 Moteur d'automatisation
-              **Sprint 6 — Command Pipeline & Shadow Mode**
+              **v0.6.4-alpha — Energy-Aware Discharge Engine**
 
-              Le moteur décide quand l'EMS simulé doit rester inactif,
-              passer en décharge ou se placer en sécurité.
+              Le moteur v0.6.4 pilote la simulation et répartit la décharge selon
+              l’énergie exploitable restante jusqu’au SOC minimum, tout en conservant
+              jusqu’à 3,6 kW de puissance combinée lorsque la demande l’exige.
 
               **Aucune commande réelle Zendure n'est envoyée.**
           - type: entities
@@ -387,9 +388,9 @@ views:
           - type: markdown
             content: |
               # 🛡️ Command Pipeline
-              **v0.6.2 — Safety State Machine & Recovery Watchdog**
+              **v0.6.4-alpha — Energy-Aware Discharge + Safety Pipeline**
 
-              Les consignes sont calculées puis validées par les garde-fous.
+              Les consignes du nouveau moteur énergétique sont calculées, réparties entre Hyper 2000 et SolarFlow 2400 Pro, puis validées par les garde-fous Sprint 6.
 
               **Écritures Zendure : VERROUILLÉES**
           - type: entities

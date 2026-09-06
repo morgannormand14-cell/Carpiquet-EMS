@@ -127,7 +127,7 @@ def evaluate_command(
         reason = "Consigne limitée par les garde-fous" if limited else "Consigne validée"
 
     # Shadow means: this command WOULD be sent if Live existed.
-    # Real writes remain impossible in v0.6.1.
+    # Real writes remain impossible in v0.6.4-alpha.
     return CommandDecision(
         requested=request,
         validated=validated,

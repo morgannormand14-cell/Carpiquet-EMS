@@ -3,6 +3,7 @@
 .github/pull_request_template.md
 .github/workflows/validate.yml
 .gitignore
+BUILD_VALIDATION_v0.6.4-alpha.txt
 CHANGELOG.md
 LICENSE
 PACKAGE_CONTENTS.md
@@ -14,6 +15,7 @@ RELEASE_BODY_SPRINT6.md
 RELEASE_BODY_SPRINT6_0_6_1.md
 RELEASE_BODY_SPRINT6_0_6_2.md
 RELEASE_BODY_SPRINT6_0_6_3.md
+RELEASE_BODY_SPRINT6_0_6_4.md
 assets/branding/carpiquet-ems-sprint2-reference.png
 assets/branding/carpiquet-ems-sprint3-style.png
 assets/screenshots/sprint2-cockpit.png
@@ -81,6 +83,7 @@ docs/RELEASE_NOTES_SPRINT6_0_6_0.md
 docs/RELEASE_NOTES_SPRINT6_0_6_1.md
 docs/RELEASE_NOTES_SPRINT6_0_6_2.md
 docs/RELEASE_NOTES_SPRINT6_0_6_3.md
+docs/RELEASE_NOTES_SPRINT6_0_6_4.md
 docs/RELEASE_PROCESS.md
 docs/RFC-0001-PROJECT-FOUNDATION.md
 docs/RFC-0002-PREMIUM-DASHBOARD.md
@@ -120,6 +123,7 @@ tests/test_dashboard.py
 tests/test_digital_twin.py
 tests/test_digital_twin_v054.py
 tests/test_digital_twin_v055.py
+tests/test_energy_balanced_discharge_v064.py
 tests/test_initialization_guard_v057.py
 tests/test_manifest.py
 tests/test_report_button_v055.py

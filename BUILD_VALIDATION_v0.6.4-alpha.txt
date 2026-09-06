@@ -1,0 +1,10 @@
+Carpiquet EMS v0.6.4-alpha-sprint6 — static build validation
+
+Release: Energy-Aware Discharge Engine
+- Usable-energy based discharge allocation
+- Hyper 2000 max: 1200 W
+- SolarFlow 2400 Pro max: 2400 W
+- Combined availability: up to 3600 W
+- Individual minimum-SOC protection
+- Sprint 6 safety/watchdog/Shadow pipeline retained
+- Zendure real writes remain HARD LOCKED

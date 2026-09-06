@@ -83,6 +83,50 @@ def _allocate(demand: float, ha: float, sa: float) -> tuple[float,float]:
     if rem: s+=min(max(0.0,sa-s),rem)
     return h,s
 
+def _usable_energy_kwh(b: TwinBattery) -> float:
+    """Energy that may still be discharged before the configured reserve."""
+    if not b.available or b.soc_percent <= b.min_soc:
+        return 0.0
+    return max(0.0, b.capacity_kwh * (b.soc_percent - b.min_soc) / 100.0)
+
+def _allocate_discharge_energy_balanced(
+    demand: float, hyper: TwinBattery, solarflow: TwinBattery, cycle_s: float
+) -> tuple[float, float]:
+    """Split discharge by usable energy, then redistribute against power caps.
+
+    This makes both systems converge toward their own minimum SOC at the same
+    time while preserving the full combined inverter power whenever required.
+    """
+    demand = max(0.0, demand)
+    hcap = _energy_limited_discharge_w(hyper, cycle_s)
+    scap = _energy_limited_discharge_w(solarflow, cycle_s)
+    target = min(demand, hcap + scap)
+    if target <= 0.0:
+        return 0.0, 0.0
+
+    he = _usable_energy_kwh(hyper) if hcap > 0.0 else 0.0
+    se = _usable_energy_kwh(solarflow) if scap > 0.0 else 0.0
+    total_energy = he + se
+    if total_energy <= 0.0:
+        return 0.0, 0.0
+
+    h = min(hcap, target * he / total_energy)
+    s = min(scap, target * se / total_energy)
+    rem = max(0.0, target - h - s)
+
+    # Preserve combined power: if the energy-proportional share hits one
+    # inverter's limit, transfer the remainder to the other inverter.
+    if rem > 0.0 and h < hcap:
+        add = min(rem, hcap - h)
+        h += add
+        rem -= add
+    if rem > 0.0 and s < scap:
+        add = min(rem, scap - s)
+        s += add
+        rem -= add
+
+    return h, s
+
 def simulate_cycle(d: TwinInput) -> TwinResult:
     house=max(0.0,d.house_load_w); hpv=max(0.0,d.hyper_pv_w); spv=max(0.0,d.solarflow_pv_w)
     hf=_is_full(d.hyper); sf=_is_full(d.solarflow); full_count=int(hf)+int(sf)
@@ -96,7 +140,7 @@ def simulate_cycle(d: TwinInput) -> TwinResult:
 
     # Deadband: do not chase tiny residual deficits.
     desired_deficit=remaining if remaining>max(0.0,d.deadband_w) else 0.0
-    hdes,sdes=_allocate(desired_deficit,_energy_limited_discharge_w(d.hyper,d.cycle_seconds),_energy_limited_discharge_w(d.solarflow,d.cycle_seconds))
+    hdes,sdes=_allocate_discharge_energy_balanced(desired_deficit,d.hyper,d.solarflow,d.cycle_seconds)
     hdis=min(_energy_limited_discharge_w(d.hyper,d.cycle_seconds),_ramp(d.previous_hyper_discharge_w,hdes,d.ramp_limit_w))
     sdis=min(_energy_limited_discharge_w(d.solarflow,d.cycle_seconds),_ramp(d.previous_solarflow_discharge_w,sdes,d.ramp_limit_w))
     remaining=max(0.0,remaining-hdis-sdis)

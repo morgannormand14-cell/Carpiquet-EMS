@@ -68,8 +68,8 @@ def build_shadow_systems(hass, config: dict[str, Any]) -> list[dict[str, Any]]:
         ("hyper_2000", "Hyper 2000", {
             "soc": config.get(CONF_HYPER_SOC_ENTITY),
             "pv_w": config.get(CONF_HYPER_PV_ENTITY),
-            "output_limit_w": config.get(CONF_HYPER_OUTPUT_ENTITY),
-            "real_output_w": config.get(CONF_HYPER_REAL_OUTPUT_ENTITY),
+            "command_limit_w": config.get(CONF_HYPER_OUTPUT_ENTITY),
+            "home_output_w": config.get(CONF_HYPER_REAL_OUTPUT_ENTITY),
             "grid_input_w": config.get(CONF_HYPER_GRID_INPUT_ENTITY, DEFAULT_HYPER_GRID_INPUT_ENTITY),
             "capacity_kwh": config.get(CONF_HYPER_CAPACITY_ENTITY),
             "max_power_w": config.get(CONF_HYPER_MAX_POWER_ENTITY),
@@ -79,8 +79,8 @@ def build_shadow_systems(hass, config: dict[str, Any]) -> list[dict[str, Any]]:
         ("solarflow_2400_pro", "SolarFlow 2400 Pro", {
             "soc": config.get(CONF_SOLARFLOW_SOC_ENTITY),
             "pv_w": config.get(CONF_SOLARFLOW_PV_ENTITY),
-            "output_limit_w": config.get(CONF_SOLARFLOW_OUTPUT_ENTITY),
-            "real_output_w": config.get(CONF_SOLARFLOW_REAL_OUTPUT_ENTITY),
+            "command_limit_w": config.get(CONF_SOLARFLOW_OUTPUT_ENTITY),
+            "home_output_w": config.get(CONF_SOLARFLOW_REAL_OUTPUT_ENTITY),
             "grid_input_w": config.get(CONF_SOLARFLOW_GRID_INPUT_ENTITY, DEFAULT_SOLARFLOW_GRID_INPUT_ENTITY),
             "capacity_kwh": config.get(CONF_SOLARFLOW_CAPACITY_ENTITY),
             "max_power_w": config.get(CONF_SOLARFLOW_MAX_POWER_ENTITY),
@@ -93,11 +93,21 @@ def build_shadow_systems(hass, config: dict[str, Any]) -> list[dict[str, Any]]:
 
 def mapper_diagnostics(systems: list[dict[str, Any]]) -> dict[str, Any]:
     """Compact parity diagnostics suitable for HA diagnostics/session logs."""
+    mapping_ready = bool(systems) and all(bool(s.get("available")) for s in systems)
     return {
         "mode": "shadow_read_only",
         "engine_authority": "legacy_v0.6.4",
         "systems_count": len(systems),
         "available_systems_count": sum(bool(s.get("available")) for s in systems),
-        "parity_ready": bool(systems) and all(bool(s.get("available")) for s in systems),
+        "mapping_ready": mapping_ready,
+        # Availability is not parity. v0.6.5-alpha.1 deliberately leaves parity
+        # unevaluated until semantically equivalent fields are compared.
+        "parity_evaluated": False,
+        "parity_ready": False,
+        "parity_reason": "awaiting_semantic_field_comparison",
+        "field_semantics": {
+            "command_limit_w": "configured Zendure discharge/output command limit; not measured home power",
+            "home_output_w": "measured power delivered by the system to the home; may include PV and battery contribution",
+        },
         "systems": systems,
     }

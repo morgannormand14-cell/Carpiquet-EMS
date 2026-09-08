@@ -979,11 +979,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             result_data["systems"] = shadow_systems
             result_data["entity_mapper"] = mapper
             result_data["mapper_parity_ready"] = mapper["parity_ready"]
+            result_data["mapper_mapping_ready"] = mapper["mapping_ready"]
             session_sample = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "entity_mapper": mapper,
                 "systems": shadow_systems,
                 "mapper_parity_ready": mapper["parity_ready"],
+                "mapper_mapping_ready": mapper["mapping_ready"],
+                "mapper_parity_evaluated": mapper["parity_evaluated"],
+                "mapper_parity_reason": mapper["parity_reason"],
                 "grid_real_w": result_data.get(ATTR_GRID_POWER),
                 "house_load_w": result_data.get(ATTR_HOUSE_LOAD),
                 "house_load_raw_w": result_data.get(ATTR_HOUSE_LOAD_RAW),

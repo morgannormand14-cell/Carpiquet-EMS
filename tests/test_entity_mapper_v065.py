@@ -13,3 +13,11 @@ def test_coordinator_records_systems_without_engine_cutover():
     assert "build_shadow_systems" in text
     assert 'result_data["systems"]' in text
     assert '"mapper_parity_ready"' in text
+
+
+def test_v065_mapper_distinguishes_command_limit_from_home_output():
+    text = Path("custom_components/carpiquet_ems/entity_mapper.py").read_text()
+    assert '"command_limit_w"' in text
+    assert '"home_output_w"' in text
+    assert '"mapping_ready"' in text
+    assert '"parity_evaluated": False' in text

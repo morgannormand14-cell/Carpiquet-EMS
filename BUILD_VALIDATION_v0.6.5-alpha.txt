@@ -1,0 +1,11 @@
+Carpiquet EMS v0.6.5-alpha-sprint6 — build validation
+
+- Base: complete corrected v0.6.4 package.
+- Phase: Entity Mapper + normalized systems[] in read-only Shadow diagnostics.
+- v0.6.4 Energy-Aware engine remains command authority.
+- Real Zendure write-lock architecture unchanged.
+- Python compileall: PASS.
+- v0.6.5 static mapper tests: PASS.
+- v0.6.4 direct Energy-Aware regression assertions: PASS.
+- Full Home Assistant pytest collection: NOT AVAILABLE in build container because Home Assistant dependency `voluptuous` is absent (same environment limitation as v0.6.4 validation).
+- ZIP integrity: checked after packaging.

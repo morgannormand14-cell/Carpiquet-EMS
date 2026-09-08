@@ -17,6 +17,7 @@ from .command_pipeline import CommandRequest, SafetyContext, evaluate_command
 from .safety_state_machine import SafetyStateMachine, STATE_SHADOW_ACTIVE
 from .zendure_command_adapter import prepare_commands
 from .session_recorder import SimulationSessionRecorder
+from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
 from .topology import valid_numeric
@@ -971,8 +972,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_DYNAMIC_SOURCES: sources,
                 ATTR_FALLBACKS: dict(self._fallbacks),
             }
+            # v0.6.5 phase 1: normalized systems[] is diagnostic-only.
+            # The v0.6.4 engine remains the sole command authority.
+            shadow_systems = build_shadow_systems(self.hass, self.config)
+            mapper = mapper_diagnostics(shadow_systems)
+            result_data["systems"] = shadow_systems
+            result_data["entity_mapper"] = mapper
+            result_data["mapper_parity_ready"] = mapper["parity_ready"]
             session_sample = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
+                "entity_mapper": mapper,
+                "systems": shadow_systems,
+                "mapper_parity_ready": mapper["parity_ready"],
                 "grid_real_w": result_data.get(ATTR_GRID_POWER),
                 "house_load_w": result_data.get(ATTR_HOUSE_LOAD),
                 "house_load_raw_w": result_data.get(ATTR_HOUSE_LOAD_RAW),

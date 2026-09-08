@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.4-alpha-sprint6"
+VERSION = "0.6.5-alpha-sprint6"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -264,3 +264,8 @@ ATTR_ADAPTER_SOLARFLOW_REASON = "adapter_solarflow_reason"
 ATTR_ADAPTER_HYPER_WOULD_EXECUTE = "adapter_hyper_would_execute"
 ATTR_ADAPTER_SOLARFLOW_WOULD_EXECUTE = "adapter_solarflow_would_execute"
 DEFAULT_ADAPTER_DEADBAND_W = 5.0
+
+# v0.6.5 Entity Mapper Shadow diagnostics
+ATTR_ENTITY_MAPPER = "entity_mapper"
+ATTR_SYSTEMS = "systems"
+ATTR_MAPPER_PARITY_READY = "mapper_parity_ready"

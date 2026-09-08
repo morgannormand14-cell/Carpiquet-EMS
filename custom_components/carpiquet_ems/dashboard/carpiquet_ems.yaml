@@ -312,7 +312,7 @@ views:
           - type: markdown
             content: |
               # 🤖 Moteur d'automatisation
-              **v0.6.4-alpha — Energy-Aware Discharge Engine**
+              **v0.6.5-alpha — Energy-Aware Discharge Engine**
 
               Le moteur v0.6.4 pilote la simulation et répartit la décharge selon
               l’énergie exploitable restante jusqu’au SOC minimum, tout en conservant
@@ -388,7 +388,7 @@ views:
           - type: markdown
             content: |
               # 🛡️ Command Pipeline
-              **v0.6.4-alpha — Energy-Aware Discharge + Safety Pipeline**
+              **v0.6.5-alpha — Energy-Aware Discharge + Safety Pipeline**
 
               Les consignes du nouveau moteur énergétique sont calculées, réparties entre Hyper 2000 et SolarFlow 2400 Pro, puis validées par les garde-fous Sprint 6.
 

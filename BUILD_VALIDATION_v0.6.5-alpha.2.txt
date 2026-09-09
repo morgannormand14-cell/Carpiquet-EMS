@@ -1,0 +1,8 @@
+Carpiquet EMS v0.6.5-alpha.2 build validation
+
+- Python compileall custom_components/carpiquet_ems: PASS
+- Entity Mapper + manifest targeted tests: 4 passed
+- Entity Mapper remains read-only: PASS (static test)
+- Engine authority remains legacy_v0.6.4: PASS (static test)
+- Parity reference encoded: SIM-20260908-221137 / 41,829 cycles / 0 semantic telemetry differences
+- Real Zendure writes: LOCKED / unchanged

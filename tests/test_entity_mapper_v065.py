@@ -20,4 +20,8 @@ def test_v065_mapper_distinguishes_command_limit_from_home_output():
     assert '"command_limit_w"' in text
     assert '"home_output_w"' in text
     assert '"mapping_ready"' in text
-    assert '"parity_evaluated": False' in text
+    assert '"parity_evaluated": True' in text
+    assert '"parity_ready": mapping_ready' in text
+    assert '"legacy_hyper"' in text
+    assert '"zensdk_generation"' in text
+    assert '"command_limit_excluded": True' in text

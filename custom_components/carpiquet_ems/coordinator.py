@@ -18,7 +18,6 @@ from .safety_state_machine import SafetyStateMachine, STATE_SHADOW_ACTIVE
 from .zendure_command_adapter import prepare_commands
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
-from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
 from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
 from .topology import valid_numeric
@@ -977,47 +976,6 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             # The v0.6.4 engine remains the sole command authority.
             shadow_systems = build_shadow_systems(self.hass, self.config)
             mapper = mapper_diagnostics(shadow_systems)
-
-            # v0.6.5-alpha.3 / Sprint 6 Phase A: generic 1..5-system engine.
-            # Shadow comparison only: legacy v0.6.4 remains the sole authority.
-            generic_inputs = [
-                GenericSystemInput(
-                    system_id="hyper_2000",
-                    soc_percent=virtual_hyper_soc,
-                    min_soc=dynamic["hyper_min_soc"],
-                    capacity_kwh=dynamic["hyper_capacity"],
-                    max_discharge_w=dynamic["hyper_max_power"],
-                    available=hyper_ok,
-                    previous_discharge_w=self._twin_prev_hyper_discharge,
-                ),
-                GenericSystemInput(
-                    system_id="solarflow_2400_pro",
-                    soc_percent=virtual_solar_soc,
-                    min_soc=dynamic["solarflow_min_soc"],
-                    capacity_kwh=dynamic["solarflow_capacity"],
-                    max_discharge_w=dynamic["solarflow_max_power"],
-                    available=solar_ok,
-                    previous_discharge_w=self._twin_prev_solar_discharge,
-                ),
-            ]
-            generic = allocate_generic_discharge(
-                desired_deficit, generic_inputs, cycle_seconds, ramp
-            ).as_dict()
-            generic_by_id = {row["system_id"]: row for row in generic["systems"]}
-            generic_h = float(generic_by_id["hyper_2000"]["discharge_w"])
-            generic_s = float(generic_by_id["solarflow_2400_pro"]["discharge_w"])
-            generic["mode"] = "shadow_compare"
-            generic["authority"] = False
-            generic["legacy_authority"] = "legacy_v0.6.4"
-            generic["supported_systems"] = "1..5"
-            generic["parity"] = {
-                "hyper_delta_w": round(generic_h - twin.hyper_battery_discharge_w, 6),
-                "solarflow_delta_w": round(generic_s - twin.solarflow_battery_discharge_w, 6),
-                "total_delta_w": round((generic_h + generic_s) - (twin.hyper_battery_discharge_w + twin.solarflow_battery_discharge_w), 6),
-                "exact": abs(generic_h - twin.hyper_battery_discharge_w) <= 0.11 and abs(generic_s - twin.solarflow_battery_discharge_w) <= 0.11,
-            }
-            result_data["generic_energy_engine"] = generic
-            result_data["generic_engine_parity_exact"] = generic["parity"]["exact"]
             result_data["systems"] = shadow_systems
             result_data["entity_mapper"] = mapper
             result_data["mapper_parity_ready"] = mapper["parity_ready"]
@@ -1030,8 +988,6 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "mapper_mapping_ready": mapper["mapping_ready"],
                 "mapper_parity_evaluated": mapper["parity_evaluated"],
                 "mapper_parity_reason": mapper["parity_reason"],
-                "generic_energy_engine": generic,
-                "generic_engine_parity_exact": generic["parity"]["exact"],
                 "grid_real_w": result_data.get(ATTR_GRID_POWER),
                 "house_load_w": result_data.get(ATTR_HOUSE_LOAD),
                 "house_load_raw_w": result_data.get(ATTR_HOUSE_LOAD_RAW),

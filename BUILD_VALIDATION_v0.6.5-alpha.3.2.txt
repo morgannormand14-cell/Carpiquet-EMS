@@ -1,0 +1,13 @@
+Carpiquet EMS v0.6.5-alpha.3.2 — Normandy Sprint 6
+
+Release synchronization hotfix.
+
+Validation targets:
+- manifest/runtime version aligned: 0.6.5-alpha.3.2
+- Generic Energy Engine present
+- Dual Engine Shadow retained
+- desired_deficit initialization hotfix retained
+- previous ramp state synchronization retained
+- Legacy v0.6.4 remains EMS authority
+- Zendure real writes remain LOCKED
+- package excludes __pycache__, *.pyc and .pytest_cache

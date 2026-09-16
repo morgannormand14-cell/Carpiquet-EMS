@@ -1040,6 +1040,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             result_data["entity_mapper"] = mapper
             result_data["mapper_parity_ready"] = mapper["parity_ready"]
             result_data["mapper_mapping_ready"] = mapper["mapping_ready"]
+            # Sprint 7 Step 1: explicit runtime architecture observability.
+            # These diagnostics do not alter command authority or write behavior.
+            result_data[ATTR_ENGINE_AUTHORITY] = mapper["engine_authority"]
+            result_data[ATTR_GENERIC_ENGINE_MODE] = generic["mode"]
+            result_data[ATTR_GENERIC_AUTHORITY] = bool(generic["authority"])
+            result_data[ATTR_REAL_WRITES_ENABLED] = False
+            result_data[ATTR_MAPPER_SYSTEMS_COUNT] = mapper["systems_count"]
+            result_data[ATTR_MAPPER_AVAILABLE_SYSTEMS_COUNT] = mapper["available_systems_count"]
+            result_data[ATTR_MAPPER_READY] = bool(mapper["mapping_ready"])
             session_sample = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "entity_mapper": mapper,

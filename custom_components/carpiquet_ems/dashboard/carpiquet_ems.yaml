@@ -251,6 +251,31 @@ views:
 
 
       - type: grid
+        title: Architecture runtime — Sprint 7
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_engine_authority
+                name: Autorité moteur
+              - entity: sensor.carpiquet_ems_generic_engine_mode
+                name: Mode Generic Engine
+              - entity: binary_sensor.carpiquet_ems_generic_authority
+                name: Generic possède l'autorité
+              - entity: binary_sensor.carpiquet_ems_real_writes_enabled
+                name: Écritures réelles activées
+              - entity: binary_sensor.carpiquet_ems_command_write_locked
+                name: Command Pipeline verrouillé
+              - entity: binary_sensor.carpiquet_ems_command_adapter_write_locked
+                name: Adaptateur Zendure verrouillé
+              - entity: sensor.carpiquet_ems_mapper_systems_count
+                name: Systèmes mappés
+              - entity: sensor.carpiquet_ems_mapper_available_systems_count
+                name: Systèmes disponibles
+              - entity: binary_sensor.carpiquet_ems_mapper_ready
+                name: Mapper prêt
+
+      - type: grid
         title: Pipeline de commande
         cards:
           - type: markdown

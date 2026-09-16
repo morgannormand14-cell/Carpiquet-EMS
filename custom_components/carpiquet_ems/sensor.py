@@ -3,6 +3,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("engine_authority", "Engine Authority", ATTR_ENGINE_AUTHORITY, None, None),
+    ("generic_engine_mode", "Generic Engine Mode", ATTR_GENERIC_ENGINE_MODE, None, None),
+    ("mapper_systems_count", "Mapper Systems Count", ATTR_MAPPER_SYSTEMS_COUNT, None, None),
+    ("mapper_available_systems_count", "Mapper Available Systems Count", ATTR_MAPPER_AVAILABLE_SYSTEMS_COUNT, None, None),
     ("command_adapter_state", "Command Adapter State", ATTR_ADAPTER_STATE, None, None),
     ("command_adapter_sequence", "Command Adapter Sequence", ATTR_ADAPTER_SEQUENCE, None, None),
     ("command_adapter_prepared_at", "Command Adapter Prepared At", ATTR_ADAPTER_PREPARED_AT, None, None),

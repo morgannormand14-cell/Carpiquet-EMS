@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.5-alpha.3.3"
+VERSION = "0.6.5-alpha.3.4"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -253,6 +253,15 @@ ATTR_ADAPTER_STATE = "command_adapter_state"
 ATTR_ADAPTER_SEQUENCE = "command_adapter_sequence"
 ATTR_ADAPTER_PREPARED_AT = "command_adapter_prepared_at"
 ATTR_ADAPTER_WRITE_LOCKED = "command_adapter_write_locked"
+
+# Sprint 7 — runtime architecture diagnostics (observability only)
+ATTR_ENGINE_AUTHORITY = "engine_authority"
+ATTR_GENERIC_ENGINE_MODE = "generic_engine_mode"
+ATTR_GENERIC_AUTHORITY = "generic_authority"
+ATTR_REAL_WRITES_ENABLED = "real_writes_enabled"
+ATTR_MAPPER_SYSTEMS_COUNT = "mapper_systems_count"
+ATTR_MAPPER_AVAILABLE_SYSTEMS_COUNT = "mapper_available_systems_count"
+ATTR_MAPPER_READY = "mapper_ready"
 ATTR_ADAPTER_HYPER_TARGET = "adapter_hyper_target_entity"
 ATTR_ADAPTER_SOLARFLOW_TARGET = "adapter_solarflow_target_entity"
 ATTR_ADAPTER_HYPER_PREPARED = "adapter_hyper_prepared_w"

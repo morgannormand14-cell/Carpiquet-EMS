@@ -52,8 +52,16 @@ def _register_services(hass: HomeAssistant) -> None:
     async def _install_dashboard(call: ServiceCall) -> None:
         overwrite = bool(call.data.get(CONF_OVERWRITE, False))
         try:
+            entries = hass.config_entries.async_entries(DOMAIN)
+            if not entries:
+                raise HomeAssistantError(
+                    "Aucune configuration Carpiquet EMS disponible."
+                )
+
+            entry = entries[0]
+
             target = await hass.async_add_executor_job(
-                install_dashboard_file, hass, None, overwrite
+                install_dashboard_file, hass, entry, overwrite
             )
         except FileExistsError as err:
             raise HomeAssistantError(

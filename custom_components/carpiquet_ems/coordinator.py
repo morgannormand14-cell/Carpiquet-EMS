@@ -19,6 +19,7 @@ from .zendure_command_adapter import prepare_commands
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
+from .zendure_discovery import discover_zendure_inventory
 from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
 from .topology import valid_numeric
@@ -89,6 +90,12 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             for _, fallback_key, _, _ in DYNAMIC.values()
         }
         self._last_fallback_sync = None
+        # Step 2B: discovery is NEVER periodic. It stays idle until manual sync.
+        self._zendure_discovery = {
+            "mode": "manual_read_only", "trigger": None, "periodic_discovery": False,
+            "writes_enabled": False, "authority": False, "state": "not_run",
+            "systems_count": 0, "batteries_count": 0, "systems": [],
+        }
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
             hass,
@@ -105,6 +112,25 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             if isinstance(values, dict):
                 self._fallbacks.update(values)
             self._last_fallback_sync = stored.get("last_sync")
+
+    async def async_sync_zendure_inventory(self):
+        """Run one explicit read-only registry discovery; never scheduled."""
+        try:
+            snapshot = discover_zendure_inventory(self.hass)
+            snapshot["state"] = "discovered_pending_validation"
+            snapshot["discovered_at"] = datetime.now(timezone.utc).isoformat()
+            self._zendure_discovery = snapshot
+        except Exception as err:
+            _LOGGER.exception("Manual Zendure discovery failed")
+            self._zendure_discovery = {
+                "mode": "manual_read_only", "trigger": "manual_sync",
+                "periodic_discovery": False, "writes_enabled": False,
+                "authority": False, "state": "error", "error": str(err),
+                "systems_count": 0, "batteries_count": 0, "systems": [],
+            }
+            raise
+        await self.async_request_refresh()
+        return self._zendure_discovery
 
     def _state(self, entity_id):
         return self.hass.states.get(entity_id)
@@ -1049,6 +1075,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             result_data[ATTR_MAPPER_SYSTEMS_COUNT] = mapper["systems_count"]
             result_data[ATTR_MAPPER_AVAILABLE_SYSTEMS_COUNT] = mapper["available_systems_count"]
             result_data[ATTR_MAPPER_READY] = bool(mapper["mapping_ready"])
+            # Step 2B diagnostics: cached manual discovery only; no registry query here.
+            result_data["zendure_discovery"] = self._zendure_discovery
+            result_data[ATTR_ZENDURE_DISCOVERY_STATE] = self._zendure_discovery.get("state", "not_run")
+            result_data[ATTR_ZENDURE_DISCOVERED_SYSTEMS_COUNT] = int(self._zendure_discovery.get("systems_count", 0))
+            result_data[ATTR_ZENDURE_DISCOVERED_BATTERIES_COUNT] = int(self._zendure_discovery.get("batteries_count", 0))
             session_sample = {
                 "timestamp": datetime.now(timezone.utc).isoformat(),
                 "entity_mapper": mapper,

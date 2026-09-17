@@ -1,0 +1,172 @@
+from __future__ import annotations
+
+"""Manual, read-only Zendure hardware discovery for Sprint 7 Step 2B.
+
+Discovery is intentionally event driven. Nothing in this module schedules polling:
+it is called only by an explicit Carpiquet synchronization action (and later by the
+initial config flow). It reads Home Assistant registries; it never calls Zendure,
+never writes an entity, and never changes EMS authority.
+"""
+
+from dataclasses import asdict, dataclass
+from typing import Any
+
+from homeassistant.helpers import device_registry as dr, entity_registry as er
+
+ZENDURE_DOMAIN = "zendure_ha"
+
+SEMANTIC_KEYS = {
+    "electric_level": "soc",
+    "min_soc": "min_soc",
+    "soc_set": "max_soc",
+    "total_kwh": "capacity_kwh",
+    "available_kwh": "available_kwh",
+    "inverse_max_power": "max_discharge_w",
+    "solar_input_power": "pv_w",
+    "output_home_power": "home_output_w",
+    "grid_input_power": "grid_input_w",
+    "output_limit": "command_limit_w",
+    "input_limit": "input_limit_w",
+    "connection_status": "connection_status",
+    "grid_off_power": "grid_off_power_w",
+}
+
+
+def _norm(value: Any) -> str:
+    return str(value or "").strip().lower().replace(" ", "").replace("_", "")
+
+
+def _control_profile(model: str) -> tuple[str, str, bool]:
+    key = _norm(model)
+    if key.startswith("hyper2000"):
+        return "legacy", "legacy_hyper", True
+    if key in {"hub1200", "solarflow2.0", "hub2000", "solarflowhub2000"}:
+        return "legacy", "legacy_hub", False
+    if key in {"aio2400", "solarflowaiozy"}:
+        return "legacy", "legacy_aio", False
+    if key.startswith("ace1500"):
+        return "legacy", "legacy_ace", False
+    if key.startswith("solarflow"):
+        return "zensdk", "zensdk_ac", key in {"solarflow2400pro"}
+    if key.startswith("superbase"):
+        return "unknown", "unsupported", False
+    return "unknown", "unsupported", False
+
+
+def _zendure_identifier(device) -> str | None:
+    for domain, value in device.identifiers:
+        if domain == ZENDURE_DOMAIN and value:
+            return str(value)
+    return None
+
+
+def _entity_translation_key(entry) -> str | None:
+    key = getattr(entry, "translation_key", None)
+    return str(key) if key else None
+
+
+@dataclass(frozen=True)
+class ZendureBatteryProfile:
+    device_id: str
+    zendure_id: str | None
+    serial_number: str | None
+    name: str
+    model: str | None
+    model_id: str | None
+    parent_device_id: str
+    entities: dict[str, str]
+
+
+@dataclass(frozen=True)
+class ZendureDeviceProfile:
+    system_id: str
+    device_id: str
+    zendure_id: str | None
+    serial_number: str | None
+    name: str
+    model: str | None
+    model_id: str | None
+    protocol_generation: str
+    control_profile: str
+    control_profile_supported: bool
+    entities: dict[str, str]
+    batteries: tuple[ZendureBatteryProfile, ...]
+
+    def as_dict(self) -> dict[str, Any]:
+        return asdict(self)
+
+
+def discover_zendure_inventory(hass) -> dict[str, Any]:
+    """Read HA registries once and return a normalized Zendure inventory."""
+    devices = dr.async_get(hass)
+    entities = er.async_get(hass)
+
+    zendure_devices = {
+        dev.id: dev
+        for dev in devices.devices.values()
+        if str(getattr(dev, "manufacturer", "") or "").casefold() == "zendure"
+        or any(domain == ZENDURE_DOMAIN for domain, _ in dev.identifiers)
+    }
+
+    by_device: dict[str, dict[str, str]] = {device_id: {} for device_id in zendure_devices}
+    for entry in entities.entities.values():
+        if entry.device_id not in by_device or entry.platform != ZENDURE_DOMAIN:
+            continue
+        translation_key = _entity_translation_key(entry)
+        if translation_key:
+            semantic = SEMANTIC_KEYS.get(translation_key)
+            if semantic:
+                by_device[entry.device_id][semantic] = entry.entity_id
+
+    roots = []
+    for device_id, dev in zendure_devices.items():
+        parent_id = getattr(dev, "via_device_id", None)
+        if parent_id and parent_id in zendure_devices:
+            continue
+
+        serial = getattr(dev, "serial_number", None)
+        zendure_id = _zendure_identifier(dev)
+        stable = str(serial or zendure_id or device_id)
+        protocol, control_profile, supported = _control_profile(str(dev.model or ""))
+        batteries = []
+        for child_id, child in zendure_devices.items():
+            if getattr(child, "via_device_id", None) != device_id:
+                continue
+            batteries.append(ZendureBatteryProfile(
+                device_id=child_id,
+                zendure_id=_zendure_identifier(child),
+                serial_number=getattr(child, "serial_number", None),
+                name=child.name or child.name_by_user or child_id,
+                model=child.model,
+                model_id=getattr(child, "model_id", None),
+                parent_device_id=device_id,
+                entities=dict(sorted(by_device.get(child_id, {}).items())),
+            ))
+
+        roots.append(ZendureDeviceProfile(
+            system_id=f"zendure:{stable}",
+            device_id=device_id,
+            zendure_id=zendure_id,
+            serial_number=serial,
+            name=dev.name_by_user or dev.name or stable,
+            model=dev.model,
+            model_id=getattr(dev, "model_id", None),
+            protocol_generation=protocol,
+            control_profile=control_profile,
+            control_profile_supported=supported,
+            entities=dict(sorted(by_device.get(device_id, {}).items())),
+            batteries=tuple(sorted(batteries, key=lambda b: (b.serial_number or "", b.device_id))),
+        ))
+
+    systems = [profile.as_dict() for profile in sorted(roots, key=lambda p: p.system_id)]
+    return {
+        "mode": "manual_read_only",
+        "trigger": "manual_sync",
+        "periodic_discovery": False,
+        "writes_enabled": False,
+        "authority": False,
+        "systems_count": len(systems),
+        "batteries_count": sum(len(row["batteries"]) for row in systems),
+        "supported_control_profiles_count": sum(bool(row["control_profile_supported"]) for row in systems),
+        "systems": systems,
+    }

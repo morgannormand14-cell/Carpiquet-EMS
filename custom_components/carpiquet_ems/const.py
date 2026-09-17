@@ -1,5 +1,5 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.5-alpha.3.4"
+VERSION = "0.6.5-alpha.3.5"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
@@ -278,3 +278,8 @@ DEFAULT_ADAPTER_DEADBAND_W = 5.0
 ATTR_ENTITY_MAPPER = "entity_mapper"
 ATTR_SYSTEMS = "systems"
 ATTR_MAPPER_PARITY_READY = "mapper_parity_ready"
+
+# Sprint 7 Step 2B — manual Zendure Discovery diagnostics
+ATTR_ZENDURE_DISCOVERY_STATE = "zendure_discovery_state"
+ATTR_ZENDURE_DISCOVERED_SYSTEMS_COUNT = "zendure_discovered_systems_count"
+ATTR_ZENDURE_DISCOVERED_BATTERIES_COUNT = "zendure_discovered_batteries_count"

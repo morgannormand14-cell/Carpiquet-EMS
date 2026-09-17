@@ -187,3 +187,10 @@ Runtime remains simulation-only. No Zendure output-limit entity is written.
 ## v0.3.0-alpha — Normandy / Sprint 1
 
 - project foundation, governance, architecture and branding.
+
+## 0.6.5-alpha.3.5 — Sprint 7 Step 2B
+- Manual read-only Zendure Device/Entity Registry discovery.
+- Top-level system and child-battery topology discovery.
+- Protocol/control-profile metadata for future generic systems[].
+- Dashboard button evolves to "Synchroniser Carpiquet EMS".
+- No periodic hardware discovery; no inventory auto-commit; no Zendure writes.

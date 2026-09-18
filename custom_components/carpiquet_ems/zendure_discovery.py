@@ -15,6 +15,20 @@ from homeassistant.helpers import device_registry as dr, entity_registry as er
 
 ZENDURE_DOMAIN = "zendure_ha"
 
+# Hardware catalogue derived from Zendure-HA product models. Infrastructure
+# devices (notably Zendure Manager) are intentionally not part of this list.
+HARDWARE_MODEL_PREFIXES = (
+    "ace1500", "aio2400", "solarflowaiozy", "hub1200", "solarflow2.0",
+    "hub2000", "solarflowhub2000", "hyper2000", "solarflow800",
+    "solarflow1600", "solarflow2400", "solarflow4000", "superbasev",
+)
+
+def _is_energy_hardware(model: str, model_id: str | None = None) -> bool:
+    model_key = _norm(model)
+    model_id_key = _norm(model_id)
+    return any(model_key.startswith(prefix) or model_id_key.startswith(prefix)
+               for prefix in HARDWARE_MODEL_PREFIXES)
+
 SEMANTIC_KEYS = {
     "electric_level": "soc",
     "min_soc": "min_soc",
@@ -122,6 +136,12 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
     for device_id, dev in zendure_devices.items():
         parent_id = getattr(dev, "via_device_id", None)
         if parent_id and parent_id in zendure_devices:
+            continue
+
+        # A root Zendure registry device is not necessarily energy hardware.
+        # Zendure Manager is also a root device; classify by model/product model
+        # rather than by display name so infrastructure never enters systems[].
+        if not _is_energy_hardware(str(dev.model or ""), getattr(dev, "model_id", None)):
             continue
 
         serial = getattr(dev, "serial_number", None)

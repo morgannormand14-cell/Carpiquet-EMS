@@ -103,3 +103,11 @@ def install_dashboard_file(hass: HomeAssistant,entry,overwrite=False):
     systems=build_shadow_systems(hass,entry.data|entry.options)
     target.write_text(render_dashboard(entry,source.read_text(encoding="utf-8"),systems),encoding="utf-8")
     return target
+
+
+def remove_dashboard_file(hass: HomeAssistant):
+    target=Path(hass.config.path(DASHBOARD_RELATIVE_PATH))
+    if target.exists():
+        target.unlink()
+        return True
+    return False

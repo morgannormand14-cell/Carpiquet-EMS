@@ -2,94 +2,38 @@
   "config": {
     "step": {
       "user": {
-        "title": "Carpiquet EMS — Sources",
-        "description": "Sélectionnez les entités Home Assistant. Les 8 valeurs Zendure dynamiques deviennent automatiquement les valeurs de secours initiales.",
+        "title": "Carpiquet EMS — Réseau",
+        "description": "Sélectionnez uniquement le capteur de puissance instantanée au point de raccordement réseau. Carpiquet détectera ensuite les systèmes Zendure depuis Home Assistant.",
         "data": {
-          "grid_power_entity": "Puissance réseau",
-          "hyper_soc_entity": "SOC Hyper 2000",
-          "hyper_pv_entity": "PV Hyper 2000",
-          "hyper_output_entity": "Limite de sortie Hyper 2000",
-          "solarflow_soc_entity": "SOC SolarFlow 2400 Pro",
-          "solarflow_pv_entity": "PV SolarFlow 2400 Pro",
-          "solarflow_output_entity": "Limite de sortie SolarFlow 2400 Pro",
-          "hyper_capacity_entity": "Capacité totale Hyper 2000",
-          "solarflow_capacity_entity": "Capacité totale SolarFlow 2400 Pro",
-          "hyper_max_power_entity": "Puissance maximale Hyper 2000",
-          "solarflow_max_power_entity": "Puissance maximale SolarFlow 2400 Pro",
-          "hyper_min_soc_entity": "SOC minimum Hyper 2000",
-          "hyper_max_soc_entity": "SOC maximum Hyper 2000",
-          "solarflow_min_soc_entity": "SOC minimum SolarFlow 2400 Pro",
-          "solarflow_max_soc_entity": "SOC maximum SolarFlow 2400 Pro",
-          "grid_target": "Cible réseau (W)",
-          "grid_deadband": "Plage de lissage (W)",
-          "ramp_limit_w": "Limite de variation par cycle (W)",
-          "automation_enabled": "Moteur d'automatisation activé",
-          "automation_min_hold_seconds": "Durée minimale d'un état (s)",
-          "automation_allow_secours": "Autoriser l'automatisation en mode secours",
-          "hyper_real_output_entity": "Puissance réelle Hyper vers la maison",
-          "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison",
-          "hyper_grid_input_entity": "Puissance réseau absorbée par Hyper 2000",
-          "solarflow_grid_input_entity": "Puissance réseau absorbée par SolarFlow 2400 Pro"
+          "grid_power_entity": "Puissance réseau (W)"
         }
       },
-      "batteries": {
-        "title": "Carpiquet EMS — Batteries Zendure",
-        "description": "Hyper détecté : {hyper_count} batterie(s). SolarFlow détecté : {solarflow_count} batterie(s). Pour chaque batterie, choisissez le type (AB2000X, AB3000L ou I2400), puis indiquez exactement les 5 derniers chiffres du numéro de série affiché dans l'application Zendure. Conservez les zéros initiaux (ex. 00545, 03090)."
+      "inventory": {
+        "title": "Carpiquet EMS — Inventaire Zendure détecté",
+        "description": "{systems} système(s) énergétique(s) et {batteries} batterie(s) détectés.\\n\\n{summary}\\n\\nZendure Manager et les composants d’infrastructure sont exclus. Validez pour créer Carpiquet EMS avec cet inventaire.",
+        "data": {
+          "confirm_inventory": "Valider cet inventaire"
+        }
       }
     },
     "error": {
-      "dynamic_value_unavailable": "Une valeur Zendure dynamique est indisponible ou invalide. Elle doit être lisible lors de l'installation pour initialiser le secours.",
-      "pack_count_unavailable": "Impossible de lire le nombre de batteries Hyper ou SolarFlow.",
-      "battery_not_found": "Une batterie n'a pas pu être validée à partir de son type et de son numéro de série.",
-      "serial_must_be_five_digits": "Le numéro de série doit contenir exactement 5 chiffres.",
-      "battery_type_invalid": "Type de batterie non pris en charge."
+      "no_zendure_system": "Aucun système énergétique Zendure compatible n’a été détecté.",
+      "discovery_mapping_incomplete": "Discovery réussi, mais les entités requises par le moteur legacy actuel ne sont pas toutes disponibles. Aucune configuration n’a été créée."
     },
     "abort": {
-      "already_configured": "Carpiquet EMS est déjà configuré."
+      "already_configured": "Carpiquet EMS est déjà configuré.",
+      "inventory_rejected": "Inventaire refusé. Aucune configuration Carpiquet EMS n’a été créée."
     }
   },
   "options": {
     "step": {
       "init": {
         "title": "Carpiquet EMS — Options",
+        "description": "Modifier le capteur réseau. La topologie Zendure reste inchangée jusqu’à une synchronisation validée.",
         "data": {
-          "grid_power_entity": "Puissance réseau",
-          "hyper_soc_entity": "SOC Hyper 2000",
-          "hyper_pv_entity": "PV Hyper 2000",
-          "hyper_output_entity": "Limite de sortie Hyper 2000",
-          "solarflow_soc_entity": "SOC SolarFlow 2400 Pro",
-          "solarflow_pv_entity": "PV SolarFlow 2400 Pro",
-          "solarflow_output_entity": "Limite de sortie SolarFlow 2400 Pro",
-          "hyper_capacity_entity": "Capacité totale Hyper 2000",
-          "solarflow_capacity_entity": "Capacité totale SolarFlow 2400 Pro",
-          "hyper_max_power_entity": "Puissance maximale Hyper 2000",
-          "solarflow_max_power_entity": "Puissance maximale SolarFlow 2400 Pro",
-          "hyper_min_soc_entity": "SOC minimum Hyper 2000",
-          "hyper_max_soc_entity": "SOC maximum Hyper 2000",
-          "solarflow_min_soc_entity": "SOC minimum SolarFlow 2400 Pro",
-          "solarflow_max_soc_entity": "SOC maximum SolarFlow 2400 Pro",
-          "grid_target": "Cible réseau (W)",
-          "grid_deadband": "Plage de lissage (W)",
-          "ramp_limit_w": "Limite de variation par cycle (W)",
-          "automation_enabled": "Moteur d'automatisation activé",
-          "automation_min_hold_seconds": "Durée minimale d'un état (s)",
-          "automation_allow_secours": "Autoriser l'automatisation en mode secours",
-          "hyper_real_output_entity": "Puissance réelle Hyper vers la maison",
-          "solarflow_real_output_entity": "Puissance réelle SolarFlow vers la maison",
-          "hyper_grid_input_entity": "Puissance réseau absorbée par Hyper 2000",
-          "solarflow_grid_input_entity": "Puissance réseau absorbée par SolarFlow 2400 Pro"
+          "grid_power_entity": "Puissance réseau (W)"
         }
-      },
-      "batteries": {
-        "title": "Topologie batteries Zendure",
-        "description": "Choisissez le type de chaque batterie (AB2000X, AB3000L ou I2400) et indiquez exactement les 5 derniers chiffres du numéro de série affiché dans l'application Zendure. Conservez les zéros initiaux."
       }
-    },
-    "error": {
-      "pack_count_unavailable": "Impossible de lire le nombre de batteries.",
-      "battery_not_found": "Une batterie n'a pas pu être validée.",
-      "serial_must_be_five_digits": "Le numéro de série doit contenir exactement 5 chiffres.",
-      "battery_type_invalid": "Type de batterie non pris en charge."
     }
   }
 }

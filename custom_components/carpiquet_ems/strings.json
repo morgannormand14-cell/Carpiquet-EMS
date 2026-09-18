@@ -10,7 +10,7 @@
       },
       "inventory": {
         "title": "Carpiquet EMS — Inventaire Zendure détecté",
-        "description": "{systems} système(s) énergétique(s) et {batteries} batterie(s) détectés.\\n\\n{summary}\\n\\nZendure Manager et les composants d’infrastructure sont exclus. Validez pour créer Carpiquet EMS avec cet inventaire.",
+        "description": "{systems} système(s) énergétique(s) et {batteries} batterie(s) détectés.\\n\\n{summary}\\n\\nInfrastructure Zendure ignorée : {infrastructure}\\n\\nVérifiez cet inventaire avant de terminer l’installation.",
         "data": {
           "confirm_inventory": "Valider cet inventaire"
         }

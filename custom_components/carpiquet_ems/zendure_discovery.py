@@ -117,13 +117,13 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
 
     zendure_devices = {
         dev.id: dev
-        for dev in devices.devices.values()
+        for dev in devices.values()
         if str(getattr(dev, "manufacturer", "") or "").casefold() == "zendure"
         or any(domain == ZENDURE_DOMAIN for domain, _ in dev.identifiers)
     }
 
     by_device: dict[str, dict[str, str]] = {device_id: {} for device_id in zendure_devices}
-    for entry in entities.entities.values():
+    for entry in entities.values():
         if entry.device_id not in by_device or entry.platform != ZENDURE_DOMAIN:
             continue
         translation_key = _entity_translation_key(entry)
@@ -133,6 +133,7 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
                 by_device[entry.device_id][semantic] = entry.entity_id
 
     roots = []
+    infrastructure = []
     for device_id, dev in zendure_devices.items():
         parent_id = getattr(dev, "via_device_id", None)
         if parent_id and parent_id in zendure_devices:
@@ -142,6 +143,13 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
         # Zendure Manager is also a root device; classify by model/product model
         # rather than by display name so infrastructure never enters systems[].
         if not _is_energy_hardware(str(dev.model or ""), getattr(dev, "model_id", None)):
+            infrastructure.append({
+                "device_id": device_id,
+                "name": dev.name_by_user or dev.name or device_id,
+                "model": dev.model,
+                "model_id": getattr(dev, "model_id", None),
+                "classification": "infrastructure_ignored",
+            })
             continue
 
         serial = getattr(dev, "serial_number", None)
@@ -188,5 +196,7 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
         "systems_count": len(systems),
         "batteries_count": sum(len(row["batteries"]) for row in systems),
         "supported_control_profiles_count": sum(bool(row["control_profile_supported"]) for row in systems),
+        "infrastructure_count": len(infrastructure),
+        "infrastructure": sorted(infrastructure, key=lambda row: (str(row.get("name") or ""), row["device_id"])),
         "systems": systems,
     }

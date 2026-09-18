@@ -81,7 +81,18 @@ class CarpiquetEMSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_inventory(self,user_input=None)->FlowResult:
         snap=self._snapshot or {}
         systems=snap.get("systems",[])
-        summary=" | ".join(f"{s.get('name')} ({s.get('model')}) — {len(s.get('batteries',[]))} batterie(s)" for s in systems)
+        summary=" | ".join(
+            f"{s.get('name')} ({s.get('model')}) — "
+            f"{len(s.get('batteries', []))} batterie(s): "
+            + ", ".join(
+                f"{b.get('name')} ({b.get('model')})" for b in s.get("batteries", [])
+            )
+            for s in systems
+        )
+        infrastructure=", ".join(
+            str(row.get("name") or row.get("model") or row.get("device_id"))
+            for row in snap.get("infrastructure", [])
+        ) or "Aucune"
         if user_input is not None:
             if not user_input.get("confirm_inventory"):
                 return self.async_abort(reason="inventory_rejected")
@@ -96,9 +107,9 @@ class CarpiquetEMSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     st=self.hass.states.get(data[ek]); data[fk]=float(st.state) if st and st.state not in ("unknown","unavailable") else None
                 if any(data[fk] is None for _,fk in pairs): raise ValueError("dynamic_value_unavailable")
             except Exception:
-                return self.async_show_form(step_id="inventory",data_schema=CONFIRM_SCHEMA,errors={"base":"discovery_mapping_incomplete"},description_placeholders={"systems":str(snap.get("systems_count",0)),"batteries":str(snap.get("batteries_count",0)),"summary":summary})
+                return self.async_show_form(step_id="inventory",data_schema=CONFIRM_SCHEMA,errors={"base":"discovery_mapping_incomplete"},description_placeholders={"systems":str(snap.get("systems_count",0)),"batteries":str(snap.get("batteries_count",0)),"summary":summary,"infrastructure":infrastructure})
             return self.async_create_entry(title="Carpiquet EMS",data=data)
-        return self.async_show_form(step_id="inventory",data_schema=CONFIRM_SCHEMA,description_placeholders={"systems":str(snap.get("systems_count",0)),"batteries":str(snap.get("batteries_count",0)),"summary":summary})
+        return self.async_show_form(step_id="inventory",data_schema=CONFIRM_SCHEMA,description_placeholders={"systems":str(snap.get("systems_count",0)),"batteries":str(snap.get("batteries_count",0)),"summary":summary,"infrastructure":infrastructure})
 
     @staticmethod
     def async_get_options_flow(config_entry):

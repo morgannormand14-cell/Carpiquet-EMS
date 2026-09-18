@@ -29,3 +29,10 @@ Safety:
 - Real Writes Enabled remains false
 - Command Write Locked remains true
 - Adapter Write Locked remains true
+
+
+Validation correction build:
+- French config-flow translations aligned with strings.json
+- Inventory preview now exposes detected systems, batteries and ignored Zendure infrastructure
+- Device/Entity Registry iteration updated away from deprecated .devices/.entities mapping access
+- Runtime Home Assistant validation remains pending

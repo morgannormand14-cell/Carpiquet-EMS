@@ -200,3 +200,35 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
         "infrastructure": sorted(infrastructure, key=lambda row: (str(row.get("name") or ""), row["device_id"])),
         "systems": systems,
     }
+
+
+def _battery_key(row: dict[str, Any]) -> str:
+    return str(row.get("serial_number") or row.get("zendure_id") or row.get("device_id") or "")
+
+def compare_zendure_inventories(saved: dict[str, Any] | None, detected: dict[str, Any]) -> dict[str, Any]:
+    """Compare stable hardware identities only; availability is deliberately ignored."""
+    saved = saved or {}
+    old = {str(s.get("system_id")): s for s in saved.get("systems", []) if s.get("system_id")}
+    new = {str(s.get("system_id")): s for s in detected.get("systems", []) if s.get("system_id")}
+    added = sorted(set(new) - set(old))
+    missing = sorted(set(old) - set(new))
+    changed = []
+    unchanged = []
+    for sid in sorted(set(old) & set(new)):
+        a, b = old[sid], new[sid]
+        old_b = {_battery_key(x) for x in a.get("batteries", [])}
+        new_b = {_battery_key(x) for x in b.get("batteries", [])}
+        signature_a = (str(a.get("model") or ""), str(a.get("model_id") or ""), old_b)
+        signature_b = (str(b.get("model") or ""), str(b.get("model_id") or ""), new_b)
+        (changed if signature_a != signature_b else unchanged).append(sid)
+    return {
+        "identical": not added and not missing and not changed,
+        "added_system_ids": added,
+        "missing_system_ids": missing,
+        "changed_system_ids": changed,
+        "unchanged_system_ids": unchanged,
+        "saved_systems_count": len(old),
+        "detected_systems_count": len(new),
+        "saved_batteries_count": int(saved.get("batteries_count", 0)),
+        "detected_batteries_count": int(detected.get("batteries_count", 0)),
+    }

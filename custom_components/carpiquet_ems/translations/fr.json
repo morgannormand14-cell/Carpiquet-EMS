@@ -33,7 +33,19 @@
         "data": {
           "grid_power_entity": "Puissance réseau (W)"
         }
+      },
+      "reconcile": {
+        "title": "Carpiquet EMS — Réconciliation Zendure",
+        "description": "Inventaire détecté : {systems} système(s), {batteries} batterie(s).\n\n{summary}\n\n{changes}\n\nL’inventaire validé actuel reste actif tant que vous n’acceptez pas les changements. Un appareil temporairement indisponible n’est jamais supprimé automatiquement.",
+        "menu_options": {
+          "apply": "Valider les changements",
+          "reject": "Refuser les changements"
+        }
       }
+    },
+    "abort": {
+      "no_pending_reconciliation": "Aucune réconciliation Zendure n’est en attente.",
+      "reconciliation_mapping_incomplete": "Le nouvel inventaire ne peut pas encore alimenter en sécurité le moteur legacy. Aucun changement n’a été appliqué."
     }
   }
 }

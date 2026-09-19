@@ -19,7 +19,7 @@ from .zendure_command_adapter import prepare_commands
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
-from .zendure_discovery import discover_zendure_inventory
+from .zendure_discovery import discover_zendure_inventory, compare_zendure_inventories
 from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
 from .topology import valid_numeric
@@ -108,6 +108,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "writes_enabled": False, "authority": False, "state": "not_run",
                 "systems_count": 0, "batteries_count": 0, "systems": [],
             }
+        self._pending_zendure_discovery = None
+        self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
             hass,
@@ -126,23 +128,39 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._last_fallback_sync = stored.get("last_sync")
 
     async def async_sync_zendure_inventory(self):
-        """Run one explicit read-only registry discovery; never scheduled."""
+        """Run one explicit read-only discovery and stage changes for validation."""
         try:
             snapshot = discover_zendure_inventory(self.hass)
             snapshot["state"] = "discovered_pending_validation"
             snapshot["discovered_at"] = datetime.now(timezone.utc).isoformat()
-            self._zendure_discovery = snapshot
+            comparison = compare_zendure_inventories(self.config.get("zendure_inventory"), snapshot)
+            self._zendure_reconciliation = comparison
+            if comparison["identical"]:
+                snapshot["state"] = "validated"
+                snapshot["trigger"] = "manual_sync_identical"
+                self._pending_zendure_discovery = None
+                self._zendure_discovery = snapshot
+            else:
+                snapshot["trigger"] = "manual_sync"
+                self._pending_zendure_discovery = snapshot
+                # Keep the validated runtime inventory authoritative until user acceptance.
+                self._zendure_discovery = dict(self._zendure_discovery)
+                self._zendure_discovery["pending_reconciliation"] = True
         except Exception as err:
             _LOGGER.exception("Manual Zendure discovery failed")
-            self._zendure_discovery = {
-                "mode": "manual_read_only", "trigger": "manual_sync",
-                "periodic_discovery": False, "writes_enabled": False,
-                "authority": False, "state": "error", "error": str(err),
-                "systems_count": 0, "batteries_count": 0, "systems": [],
-            }
             raise
         await self.async_request_refresh()
-        return self._zendure_discovery
+        return {"snapshot": snapshot, "comparison": comparison}
+
+    def get_pending_zendure_reconciliation(self):
+        return self._pending_zendure_discovery, self._zendure_reconciliation
+
+    def clear_pending_zendure_reconciliation(self):
+        self._pending_zendure_discovery = None
+        self._zendure_reconciliation = None
+        if isinstance(self._zendure_discovery, dict):
+            self._zendure_discovery.pop("pending_reconciliation", None)
+
 
     def _state(self, entity_id):
         return self.hass.states.get(entity_id)

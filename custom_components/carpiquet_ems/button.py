@@ -57,10 +57,14 @@ class SynchronizeCarpiquetButton(CoordinatorEntity, ButtonEntity):
 
     async def async_press(self):
         try:
-            discovery = await self.coordinator.async_sync_zendure_inventory()
-            target = await self.hass.async_add_executor_job(
-                install_dashboard_file, self.hass, self._entry, True
-            )
+            result = await self.coordinator.async_sync_zendure_inventory()
+            discovery = result["snapshot"]
+            comparison = result["comparison"]
+            target = None
+            if comparison.get("identical"):
+                target = await self.hass.async_add_executor_job(
+                    install_dashboard_file, self.hass, self._entry, True
+                )
         except Exception as err:
             persistent_notification.async_create(
                 self.hass,
@@ -74,13 +78,23 @@ class SynchronizeCarpiquetButton(CoordinatorEntity, ButtonEntity):
 
         systems = discovery.get("systems_count", 0)
         batteries = discovery.get("batteries_count", 0)
+        if comparison.get("identical"):
+            message = (
+                f"Inventaire Zendure identique : **{systems} système(s)** et "
+                f"**{batteries} batterie(s)**. Aucune modification matérielle.\n\n"
+                f"Dashboard régénéré dans `{target}`."
+            )
+        else:
+            message = (
+                f"Modification matérielle détectée : **{systems} système(s)** et "
+                f"**{batteries} batterie(s)** actuellement détectés.\n\n"
+                "L'inventaire Carpiquet validé reste inchangé. Ouvrez "
+                "**Paramètres → Appareils et services → Carpiquet EMS → Configurer** "
+                "pour examiner puis **Valider** ou **Refuser** les changements.\n\n"
+                "Le Dashboard n'a pas été modifié."
+            )
         persistent_notification.async_create(
-            self.hass,
-            (f"Discovery Zendure terminée en lecture seule : **{systems} système(s)** "
-             f"et **{batteries} batterie(s)** détectés.\n\n"
-             "Inventaire en attente de validation : aucune modification matérielle "
-             "n'a été appliquée automatiquement.\n\n"
-             f"Dashboard régénéré dans `{target}`."),
+            self.hass, message,
             title="Carpiquet EMS — Synchronisation terminée",
             notification_id="carpiquet_ems_synchronization",
         )

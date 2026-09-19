@@ -1,49 +1,45 @@
-# 🏴 Carpiquet EMS
+# Carpiquet EMS
 
-> **Every watt counts.**  
-> **Intelligent energy management for Zendure.**  
-> *Designed with ❤️ in Normandy.*  
-> **Engineered for reliability. Built for Home Assistant.**
+**Version packagée : 0.6.5-alpha.3.7 — Normandy Sprint 7 — Step 2B**
 
-## Current milestone
+Carpiquet EMS est une intégration personnalisée Home Assistant qui pilote sa propre logique EMS à partir de la télémétrie et des capacités matérielles Zendure. Zendure-HA fournit la découverte, la topologie, les capacités et la télémétrie ; les décisions énergétiques restent sous l'autorité de Carpiquet EMS.
 
-**v0.5.0-alpha — Normandy / Sprint 5 — Automation Engine**
+## Périmètre de cette alpha
 
-Carpiquet EMS is a Home Assistant custom integration for a Zendure Hyper 2000,
-a Zendure SolarFlow 2400 Pro and a Shelly Pro 3EM.
+Cette version ajoute la réconciliation manuelle de l'inventaire Zendure :
 
-Sprint 3 adds:
+- découverte matérielle une fois pendant l'installation ;
+- restauration au démarrage de l'inventaire explicitement validé, sans nouvelle découverte ;
+- bouton **Synchroniser Carpiquet EMS** pour lancer une découverte ponctuelle ;
+- comparaison entre l'inventaire validé et l'inventaire nouvellement détecté ;
+- inventaire identique : conservation de l'inventaire et régénération/réparation du Dashboard ;
+- inventaire différent : mise en attente des changements jusqu'à validation ou refus explicite dans **Configurer** ;
+- une indisponibilité temporaire n'est pas utilisée comme preuve de retrait matériel ;
+- aucune découverte matérielle périodique.
 
-- entity selectors in the configuration assistant;
-- an Options Flow for later configuration changes;
-- a guided Premium Dashboard installer;
-- French interface strings;
-- complete onboarding and validation documentation.
+## Sécurité de cette version
 
-## Safety
+Pendant Sprint 7 Step 2B :
 
-This alpha release is **100% simulation-only**. No command is sent to Zendure
-output-limit entities.
+- autorité moteur : `legacy_v0.6.4` ;
+- moteur générique : `shadow_compare` ;
+- autorité générique : désactivée ;
+- écritures Zendure réelles : désactivées ;
+- verrouillage des commandes : activé ;
+- verrouillage de l'adaptateur de commandes : activé.
 
-## Installation
+La couche de découverte/réconciliation ne donne aucune autorité de décision énergétique à Zendure Manager.
 
-See [Installation](docs/INSTALLATION.md) and
-[Dashboard installation](docs/DASHBOARD_INSTALLATION.md).
+## Installation / mise à jour
 
-## Dashboard
+Copier `custom_components/carpiquet_ems/` dans `/config/custom_components/carpiquet_ems/`, remplacer les fichiers de la version précédente puis redémarrer Home Assistant. Pour une mise à jour depuis alpha.3.6-r3, conserver l'entrée d'intégration existante.
 
-The dashboard source is stored at `dashboards/carpiquet_ems.yaml` and is also
-bundled inside the integration.
+Le Dashboard YAML généré est conservé dans le fonctionnement actuel. Dans cette alpha, l'enregistrement Lovelace automatique n'est pas encore activé : conserver la déclaration `lovelace:` déjà utilisée pour afficher le Dashboard dans la barre latérale.
 
-## Documentation
+## Validation attendue après redémarrage
 
-- [Project Charter](docs/PROJECT_CHARTER.md)
-- [Roadmap](docs/ROADMAP.md)
-- [Architecture](docs/ARCHITECTURE.md)
-- [EMS Specification](docs/EMS_SPECIFICATION.md)
-- [RFC-0003](docs/RFC-0003-ONBOARDING.md)
-- [Sprint 3 validation](docs/SPRINT3_VALIDATION.md)
+Pour l'installation actuellement validée comme référence : `Discovery State = validated`, `Discovered Systems = 2`, `Discovered Batteries = 4`, `Mapper Ready = on`, `Mapper Systems = 2`, `Mapper Available = 2`. Les deux verrous de commande doivent rester `on` et les écritures réelles `off`.
 
-## Founder
+## Contenu
 
-**Morgan Normand — Founder & Product Owner**
+Le ZIP d'installation contient uniquement le code nécessaire à cette version et quatre fichiers racine maintenus à jour : `README.md`, `CHANGELOG.md`, `PACKAGE_CONTENTS.md` et `LICENSE`. Les anciens Release Bodies, Build Validations et documentations de sprints devenues non applicables ne sont pas embarqués.

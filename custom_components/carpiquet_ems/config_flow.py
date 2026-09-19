@@ -116,9 +116,85 @@ class CarpiquetEMSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
         return CarpiquetEMSOptionsFlow(config_entry)
 
 class CarpiquetEMSOptionsFlow(config_entries.OptionsFlow):
-    def __init__(self, config_entry): self._config_entry=config_entry
-    async def async_step_init(self,user_input=None)->FlowResult:
-        current=self._config_entry.options.get(CONF_GRID_POWER_ENTITY,self._config_entry.data.get(CONF_GRID_POWER_ENTITY))
-        schema=vol.Schema({vol.Required(CONF_GRID_POWER_ENTITY,default=current):_entity("sensor")})
-        if user_input is not None: return self.async_create_entry(title="",data=user_input)
-        return self.async_show_form(step_id="init",data_schema=schema)
+    def __init__(self, config_entry):
+        self._config_entry = config_entry
+
+    def _pending(self):
+        coordinator = self.hass.data.get(DOMAIN, {}).get(self._config_entry.entry_id)
+        if coordinator is None:
+            return None, None, None
+        pending, comparison = coordinator.get_pending_zendure_reconciliation()
+        return coordinator, pending, comparison
+
+    async def async_step_init(self, user_input=None) -> FlowResult:
+        coordinator, pending, comparison = self._pending()
+        if pending is not None and comparison is not None:
+            return await self.async_step_reconcile()
+        current = self._config_entry.options.get(
+            CONF_GRID_POWER_ENTITY, self._config_entry.data.get(CONF_GRID_POWER_ENTITY)
+        )
+        schema = vol.Schema({vol.Required(CONF_GRID_POWER_ENTITY, default=current): _entity("sensor")})
+        if user_input is not None:
+            return self.async_create_entry(title="", data=user_input)
+        return self.async_show_form(step_id="init", data_schema=schema)
+
+    async def async_step_reconcile(self, user_input=None) -> FlowResult:
+        coordinator, pending, comparison = self._pending()
+        if pending is None or comparison is None:
+            return self.async_abort(reason="no_pending_reconciliation")
+        systems = pending.get("systems", [])
+        summary = " | ".join(
+            f"{row.get('name')} ({row.get('model')}) — {len(row.get('batteries', []))} batterie(s)"
+            for row in systems
+        )
+        changes = (
+            f"Ajoutés: {len(comparison.get('added_system_ids', []))} — "
+            f"Modifiés: {len(comparison.get('changed_system_ids', []))} — "
+            f"Absents lors de ce scan: {len(comparison.get('missing_system_ids', []))}"
+        )
+        return self.async_show_menu(
+            step_id="reconcile",
+            menu_options=["apply", "reject"],
+            description_placeholders={
+                "systems": str(pending.get("systems_count", 0)),
+                "batteries": str(pending.get("batteries_count", 0)),
+                "summary": summary or "Aucun système",
+                "changes": changes,
+            },
+        )
+
+    async def async_step_apply(self, user_input=None) -> FlowResult:
+        coordinator, pending, comparison = self._pending()
+        if pending is None:
+            return self.async_abort(reason="no_pending_reconciliation")
+        try:
+            grid = self._config_entry.options.get(
+                CONF_GRID_POWER_ENTITY, self._config_entry.data.get(CONF_GRID_POWER_ENTITY)
+            )
+            data = _legacy_data_from_discovery(grid, pending)
+            pairs = (
+                (CONF_HYPER_CAPACITY_ENTITY, CONF_FALLBACK_HYPER_CAPACITY),
+                (CONF_SOLARFLOW_CAPACITY_ENTITY, CONF_FALLBACK_SOLARFLOW_CAPACITY),
+                (CONF_HYPER_MAX_POWER_ENTITY, CONF_FALLBACK_HYPER_MAX_POWER),
+                (CONF_SOLARFLOW_MAX_POWER_ENTITY, CONF_FALLBACK_SOLARFLOW_MAX_POWER),
+                (CONF_HYPER_MIN_SOC_ENTITY, CONF_FALLBACK_HYPER_MIN_SOC),
+                (CONF_HYPER_MAX_SOC_ENTITY, CONF_FALLBACK_HYPER_MAX_SOC),
+                (CONF_SOLARFLOW_MIN_SOC_ENTITY, CONF_FALLBACK_SOLARFLOW_MIN_SOC),
+                (CONF_SOLARFLOW_MAX_SOC_ENTITY, CONF_FALLBACK_SOLARFLOW_MAX_SOC),
+            )
+            for entity_key, fallback_key in pairs:
+                st = self.hass.states.get(data[entity_key])
+                data[fallback_key] = float(st.state) if st and st.state not in ("unknown", "unavailable") else None
+            if any(data[fallback_key] is None for _, fallback_key in pairs):
+                raise ValueError("dynamic_value_unavailable")
+        except Exception:
+            return self.async_abort(reason="reconciliation_mapping_incomplete")
+        coordinator.clear_pending_zendure_reconciliation()
+        self.hass.config_entries.async_update_entry(self._config_entry, data=data)
+        return self.async_create_entry(title="", data=dict(self._config_entry.options))
+
+    async def async_step_reject(self, user_input=None) -> FlowResult:
+        coordinator, pending, comparison = self._pending()
+        if coordinator is not None:
+            coordinator.clear_pending_zendure_reconciliation()
+        return self.async_create_entry(title="", data=dict(self._config_entry.options))

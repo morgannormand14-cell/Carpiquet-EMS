@@ -33,7 +33,19 @@
         "data": {
           "grid_power_entity": "Puissance réseau (W)"
         }
+      },
+      "reconcile": {
+        "title": "Carpiquet EMS — Zendure reconciliation",
+        "description": "Detected inventory: {systems} system(s), {batteries} battery(ies).\n\n{summary}\n\n{changes}\n\nThe currently validated inventory remains active until you accept the changes. A temporarily unavailable device is never removed automatically.",
+        "menu_options": {
+          "apply": "Apply changes",
+          "reject": "Reject changes"
+        }
       }
+    },
+    "abort": {
+      "no_pending_reconciliation": "No Zendure reconciliation is pending.",
+      "reconciliation_mapping_incomplete": "The new inventory cannot safely feed the legacy engine yet. No change was applied."
     }
   }
 }

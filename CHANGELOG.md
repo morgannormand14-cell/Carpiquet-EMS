@@ -1,3 +1,9 @@
+
+## 0.6.5-alpha.3.6 r3 — Sprint 7 Step 2B
+- Restore the user-validated Zendure inventory into runtime diagnostics without a new discovery at startup.
+- Move session recorder append file I/O off the Home Assistant event loop.
+- Fix inventory preview line breaks in localized config flow text.
+- Remove historical RELEASE_BODY_* and BUILD_VALIDATION_* files from the install package.
 ## 0.6.4-alpha-sprint6
 - Nouveau moteur de décharge équilibrée par énergie exploitable restante.
 - Convergence Hyper/SolarFlow vers leur SOC minimum respectif.

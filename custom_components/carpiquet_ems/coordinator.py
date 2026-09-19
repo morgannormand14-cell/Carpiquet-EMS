@@ -90,12 +90,24 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             for _, fallback_key, _, _ in DYNAMIC.values()
         }
         self._last_fallback_sync = None
-        # Step 2B: discovery is NEVER periodic. It stays idle until manual sync.
-        self._zendure_discovery = {
-            "mode": "manual_read_only", "trigger": None, "periodic_discovery": False,
-            "writes_enabled": False, "authority": False, "state": "not_run",
-            "systems_count": 0, "batteries_count": 0, "systems": [],
-        }
+        # Step 2B: discovery is NEVER periodic. Reuse the inventory explicitly
+        # validated during the config flow without querying the registries again.
+        confirmed_inventory = self.config.get("zendure_inventory")
+        if isinstance(confirmed_inventory, dict):
+            self._zendure_discovery = dict(confirmed_inventory)
+            self._zendure_discovery.update({
+                "trigger": "installation",
+                "periodic_discovery": False,
+                "writes_enabled": False,
+                "authority": False,
+                "state": "validated",
+            })
+        else:
+            self._zendure_discovery = {
+                "mode": "manual_read_only", "trigger": None, "periodic_discovery": False,
+                "writes_enabled": False, "authority": False, "state": "not_run",
+                "systems_count": 0, "batteries_count": 0, "systems": [],
+            }
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
             hass,
@@ -1169,7 +1181,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "adapter_solarflow_would_execute": result_data.get(ATTR_ADAPTER_SOLARFLOW_WOULD_EXECUTE),
             }
             if self._automation_enabled_runtime and not self._session_stopping:
-                self._session.append(session_sample)
+                await self.hass.async_add_executor_job(self._session.append, session_sample)
             result_data[ATTR_SESSION_SAMPLE_COUNT] = self._session.sample_count
             return result_data
         except UpdateFailed:

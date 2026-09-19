@@ -117,13 +117,13 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
 
     zendure_devices = {
         dev.id: dev
-        for dev in devices.values()
+        for dev in devices.devices
         if str(getattr(dev, "manufacturer", "") or "").casefold() == "zendure"
         or any(domain == ZENDURE_DOMAIN for domain, _ in dev.identifiers)
     }
 
     by_device: dict[str, dict[str, str]] = {device_id: {} for device_id in zendure_devices}
-    for entry in entities.values():
+    for entry in entities.entities.values():
         if entry.device_id not in by_device or entry.platform != ZENDURE_DOMAIN:
             continue
         translation_key = _entity_translation_key(entry)

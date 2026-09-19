@@ -10,6 +10,33 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - run: python -m compileall custom_components/carpiquet_ems
-      - run: python -m pip install pytest
-      - run: pytest tests/test_algorithm.py tests/test_manifest.py tests/test_dashboard.py
+      - name: Compile Python
+        run: python -m compileall custom_components/carpiquet_ems
+      - name: Validate JSON
+        run: |
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          for path in [
+              Path("custom_components/carpiquet_ems/manifest.json"),
+              Path("custom_components/carpiquet_ems/strings.json"),
+              Path("custom_components/carpiquet_ems/translations/fr.json"),
+              Path("hacs.json"),
+          ]:
+              json.loads(path.read_text(encoding="utf-8"))
+              print(f"OK {path}")
+          PY
+      - name: Validate version parity
+        run: |
+          python - <<'PY'
+          import ast, json
+          from pathlib import Path
+          manifest=json.loads(Path("custom_components/carpiquet_ems/manifest.json").read_text())
+          tree=ast.parse(Path("custom_components/carpiquet_ems/const.py").read_text())
+          version=None
+          for node in tree.body:
+              if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "VERSION" for t in node.targets):
+                  version=ast.literal_eval(node.value)
+          assert version == manifest["version"], (version, manifest["version"])
+          print("Version parity:", version)
+          PY

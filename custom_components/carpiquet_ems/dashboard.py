@@ -164,6 +164,9 @@ async def async_unregister_dashboard(hass: HomeAssistant) -> bool:
     lovelace_data = hass.data.get(LOVELACE_DATA)
     if lovelace_data is None:
         return False
+    # Never remove a dashboard declared by the user in configuration.yaml.
+    if DASHBOARD_URL_PATH in lovelace_data.yaml_dashboards:
+        return False
     dashboard = lovelace_data.dashboards.get(DASHBOARD_URL_PATH)
     if not isinstance(dashboard, LovelaceYAML):
         return False

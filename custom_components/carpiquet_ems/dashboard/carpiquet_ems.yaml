@@ -192,15 +192,21 @@ views:
           - type: entities
             show_header_toggle: false
             entities:
-              - entity: sensor.carpiquet_ems_write_gate_state
-                name: État Write Gate
               - entity: binary_sensor.carpiquet_ems_write_gate_master_lock
                 name: Master Lock
+              - type: attribute
+                entity: binary_sensor.carpiquet_ems_write_gate_master_lock
+                attribute: gate_state
+                name: État Write Gate
               - entity: binary_sensor.carpiquet_ems_write_gate_execute_allowed
                 name: Exécution autorisée
-              - entity: sensor.carpiquet_ems_write_gate_blockers
+              - type: attribute
+                entity: binary_sensor.carpiquet_ems_write_gate_master_lock
+                attribute: blockers
                 name: Raisons du blocage
-              - entity: sensor.carpiquet_ems_write_gate_evaluated_at
+              - type: attribute
+                entity: binary_sensor.carpiquet_ems_write_gate_master_lock
+                attribute: evaluated_at
                 name: Dernière évaluation
 
       - type: grid

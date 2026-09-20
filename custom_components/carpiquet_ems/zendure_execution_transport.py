@@ -111,3 +111,71 @@ def resolve_execution_transports(
         )
 
     return {"hyper": hyper_transport, "solarflow": solar_transport}
+
+
+@dataclass(frozen=True)
+class LocalTransportProbe:
+    """Read-only qualification result for a Zendure local HTTP endpoint."""
+
+    host: str
+    target: str
+    attempted: bool
+    reachable: bool
+    qualified: bool
+    http_status: int | None
+    reason: str
+
+
+async def probe_solarflow_local_report(hass, inventory: dict[str, Any]) -> LocalTransportProbe:
+    """GET SolarFlow /properties/report without performing any write.
+
+    This function deliberately has no POST path and never calls /properties/write.
+    """
+    solar = _system_by_profile(inventory, "zensdk_ac")
+    host = str((solar or {}).get("local_host") or "")
+    if not host:
+        return LocalTransportProbe(
+            host="", target="", attempted=False, reachable=False, qualified=False,
+            http_status=None, reason="SolarFlow local host metadata missing",
+        )
+
+    target = f"http://{host}/properties/report"
+    try:
+        from homeassistant.helpers.aiohttp_client import async_get_clientsession
+
+        session = async_get_clientsession(hass)
+        async with session.get(target, timeout=5) as response:
+            status = int(response.status)
+            if status != 200:
+                return LocalTransportProbe(
+                    host=host, target=target, attempted=True, reachable=True,
+                    qualified=False, http_status=status,
+                    reason=f"GET /properties/report returned HTTP {status}",
+                )
+            try:
+                payload = await response.json(content_type=None)
+            except Exception:
+                return LocalTransportProbe(
+                    host=host, target=target, attempted=True, reachable=True,
+                    qualified=False, http_status=status,
+                    reason="GET /properties/report did not return valid JSON",
+                )
+            valid = isinstance(payload, dict) and (
+                isinstance(payload.get("properties"), dict)
+                or isinstance(payload.get("packData"), list)
+            )
+            return LocalTransportProbe(
+                host=host, target=target, attempted=True, reachable=True,
+                qualified=valid, http_status=status,
+                reason=(
+                    "Read-only GET /properties/report returned Zendure-shaped JSON"
+                    if valid else
+                    "GET /properties/report JSON missing properties/packData"
+                ),
+            )
+    except Exception as err:
+        return LocalTransportProbe(
+            host=host, target=target, attempted=True, reachable=False,
+            qualified=False, http_status=None,
+            reason=f"Read-only local HTTP probe failed: {type(err).__name__}",
+        )

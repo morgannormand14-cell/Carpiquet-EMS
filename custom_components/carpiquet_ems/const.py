@@ -1,11 +1,14 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.5-alpha.3.7"
+VERSION = "0.6.5-alpha.3.8"
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
 CONF_OVERWRITE = "overwrite"
 DASHBOARD_FILENAME = "carpiquet_ems.yaml"
 DASHBOARD_RELATIVE_PATH = "dashboards/carpiquet_ems.yaml"
+DASHBOARD_URL_PATH = "carpiquet-ems-dynamic"
+DASHBOARD_TITLE = "Carpiquet EMS Dynamic"
+DASHBOARD_ICON = "mdi:home-lightning-bolt"
 
 CONF_GRID_POWER_ENTITY = "grid_power_entity"
 CONF_HYPER_SOC_ENTITY = "hyper_soc_entity"

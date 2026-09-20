@@ -133,15 +133,25 @@ views:
             title: Hyper 2000 — legacy_hyper
             show_header_toggle: false
             entities:
-              - entity: sensor.carpiquet_ems_adapter_hyper_control_profile
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_hyper_prepared
+                attribute: control_profile
                 name: Profil
-              - entity: sensor.carpiquet_ems_adapter_hyper_protocol_generation
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_hyper_prepared
+                attribute: protocol_generation
                 name: Protocole
-              - entity: sensor.carpiquet_ems_adapter_hyper_operation
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_hyper_prepared
+                attribute: operation
                 name: Opération
-              - entity: sensor.carpiquet_ems_adapter_hyper_service
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_hyper_prepared
+                attribute: service
                 name: Service prévu
-              - entity: sensor.carpiquet_ems_adapter_hyper_payload
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_hyper_prepared
+                attribute: payload
                 name: Payload DRY-RUN
               - entity: sensor.carpiquet_ems_adapter_hyper_prepared
                 name: Puissance préparée
@@ -151,15 +161,25 @@ views:
             title: SolarFlow 2400 Pro — zensdk_ac
             show_header_toggle: false
             entities:
-              - entity: sensor.carpiquet_ems_adapter_solarflow_control_profile
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_solarflow_prepared
+                attribute: control_profile
                 name: Profil
-              - entity: sensor.carpiquet_ems_adapter_solarflow_protocol_generation
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_solarflow_prepared
+                attribute: protocol_generation
                 name: Protocole
-              - entity: sensor.carpiquet_ems_adapter_solarflow_operation
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_solarflow_prepared
+                attribute: operation
                 name: Opération
-              - entity: sensor.carpiquet_ems_adapter_solarflow_service
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_solarflow_prepared
+                attribute: service
                 name: Service prévu
-              - entity: sensor.carpiquet_ems_adapter_solarflow_payload
+              - type: attribute
+                entity: sensor.carpiquet_ems_adapter_solarflow_prepared
+                attribute: payload
                 name: Payload DRY-RUN
               - entity: sensor.carpiquet_ems_adapter_solarflow_prepared
                 name: Puissance préparée

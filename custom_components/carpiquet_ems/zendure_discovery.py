@@ -112,6 +112,48 @@ class ZendureDeviceProfile:
         return asdict(self)
 
 
+
+def enrich_validated_inventory_routing_metadata(hass, inventory: dict[str, Any]) -> dict[str, Any]:
+    """Enrich saved validated systems with public HA registry routing metadata.
+
+    This is deliberately NOT hardware discovery: it only looks up the exact
+    Home Assistant device_id values already present in the validated inventory.
+    It cannot add/remove systems or batteries, alter topology, or change
+    authority. Missing registry devices leave the saved system unchanged.
+    """
+    enriched = dict(inventory)
+    systems = inventory.get("systems", [])
+    if not isinstance(systems, list):
+        return enriched
+
+    devices = dr.async_get(hass)
+    by_id = {dev.id: dev for dev in devices.devices}
+    enriched_systems = []
+
+    for saved in systems:
+        if not isinstance(saved, dict):
+            enriched_systems.append(saved)
+            continue
+
+        row = dict(saved)
+        device_id = str(row.get("device_id") or "")
+        dev = by_id.get(device_id)
+        if dev is not None:
+            is_zendure = (
+                str(getattr(dev, "manufacturer", "") or "").casefold() == "zendure"
+                or any(domain == ZENDURE_DOMAIN for domain, _ in dev.identifiers)
+            )
+            if is_zendure:
+                row["product_key"] = getattr(dev, "model_id", None)
+                row["protocol_device_id"] = getattr(dev, "hw_version", None)
+
+        enriched_systems.append(row)
+
+    enriched["systems"] = enriched_systems
+    enriched["routing_metadata_enriched"] = True
+    return enriched
+
+
 def discover_zendure_inventory(hass) -> dict[str, Any]:
     """Read HA registries once and return a normalized Zendure inventory."""
     devices = dr.async_get(hass)

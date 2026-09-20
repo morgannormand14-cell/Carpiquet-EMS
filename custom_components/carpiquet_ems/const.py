@@ -1,5 +1,22 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.5-alpha.3.9"
+from importlib.metadata import PackageNotFoundError, version as package_version
+import json
+from pathlib import Path
+
+
+def _integration_version() -> str:
+    """Read the installed integration version from the Home Assistant manifest."""
+    try:
+        manifest = Path(__file__).with_name("manifest.json")
+        return str(json.loads(manifest.read_text(encoding="utf-8"))["version"])
+    except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError):
+        try:
+            return package_version("carpiquet_ems")
+        except PackageNotFoundError:
+            return "unknown"
+
+
+VERSION = _integration_version()
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"

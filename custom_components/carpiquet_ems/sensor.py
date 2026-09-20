@@ -187,6 +187,8 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
     def extra_state_attributes(self):
         if self._data_key == ATTR_DATA_MODE:
             return {
+                "integration_version": VERSION,
+                "version": VERSION,
                 "sources": self.coordinator.data.get(ATTR_DYNAMIC_SOURCES, {}),
                 "fallbacks": self.coordinator.data.get(ATTR_FALLBACKS, {}),
                 "last_sync": self.coordinator.data.get(ATTR_LAST_FALLBACK_SYNC),

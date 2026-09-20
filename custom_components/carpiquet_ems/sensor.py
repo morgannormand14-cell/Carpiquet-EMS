@@ -5,6 +5,11 @@ from .const import *
 SENSORS = [
     ("engine_authority", "Engine Authority", ATTR_ENGINE_AUTHORITY, None, None),
     ("generic_engine_mode", "Generic Engine Mode", ATTR_GENERIC_ENGINE_MODE, None, None),
+    ("generic_authority", "Generic Authority", ATTR_GENERIC_AUTHORITY, None, None),
+    ("real_writes_enabled", "Real Writes Enabled", ATTR_REAL_WRITES_ENABLED, None, None),
+    ("command_write_locked", "Command Write Locked", ATTR_COMMAND_WRITE_LOCKED, None, None),
+    ("command_adapter_write_locked", "Command Adapter Write Locked", ATTR_ADAPTER_WRITE_LOCKED, None, None),
+    ("mapper_ready", "Mapper Ready", ATTR_MAPPER_READY, None, None),
     ("mapper_systems_count", "Mapper Systems Count", ATTR_MAPPER_SYSTEMS_COUNT, None, None),
     ("mapper_available_systems_count", "Mapper Available Systems Count", ATTR_MAPPER_AVAILABLE_SYSTEMS_COUNT, None, None),
     ("zendure_discovery_state", "Zendure Discovery State", ATTR_ZENDURE_DISCOVERY_STATE, None, None),

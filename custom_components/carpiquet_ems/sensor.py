@@ -208,4 +208,24 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
                 "fallbacks": self.coordinator.data.get(ATTR_FALLBACKS, {}),
                 "last_sync": self.coordinator.data.get(ATTR_LAST_FALLBACK_SYNC),
             }
+        if self._data_key == ATTR_ADAPTER_HYPER_PREPARED:
+            return {
+                "mode": "simulation",
+                "version": VERSION,
+                "control_profile": self.coordinator.data.get(ATTR_ADAPTER_HYPER_PROFILE),
+                "protocol_generation": self.coordinator.data.get(ATTR_ADAPTER_HYPER_PROTOCOL),
+                "operation": self.coordinator.data.get(ATTR_ADAPTER_HYPER_OPERATION),
+                "service": self.coordinator.data.get(ATTR_ADAPTER_HYPER_SERVICE),
+                "payload": self.coordinator.data.get(ATTR_ADAPTER_HYPER_PAYLOAD),
+            }
+        if self._data_key == ATTR_ADAPTER_SOLARFLOW_PREPARED:
+            return {
+                "mode": "simulation",
+                "version": VERSION,
+                "control_profile": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_PROFILE),
+                "protocol_generation": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_PROTOCOL),
+                "operation": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_OPERATION),
+                "service": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_SERVICE),
+                "payload": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_PAYLOAD),
+            }
         return {"mode": "simulation", "version": VERSION}

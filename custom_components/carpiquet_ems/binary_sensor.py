@@ -42,3 +42,15 @@ class CarpiquetBinarySensor(CoordinatorEntity, BinarySensorEntity):
     @property
     def is_on(self):
         return bool(self.coordinator.data.get(self._data_key, False))
+
+    @property
+    def extra_state_attributes(self):
+        if self._data_key == ATTR_WRITE_GATE_MASTER_LOCK:
+            return {
+                "gate_state": self.coordinator.data.get(ATTR_WRITE_GATE_STATE),
+                "execute_allowed": self.coordinator.data.get(ATTR_WRITE_GATE_EXECUTE_ALLOWED),
+                "blockers": self.coordinator.data.get(ATTR_WRITE_GATE_BLOCKERS),
+                "evaluated_at": self.coordinator.data.get(ATTR_WRITE_GATE_EVALUATED_AT),
+                "version": VERSION,
+            }
+        return {"version": VERSION}

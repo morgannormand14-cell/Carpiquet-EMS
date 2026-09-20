@@ -292,6 +292,16 @@ ATTR_ADAPTER_HYPER_REASON = "adapter_hyper_reason"
 ATTR_ADAPTER_SOLARFLOW_REASON = "adapter_solarflow_reason"
 ATTR_ADAPTER_HYPER_WOULD_EXECUTE = "adapter_hyper_would_execute"
 ATTR_ADAPTER_SOLARFLOW_WOULD_EXECUTE = "adapter_solarflow_would_execute"
+ATTR_ADAPTER_HYPER_PROFILE = "adapter_hyper_control_profile"
+ATTR_ADAPTER_HYPER_PROTOCOL = "adapter_hyper_protocol_generation"
+ATTR_ADAPTER_HYPER_OPERATION = "adapter_hyper_operation"
+ATTR_ADAPTER_HYPER_SERVICE = "adapter_hyper_service"
+ATTR_ADAPTER_HYPER_PAYLOAD = "adapter_hyper_payload"
+ATTR_ADAPTER_SOLARFLOW_PROFILE = "adapter_solarflow_control_profile"
+ATTR_ADAPTER_SOLARFLOW_PROTOCOL = "adapter_solarflow_protocol_generation"
+ATTR_ADAPTER_SOLARFLOW_OPERATION = "adapter_solarflow_operation"
+ATTR_ADAPTER_SOLARFLOW_SERVICE = "adapter_solarflow_service"
+ATTR_ADAPTER_SOLARFLOW_PAYLOAD = "adapter_solarflow_payload"
 DEFAULT_ADAPTER_DEADBAND_W = 5.0
 
 # v0.6.5 Entity Mapper Shadow diagnostics

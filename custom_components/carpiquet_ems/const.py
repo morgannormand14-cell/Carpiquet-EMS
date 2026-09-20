@@ -313,3 +313,10 @@ ATTR_MAPPER_PARITY_READY = "mapper_parity_ready"
 ATTR_ZENDURE_DISCOVERY_STATE = "zendure_discovery_state"
 ATTR_ZENDURE_DISCOVERED_SYSTEMS_COUNT = "zendure_discovered_systems_count"
 ATTR_ZENDURE_DISCOVERED_BATTERIES_COUNT = "zendure_discovered_batteries_count"
+
+# Sprint 7 — alpha.3.12 final hardware Write Gate diagnostics
+ATTR_WRITE_GATE_STATE = "write_gate_state"
+ATTR_WRITE_GATE_EXECUTE_ALLOWED = "write_gate_execute_allowed"
+ATTR_WRITE_GATE_MASTER_LOCK = "write_gate_master_lock"
+ATTR_WRITE_GATE_BLOCKERS = "write_gate_blockers"
+ATTR_WRITE_GATE_EVALUATED_AT = "write_gate_evaluated_at"

@@ -4,11 +4,12 @@ from dataclasses import dataclass
 from typing import Any
 
 TRANSPORT_MQTT_CANDIDATE = "HA_MQTT_PUBLISH_CANDIDATE"
+TRANSPORT_ZENSDK_DUAL_CANDIDATE = "ZENSDK_ATOMIC_DUAL_CANDIDATE"
 TRANSPORT_UNRESOLVED = "UNRESOLVED_PUBLIC_SURFACE"
 TRANSPORT_UNSUPPORTED = "UNSUPPORTED"
 
 REASON_LEGACY_MQTT = "Legacy function/invoke topic derivable from public HA registry metadata"
-REASON_ZENSDK_ATOMIC = "No public Zendure-HA service found for atomic ZenSDK properties/write command"
+REASON_ZENSDK_ATOMIC = "Atomic ZenSDK properties/write is derivable for MQTT and local HTTP; execution remains locked"
 REASON_METADATA = "Required Zendure protocol metadata missing"
 REASON_UNSUPPORTED = "Hardware control profile unsupported"
 
@@ -81,19 +82,26 @@ def resolve_execution_transports(
         )
 
     if solar:
-        # Zendure-HA exposes outputLimit as a standard HA number entity, but
-        # ZenSDK discharge requires one atomic properties command containing
-        # smartMode, acMode, outputLimit and inputLimit. Sequential entity
-        # writes are therefore not accepted as protocol-equivalent transport.
+        # ZendureZenSdk.doCommand() sends the same atomic properties payload
+        # either to MQTT topic properties/write (cloud transport) or to the
+        # device-local HTTP endpoint /properties/write (zenSDK transport).
+        # Carpiquet only resolves those candidates here; it executes neither.
+        product_key = str(solar.get("product_key") or "")
+        protocol_device_id = str(solar.get("protocol_device_id") or "")
+        metadata_ready = bool(product_key and protocol_device_id)
+        mqtt_target = (
+            f"iot/{product_key}/{protocol_device_id}/properties/write"
+            if metadata_ready else ""
+        )
         solar_transport = ExecutionTransport(
             profile="zensdk_ac",
-            kind=TRANSPORT_UNRESOLVED,
-            public_surface="",
-            target="",
+            kind=TRANSPORT_ZENSDK_DUAL_CANDIDATE if metadata_ready else TRANSPORT_UNRESOLVED,
+            public_surface="mqtt.publish | local_http.post",
+            target=f"{mqtt_target} | /properties/write" if metadata_ready else "",
             payload=solarflow_payload,
-            metadata_ready=bool(solar.get("product_key") and solar.get("protocol_device_id")),
+            metadata_ready=metadata_ready,
             execution_ready=False,
-            reason=REASON_ZENSDK_ATOMIC,
+            reason=REASON_ZENSDK_ATOMIC if metadata_ready else REASON_METADATA,
         )
     else:
         solar_transport = ExecutionTransport(

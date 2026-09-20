@@ -81,16 +81,20 @@ class CarpiquetEMSConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
     async def async_step_inventory(self,user_input=None)->FlowResult:
         snap=self._snapshot or {}
         systems=snap.get("systems",[])
-        summary=" | ".join(
-            f"{s.get('name')} ({s.get('model')}) — "
-            f"{len(s.get('batteries', []))} batterie(s): "
-            + ", ".join(
-                f"{b.get('name')} ({b.get('model')})" for b in s.get("batteries", [])
+        summary="\n\n".join(
+            "\n".join(
+                [
+                    f"**{s.get('name')} ({s.get('model')})** — {len(s.get('batteries', []))} batterie(s)",
+                    *[
+                        f"• {b.get('name')} ({b.get('model')})"
+                        for b in s.get("batteries", [])
+                    ],
+                ]
             )
             for s in systems
         )
-        infrastructure=", ".join(
-            str(row.get("name") or row.get("model") or row.get("device_id"))
+        infrastructure="\n".join(
+            f"• {row.get('name') or row.get('model') or row.get('device_id')}"
             for row in snap.get("infrastructure", [])
         ) or "Aucune"
         if user_input is not None:

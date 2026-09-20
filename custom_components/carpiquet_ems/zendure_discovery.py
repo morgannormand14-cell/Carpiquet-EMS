@@ -147,7 +147,9 @@ def enrich_validated_inventory_routing_metadata(hass, inventory: dict[str, Any])
             if is_zendure:
                 row["product_key"] = getattr(dev, "model_id", None)
                 row["protocol_device_id"] = getattr(dev, "hw_version", None)
-                row["local_host"] = getattr(dev, "configuration_url", None)
+                # Zendure-HA does not expose its resolved local IP in DeviceInfo.
+                # Keep routing qualification separate from inventory topology.
+                row.setdefault("local_host", None)
 
         enriched_systems.append(row)
 
@@ -227,7 +229,7 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
             model_id=getattr(dev, "model_id", None),
             product_key=getattr(dev, "model_id", None),
             protocol_device_id=getattr(dev, "hw_version", None),
-            local_host=getattr(dev, "configuration_url", None),
+            local_host=None,
             protocol_generation=protocol,
             control_profile=control_profile,
             control_profile_supported=supported,

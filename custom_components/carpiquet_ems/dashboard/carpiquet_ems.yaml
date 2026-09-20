@@ -126,6 +126,19 @@ views:
               - entity: sensor.carpiquet_ems_last_fallback_sync
                 name: Dernière synchronisation fallback
 
+      - type: grid
+        title: Maintenance Carpiquet EMS
+        cards:
+          - type: tile
+            entity: button.carpiquet_ems_synchroniser_carpiquet_ems
+            name: Synchroniser Carpiquet EMS
+            icon: mdi:sync
+            tap_action:
+              action: perform-action
+              perform_action: button.press
+              target:
+                entity_id: button.carpiquet_ems_synchroniser_carpiquet_ems
+
   - title: Historique
     path: history
     icon: mdi:chart-line

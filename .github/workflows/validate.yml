@@ -29,14 +29,11 @@ jobs:
       - name: Validate version parity
         run: |
           python - <<'PY'
-          import ast, json
+          import json, runpy
           from pathlib import Path
           manifest=json.loads(Path("custom_components/carpiquet_ems/manifest.json").read_text())
-          tree=ast.parse(Path("custom_components/carpiquet_ems/const.py").read_text())
-          version=None
-          for node in tree.body:
-              if isinstance(node, ast.Assign) and any(getattr(t, "id", None) == "VERSION" for t in node.targets):
-                  version=ast.literal_eval(node.value)
+          namespace=runpy.run_path("custom_components/carpiquet_ems/const.py")
+          version=namespace["VERSION"]
           assert version == manifest["version"], (version, manifest["version"])
-          print("Version parity:", version)
+          print("Single version source:", version)
           PY

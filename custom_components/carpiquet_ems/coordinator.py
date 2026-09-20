@@ -21,7 +21,11 @@ from .zendure_execution_transport import resolve_execution_transports
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
-from .zendure_discovery import (\n    discover_zendure_inventory,\n    compare_zendure_inventories,\n    enrich_validated_inventory_routing_metadata,\n)
+from .zendure_discovery import (
+    discover_zendure_inventory,
+    compare_zendure_inventories,
+    enrich_validated_inventory_routing_metadata,
+)
 from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
 from .topology import valid_numeric
@@ -96,7 +100,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         # validated during the config flow without querying the registries again.
         confirmed_inventory = self.config.get("zendure_inventory")
         if isinstance(confirmed_inventory, dict):
-            self._zendure_discovery = dict(confirmed_inventory)
+            self._zendure_discovery = enrich_validated_inventory_routing_metadata(
+                hass, dict(confirmed_inventory)
+            )
             self._zendure_discovery.update({
                 "trigger": "installation",
                 "periodic_discovery": False,

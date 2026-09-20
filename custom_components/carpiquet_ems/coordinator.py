@@ -16,6 +16,7 @@ from .digital_twin import TwinBattery, TwinInput, simulate_cycle
 from .command_pipeline import CommandRequest, SafetyContext, evaluate_command
 from .safety_state_machine import SafetyStateMachine, STATE_SHADOW_ACTIVE
 from .zendure_command_adapter import prepare_commands
+from .write_gate import WriteGateInput, evaluate_write_gate
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -859,6 +860,17 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             health = round(sum([grid_ok, hyper_ok, solar_ok]) / 3 * 100)
             status = "Sain" if health == 100 else "Attention" if health >= 67 else "Critique"
 
+            write_gate = evaluate_write_gate(WriteGateInput(
+                safety_ok=bool(command_decision.safety_ok),
+                pipeline_write_locked=bool(command_decision.write_locked),
+                adapter_write_locked=bool(adapter.write_locked),
+                real_writes_enabled=False,
+                hyper_plan_supported=bool(adapter.hyper.hardware_plan.supported),
+                solarflow_plan_supported=bool(adapter.solarflow.hardware_plan.supported),
+                hyper_would_execute=bool(adapter.hyper.would_execute),
+                solarflow_would_execute=bool(adapter.solarflow.would_execute),
+            ))
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1023,6 +1035,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_ADAPTER_SOLARFLOW_OPERATION: adapter.solarflow.hardware_plan.operation,
                 ATTR_ADAPTER_SOLARFLOW_SERVICE: adapter.solarflow.hardware_plan.service,
                 ATTR_ADAPTER_SOLARFLOW_PAYLOAD: str(adapter.solarflow.hardware_plan.payload),
+                ATTR_WRITE_GATE_STATE: write_gate.state,
+                ATTR_WRITE_GATE_EXECUTE_ALLOWED: write_gate.execute_allowed,
+                ATTR_WRITE_GATE_MASTER_LOCK: write_gate.master_lock,
+                ATTR_WRITE_GATE_BLOCKERS: ", ".join(write_gate.blockers),
+                ATTR_WRITE_GATE_EVALUATED_AT: write_gate.evaluated_at,
                 ATTR_SHADOW_CYCLE: self._shadow_cycle,
                 ATTR_SHADOW_ACCEPTED: self._shadow_accepted,
                 ATTR_SHADOW_REJECTED: self._shadow_rejected,

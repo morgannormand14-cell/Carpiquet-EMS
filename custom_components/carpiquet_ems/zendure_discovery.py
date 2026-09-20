@@ -102,6 +102,7 @@ class ZendureDeviceProfile:
     model_id: str | None
     product_key: str | None
     protocol_device_id: str | None
+    local_host: str | None
     protocol_generation: str
     control_profile: str
     control_profile_supported: bool
@@ -146,6 +147,7 @@ def enrich_validated_inventory_routing_metadata(hass, inventory: dict[str, Any])
             if is_zendure:
                 row["product_key"] = getattr(dev, "model_id", None)
                 row["protocol_device_id"] = getattr(dev, "hw_version", None)
+                row["local_host"] = getattr(dev, "configuration_url", None)
 
         enriched_systems.append(row)
 
@@ -225,6 +227,7 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
             model_id=getattr(dev, "model_id", None),
             product_key=getattr(dev, "model_id", None),
             protocol_device_id=getattr(dev, "hw_version", None),
+            local_host=getattr(dev, "configuration_url", None),
             protocol_generation=protocol,
             control_profile=control_profile,
             control_profile_supported=supported,

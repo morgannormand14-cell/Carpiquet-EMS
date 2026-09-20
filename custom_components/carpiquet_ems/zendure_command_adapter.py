@@ -8,10 +8,13 @@ PROFILE_LEGACY_HYPER = "legacy_hyper"
 PROFILE_ZENSDK_AC = "zensdk_ac"
 PROFILE_UNSUPPORTED = "unsupported"
 
+BINDING_LEGACY_INVOKE = "zendure_legacy.deviceAutomation"
+BINDING_ZENSDK_PROPERTIES = "zendure_zensdk.properties_write"
+
 
 @dataclass(frozen=True)
 class HardwareCommandPlan:
-    """Read-only description of the device-specific command Carpiquet would send."""
+    """Read-only, protocol-accurate description of the command Carpiquet would send."""
 
     control_profile: str
     protocol_generation: str
@@ -49,38 +52,50 @@ class AdapterResult:
 
 
 def _legacy_hyper_plan(entity: str, prepared_w: float) -> HardwareCommandPlan:
-    # Sprint 7 alpha.3.10: descriptive plan only. The exact public Zendure-HA
-    # execution surface will be bound in a later gated phase after runtime review.
+    """Mirror Zendure-HA Hyper2000.discharge() without executing it."""
+    power = max(0, int(round(prepared_w)))
     return HardwareCommandPlan(
         control_profile=PROFILE_LEGACY_HYPER,
         protocol_generation="legacy",
         operation="set_ac_output_power",
         service_domain="zendure_ha",
-        service="UNBOUND_DRY_RUN",
+        service=BINDING_LEGACY_INVOKE,
         target_entity=entity or "Non configurée",
         payload={
-            "semantic": "deviceAutomation",
-            "power_w": round(prepared_w, 1),
+            "function": "deviceAutomation",
+            "arguments": [{
+                "autoModelProgram": 2,
+                "autoModelValue": {
+                    "chargingType": 0,
+                    "chargingPower": 0,
+                    "freq": 0,
+                    "outPower": power,
+                },
+                "msgType": 1,
+                "autoModel": 8,
+            }],
         },
         supported=True,
     )
 
 
 def _zensdk_ac_plan(entity: str, prepared_w: float) -> HardwareCommandPlan:
-    # ZenSDK AC requires a complete output-mode command plan. This remains a
-    # semantic DRY-RUN representation: no Home Assistant service is called here.
+    """Mirror ZendureZenSdk.discharge() without executing it."""
+    power = max(0, int(round(prepared_w)))
     return HardwareCommandPlan(
         control_profile=PROFILE_ZENSDK_AC,
         protocol_generation="zensdk",
         operation="set_ac_output_power",
         service_domain="zendure_ha",
-        service="UNBOUND_DRY_RUN",
+        service=BINDING_ZENSDK_PROPERTIES,
         target_entity=entity or "Non configurée",
         payload={
-            "semantic": "ac_output",
-            "ac_mode": "output",
-            "output_limit_w": round(prepared_w, 1),
-            "input_limit_w": 0.0,
+            "properties": {
+                "smartMode": 0 if power == 0 else 1,
+                "acMode": 2,
+                "outputLimit": power,
+                "inputLimit": 0,
+            },
         },
         supported=True,
     )
@@ -179,11 +194,11 @@ def prepare_commands(
     hyper_control_profile: str = PROFILE_LEGACY_HYPER,
     solarflow_control_profile: str = PROFILE_ZENSDK_AC,
 ) -> AdapterResult:
-    """Build device-specific DRY-RUN hardware plans.
+    """Build protocol-accurate, non-executable Zendure command bindings.
 
-    alpha.3.10 remains deliberately non-executable. This module does not call
-    Home Assistant services, never writes Zendure state and always reports
-    write_locked=True.
+    alpha.3.11 deliberately has no execution path. It mirrors the current
+    Zendure-HA command shapes for validation while every hardware write remains
+    locked.
     """
     hyper = _prepare_device(
         "Hyper 2000", hyper_entity, hyper_requested_w, hyper_observed_w,

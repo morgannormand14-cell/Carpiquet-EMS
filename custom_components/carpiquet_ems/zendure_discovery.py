@@ -100,6 +100,8 @@ class ZendureDeviceProfile:
     name: str
     model: str | None
     model_id: str | None
+    product_key: str | None
+    protocol_device_id: str | None
     protocol_generation: str
     control_profile: str
     control_profile_supported: bool
@@ -179,6 +181,8 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
             name=dev.name_by_user or dev.name or stable,
             model=dev.model,
             model_id=getattr(dev, "model_id", None),
+            product_key=getattr(dev, "model_id", None),
+            protocol_device_id=getattr(dev, "hw_version", None),
             protocol_generation=protocol,
             control_profile=control_profile,
             control_profile_supported=supported,

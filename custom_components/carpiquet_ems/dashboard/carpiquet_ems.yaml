@@ -187,6 +187,29 @@ views:
                 name: Action
 
       - type: grid
+        title: Write Gate — alpha.3.12 🔒
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.carpiquet_ems_write_gate_master_lock
+                name: Master Lock
+              - type: attribute
+                entity: binary_sensor.carpiquet_ems_write_gate_master_lock
+                attribute: gate_state
+                name: État Write Gate
+              - entity: binary_sensor.carpiquet_ems_write_gate_execute_allowed
+                name: Exécution autorisée
+              - type: attribute
+                entity: binary_sensor.carpiquet_ems_write_gate_master_lock
+                attribute: blockers
+                name: Raisons du blocage
+              - type: attribute
+                entity: binary_sensor.carpiquet_ems_write_gate_master_lock
+                attribute: evaluated_at
+                name: Dernière évaluation
+
+      - type: grid
         title: Maintenance Carpiquet EMS
         cards:
           - type: tile

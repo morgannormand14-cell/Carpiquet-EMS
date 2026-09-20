@@ -127,6 +127,46 @@ views:
                 name: Dernière synchronisation fallback
 
       - type: grid
+        title: Hardware Command Planner — DRY-RUN 🔒
+        cards:
+          - type: entities
+            title: Hyper 2000 — legacy_hyper
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_adapter_hyper_profile
+                name: Profil
+              - entity: sensor.carpiquet_ems_adapter_hyper_protocol
+                name: Protocole
+              - entity: sensor.carpiquet_ems_adapter_hyper_operation
+                name: Opération
+              - entity: sensor.carpiquet_ems_adapter_hyper_service
+                name: Service prévu
+              - entity: sensor.carpiquet_ems_adapter_hyper_payload
+                name: Payload DRY-RUN
+              - entity: sensor.carpiquet_ems_adapter_hyper_prepared
+                name: Puissance préparée
+              - entity: sensor.carpiquet_ems_adapter_hyper_action
+                name: Action
+          - type: entities
+            title: SolarFlow 2400 Pro — zensdk_ac
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_adapter_solarflow_profile
+                name: Profil
+              - entity: sensor.carpiquet_ems_adapter_solarflow_protocol
+                name: Protocole
+              - entity: sensor.carpiquet_ems_adapter_solarflow_operation
+                name: Opération
+              - entity: sensor.carpiquet_ems_adapter_solarflow_service
+                name: Service prévu
+              - entity: sensor.carpiquet_ems_adapter_solarflow_payload
+                name: Payload DRY-RUN
+              - entity: sensor.carpiquet_ems_adapter_solarflow_prepared
+                name: Puissance préparée
+              - entity: sensor.carpiquet_ems_adapter_solarflow_action
+                name: Action
+
+      - type: grid
         title: Maintenance Carpiquet EMS
         cards:
           - type: tile

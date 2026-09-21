@@ -43,8 +43,9 @@ def resolve_execution_transports(
 ) -> dict[str, ExecutionTransport]:
     """Resolve candidate public transports without performing any write.
 
-    alpha.3.13 is intentionally transport-observation only. It does not call
-    hass.services.async_call(), MQTT publish, HTTP, or Zendure private objects.
+    Transport resolution performs no I/O. The separate local qualification
+    probe performs GET /properties/report only; no MQTT publish, POST, write
+    service, or Zendure private object is used.
     """
     hyper = _system_by_profile(inventory, "legacy_hyper")
     solar = _system_by_profile(inventory, "zensdk_ac")
@@ -160,17 +161,14 @@ async def probe_solarflow_local_report(hass, inventory: dict[str, Any]) -> Local
                     qualified=False, http_status=status,
                     reason="GET /properties/report did not return valid JSON",
                 )
-            valid = isinstance(payload, dict) and (
-                isinstance(payload.get("properties"), dict)
-                or isinstance(payload.get("packData"), list)
-            )
+            valid = isinstance(payload, dict) and isinstance(payload.get("properties"), dict)
             return LocalTransportProbe(
                 host=host, target=target, attempted=True, reachable=True,
                 qualified=valid, http_status=status,
                 reason=(
                     "Read-only GET /properties/report returned Zendure-shaped JSON"
                     if valid else
-                    "GET /properties/report JSON missing properties/packData"
+                    "GET /properties/report JSON missing properties object"
                 ),
             )
     except Exception as err:

@@ -118,6 +118,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             }
         self._pending_zendure_discovery = None
         self._solarflow_local_probe = None
+        self._hyper_transport_selection = TRANSPORT_MODE_AUTO
+        self._solarflow_transport_selection = TRANSPORT_MODE_AUTO
         self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
@@ -171,6 +173,55 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         if isinstance(self._zendure_discovery, dict):
             self._zendure_discovery.pop("pending_reconciliation", None)
 
+
+    @property
+    def hyper_transport_selection(self):
+        return self._hyper_transport_selection
+
+    @property
+    def solarflow_transport_selection(self):
+        return self._solarflow_transport_selection
+
+    async def async_set_hyper_transport_selection(self, option):
+        if option not in TRANSPORT_HYPER_OPTIONS:
+            raise ValueError(f"Unsupported Hyper transport selection: {option}")
+        self._hyper_transport_selection = option
+        await self.async_request_refresh()
+
+    async def async_set_solarflow_transport_selection(self, option):
+        if option not in TRANSPORT_SOLARFLOW_OPTIONS:
+            raise ValueError(f"Unsupported SolarFlow transport selection: {option}")
+        self._solarflow_transport_selection = option
+        await self.async_request_refresh()
+
+    def _transport_policy_diagnostics(self):
+        hyper_selected = "MQTT"
+        hyper_reason = "AUTO: only MQTT candidate is available" if self._hyper_transport_selection == TRANSPORT_MODE_AUTO else "Manual MQTT selection"
+
+        probe = self._solarflow_local_probe
+        local_ok = bool(probe and probe.qualified)
+        if self._solarflow_transport_selection == TRANSPORT_MODE_AUTO:
+            if local_ok:
+                solar_selected = "LOCAL_HTTP"
+                solar_reason = "AUTO: qualified local HTTP preferred"
+            else:
+                solar_selected = "MQTT"
+                solar_reason = "AUTO fallback: local HTTP not qualified"
+        elif self._solarflow_transport_selection == TRANSPORT_MODE_LOCAL_HTTP:
+            solar_selected = "LOCAL_HTTP" if local_ok else "BLOCKED"
+            solar_reason = "Manual Local HTTP selection" if local_ok else "Manual Local HTTP unavailable: no automatic fallback"
+        else:
+            solar_selected = "MQTT"
+            solar_reason = "Manual MQTT selection"
+
+        return {
+            ATTR_TRANSPORT_HYPER_SELECTION: self._hyper_transport_selection,
+            ATTR_TRANSPORT_HYPER_SELECTED: hyper_selected,
+            ATTR_TRANSPORT_HYPER_FALLBACK_REASON: hyper_reason,
+            ATTR_TRANSPORT_SOLARFLOW_SELECTION: self._solarflow_transport_selection,
+            ATTR_TRANSPORT_SOLARFLOW_SELECTED: solar_selected,
+            ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON: solar_reason,
+        }
 
     def _state(self, entity_id):
         return self.hass.states.get(entity_id)
@@ -1067,6 +1118,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_TRANSPORT_SOLARFLOW_METADATA_READY: transports["solarflow"].metadata_ready,
                 ATTR_TRANSPORT_SOLARFLOW_EXECUTION_READY: transports["solarflow"].execution_ready,
                 ATTR_TRANSPORT_SOLARFLOW_REASON: transports["solarflow"].reason,
+            **self._transport_policy_diagnostics(),
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

@@ -18,6 +18,7 @@ from .safety_state_machine import SafetyStateMachine, STATE_SHADOW_ACTIVE
 from .zendure_command_adapter import prepare_commands
 from .write_gate import WriteGateInput, evaluate_write_gate
 from .zendure_execution_transport import resolve_execution_transports, probe_solarflow_local_report
+from .zendure_controlled_executor import prepare_locked_execution
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -937,6 +938,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 adapter.solarflow.hardware_plan.payload,
             )
 
+            transport_policy = self._transport_policy_diagnostics()
+            executor = prepare_locked_execution(
+                inventory=self._zendure_discovery,
+                hyper_payload=adapter.hyper.hardware_plan.payload,
+                solarflow_payload=adapter.solarflow.hardware_plan.payload,
+                hyper_selected_transport=str(transport_policy[ATTR_TRANSPORT_HYPER_SELECTED]),
+                solarflow_selected_transport=str(transport_policy[ATTR_TRANSPORT_SOLARFLOW_SELECTED]),
+                solarflow_local_http_qualified=bool(
+                    self._solarflow_local_probe and self._solarflow_local_probe.qualified
+                ),
+            )
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1118,7 +1131,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_TRANSPORT_SOLARFLOW_METADATA_READY: transports["solarflow"].metadata_ready,
                 ATTR_TRANSPORT_SOLARFLOW_EXECUTION_READY: transports["solarflow"].execution_ready,
                 ATTR_TRANSPORT_SOLARFLOW_REASON: transports["solarflow"].reason,
-            **self._transport_policy_diagnostics(),
+                **transport_policy,
+                ATTR_EXECUTOR_STATE: executor.state,
+                ATTR_EXECUTOR_WRITE_LOCKED: executor.write_locked,
+                ATTR_EXECUTOR_EXECUTION_REQUESTED: executor.execution_requested,
+                ATTR_EXECUTOR_EXECUTION_ALLOWED: executor.execution_allowed,
+                ATTR_EXECUTOR_COMMAND_SENT: executor.command_sent,
+                ATTR_EXECUTOR_PREPARED_AT: executor.prepared_at,
+                ATTR_EXECUTOR_HYPER_PREPARED: executor.hyper.prepared,
+                ATTR_EXECUTOR_HYPER_TARGET: executor.hyper.target,
+                ATTR_EXECUTOR_HYPER_ENVELOPE: str(executor.hyper.envelope),
+                ATTR_EXECUTOR_HYPER_REASON: executor.hyper.reason,
+                ATTR_EXECUTOR_SOLARFLOW_PREPARED: executor.solarflow.prepared,
+                ATTR_EXECUTOR_SOLARFLOW_TARGET: executor.solarflow.target,
+                ATTR_EXECUTOR_SOLARFLOW_ENVELOPE: str(executor.solarflow.envelope),
+                ATTR_EXECUTOR_SOLARFLOW_REASON: executor.solarflow.reason,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

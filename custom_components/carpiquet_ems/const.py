@@ -341,3 +341,17 @@ ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE = "solarflow_local_http_reachable"
 ATTR_SOLARFLOW_LOCAL_HTTP_QUALIFIED = "solarflow_local_http_qualified"
 ATTR_SOLARFLOW_LOCAL_HTTP_STATUS = "solarflow_local_http_status"
 ATTR_SOLARFLOW_LOCAL_HTTP_REASON = "solarflow_local_http_reason"
+
+
+# Sprint 7 — alpha.3.13 transport policy selection (observation only)
+TRANSPORT_MODE_AUTO = "Automatique"
+TRANSPORT_MODE_MQTT = "MQTT"
+TRANSPORT_MODE_LOCAL_HTTP = "Local HTTP"
+TRANSPORT_HYPER_OPTIONS = [TRANSPORT_MODE_AUTO, TRANSPORT_MODE_MQTT]
+TRANSPORT_SOLARFLOW_OPTIONS = [TRANSPORT_MODE_AUTO, TRANSPORT_MODE_LOCAL_HTTP, TRANSPORT_MODE_MQTT]
+ATTR_TRANSPORT_HYPER_SELECTION = "transport_hyper_selection"
+ATTR_TRANSPORT_HYPER_SELECTED = "transport_hyper_selected"
+ATTR_TRANSPORT_HYPER_FALLBACK_REASON = "transport_hyper_fallback_reason"
+ATTR_TRANSPORT_SOLARFLOW_SELECTION = "transport_solarflow_selection"
+ATTR_TRANSPORT_SOLARFLOW_SELECTED = "transport_solarflow_selected"
+ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON = "transport_solarflow_fallback_reason"

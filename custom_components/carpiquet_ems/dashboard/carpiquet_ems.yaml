@@ -284,9 +284,13 @@ views:
             entities:
               - entity: select.carpiquet_ems_hyper_transport
                 name: Transport
-              - entity: sensor.carpiquet_ems_transport_hyper_selected
+              - type: attribute
+                entity: select.carpiquet_ems_hyper_transport
+                attribute: selected_transport
                 name: Transport sélectionné
-              - entity: sensor.carpiquet_ems_transport_hyper_fallback_reason
+              - type: attribute
+                entity: select.carpiquet_ems_hyper_transport
+                attribute: selection_reason
                 name: Raison
               - entity: binary_sensor.carpiquet_ems_transport_hyper_execution_ready
                 name: Exécution prête
@@ -296,9 +300,13 @@ views:
             entities:
               - entity: select.carpiquet_ems_solarflow_transport
                 name: Transport
-              - entity: sensor.carpiquet_ems_transport_solarflow_selected
+              - type: attribute
+                entity: select.carpiquet_ems_solarflow_transport
+                attribute: selected_transport
                 name: Transport sélectionné
-              - entity: sensor.carpiquet_ems_transport_solarflow_fallback_reason
+              - type: attribute
+                entity: select.carpiquet_ems_solarflow_transport
+                attribute: selection_reason
                 name: Sélection / fallback
               - entity: binary_sensor.carpiquet_ems_solarflow_local_http_qualified
                 name: Local HTTP qualifié

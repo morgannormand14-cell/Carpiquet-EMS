@@ -100,6 +100,9 @@ class ZendureDeviceProfile:
     name: str
     model: str | None
     model_id: str | None
+    product_key: str | None
+    protocol_device_id: str | None
+    local_host: str | None
     protocol_generation: str
     control_profile: str
     control_profile_supported: bool
@@ -108,6 +111,56 @@ class ZendureDeviceProfile:
 
     def as_dict(self) -> dict[str, Any]:
         return asdict(self)
+
+
+
+def enrich_validated_inventory_routing_metadata(hass, inventory: dict[str, Any]) -> dict[str, Any]:
+    """Enrich saved validated systems with public HA registry routing metadata.
+
+    This is deliberately NOT hardware discovery: it only looks up the exact
+    Home Assistant device_id values already present in the validated inventory.
+    It cannot add/remove systems or batteries, alter topology, or change
+    authority. Missing registry devices leave the saved system unchanged.
+    """
+    enriched = dict(inventory)
+    systems = inventory.get("systems", [])
+    if not isinstance(systems, list):
+        return enriched
+
+    devices = dr.async_get(hass)
+    by_id = {dev.id: dev for dev in devices.devices}
+    enriched_systems = []
+
+    for saved in systems:
+        if not isinstance(saved, dict):
+            enriched_systems.append(saved)
+            continue
+
+        row = dict(saved)
+        device_id = str(row.get("device_id") or "")
+        dev = by_id.get(device_id)
+        if dev is not None:
+            is_zendure = (
+                str(getattr(dev, "manufacturer", "") or "").casefold() == "zendure"
+                or any(domain == ZENDURE_DOMAIN for domain, _ in dev.identifiers)
+            )
+            if is_zendure:
+                row["product_key"] = getattr(dev, "model_id", None)
+                row["protocol_device_id"] = getattr(dev, "hw_version", None)
+                # Zendure-HA does not expose its resolved local IP in DeviceInfo.
+                # Keep routing qualification separate from inventory topology.
+                model_name = str(getattr(dev, "model", "") or "").replace(" ", "")
+                serial = str(getattr(dev, "serial_number", "") or "")
+                row["local_host"] = (
+                    f"zendure-{model_name}-{serial}.local"
+                    if model_name and serial else None
+                )
+
+        enriched_systems.append(row)
+
+    enriched["systems"] = enriched_systems
+    enriched["routing_metadata_enriched"] = True
+    return enriched
 
 
 def discover_zendure_inventory(hass) -> dict[str, Any]:
@@ -179,6 +232,12 @@ def discover_zendure_inventory(hass) -> dict[str, Any]:
             name=dev.name_by_user or dev.name or stable,
             model=dev.model,
             model_id=getattr(dev, "model_id", None),
+            product_key=getattr(dev, "model_id", None),
+            protocol_device_id=getattr(dev, "hw_version", None),
+            local_host=(
+                f"zendure-{str(dev.model or '').replace(' ', '')}-{str(serial)}.local"
+                if dev.model and serial else None
+            ),
             protocol_generation=protocol,
             control_profile=control_profile,
             control_profile_supported=supported,

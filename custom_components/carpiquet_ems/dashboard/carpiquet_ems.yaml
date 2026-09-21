@@ -264,6 +264,63 @@ views:
       # __CARPIQUET_BATTERY_CARDS__
 
 
+  - title: Paramètres
+    path: settings
+    icon: mdi:cog
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        title: Avancé — Transport Zendure
+        cards:
+          - type: markdown
+            content: |
+              # 🔒 Sélection du transport
+              Ces sélecteurs choisissent uniquement le transport logique.
+              **Aucune écriture Zendure n'est autorisée en alpha.3.13.**
+          - type: entities
+            title: Hyper 2000
+            show_header_toggle: false
+            entities:
+              - entity: select.carpiquet_ems_hyper_transport
+                name: Transport
+              - type: attribute
+                entity: select.carpiquet_ems_hyper_transport
+                attribute: selected_transport
+                name: Transport sélectionné
+              - type: attribute
+                entity: select.carpiquet_ems_hyper_transport
+                attribute: selection_reason
+                name: Raison
+              - entity: binary_sensor.carpiquet_ems_transport_hyper_execution_ready
+                name: Exécution prête
+          - type: entities
+            title: SolarFlow 2400 Pro
+            show_header_toggle: false
+            entities:
+              - entity: select.carpiquet_ems_solarflow_transport
+                name: Transport
+              - type: attribute
+                entity: select.carpiquet_ems_solarflow_transport
+                attribute: selected_transport
+                name: Transport sélectionné
+              - type: attribute
+                entity: select.carpiquet_ems_solarflow_transport
+                attribute: selection_reason
+                name: Sélection / fallback
+              - entity: binary_sensor.carpiquet_ems_solarflow_local_http_qualified
+                name: Local HTTP qualifié
+              - entity: binary_sensor.carpiquet_ems_transport_solarflow_execution_ready
+                name: Exécution prête
+          - type: entities
+            title: Verrous d'exécution
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.carpiquet_ems_write_gate_master_lock
+                name: Master Lock
+              - entity: binary_sensor.carpiquet_ems_write_gate_execute_allowed
+                name: Exécution autorisée
+
   - title: Automatisation
     path: automation
     icon: mdi:robot-industrial

@@ -320,3 +320,38 @@ ATTR_WRITE_GATE_EXECUTE_ALLOWED = "write_gate_execute_allowed"
 ATTR_WRITE_GATE_MASTER_LOCK = "write_gate_master_lock"
 ATTR_WRITE_GATE_BLOCKERS = "write_gate_blockers"
 ATTR_WRITE_GATE_EVALUATED_AT = "write_gate_evaluated_at"
+
+# Sprint 7 — alpha.3.13 execution transport observation
+ATTR_TRANSPORT_HYPER_KIND = "transport_hyper_kind"
+ATTR_TRANSPORT_HYPER_SURFACE = "transport_hyper_surface"
+ATTR_TRANSPORT_HYPER_TARGET = "transport_hyper_target"
+ATTR_TRANSPORT_HYPER_METADATA_READY = "transport_hyper_metadata_ready"
+ATTR_TRANSPORT_HYPER_EXECUTION_READY = "transport_hyper_execution_ready"
+ATTR_TRANSPORT_HYPER_REASON = "transport_hyper_reason"
+ATTR_TRANSPORT_SOLARFLOW_KIND = "transport_solarflow_kind"
+ATTR_TRANSPORT_SOLARFLOW_SURFACE = "transport_solarflow_surface"
+ATTR_TRANSPORT_SOLARFLOW_TARGET = "transport_solarflow_target"
+ATTR_TRANSPORT_SOLARFLOW_METADATA_READY = "transport_solarflow_metadata_ready"
+ATTR_TRANSPORT_SOLARFLOW_EXECUTION_READY = "transport_solarflow_execution_ready"
+ATTR_TRANSPORT_SOLARFLOW_REASON = "transport_solarflow_reason"
+
+ATTR_SOLARFLOW_LOCAL_HTTP_HOST = "solarflow_local_http_host"
+ATTR_SOLARFLOW_LOCAL_HTTP_TARGET = "solarflow_local_http_target"
+ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE = "solarflow_local_http_reachable"
+ATTR_SOLARFLOW_LOCAL_HTTP_QUALIFIED = "solarflow_local_http_qualified"
+ATTR_SOLARFLOW_LOCAL_HTTP_STATUS = "solarflow_local_http_status"
+ATTR_SOLARFLOW_LOCAL_HTTP_REASON = "solarflow_local_http_reason"
+
+
+# Sprint 7 — alpha.3.13 transport policy selection (observation only)
+TRANSPORT_MODE_AUTO = "Automatique"
+TRANSPORT_MODE_MQTT = "MQTT"
+TRANSPORT_MODE_LOCAL_HTTP = "Local HTTP"
+TRANSPORT_HYPER_OPTIONS = [TRANSPORT_MODE_AUTO, TRANSPORT_MODE_MQTT]
+TRANSPORT_SOLARFLOW_OPTIONS = [TRANSPORT_MODE_AUTO, TRANSPORT_MODE_LOCAL_HTTP, TRANSPORT_MODE_MQTT]
+ATTR_TRANSPORT_HYPER_SELECTION = "transport_hyper_selection"
+ATTR_TRANSPORT_HYPER_SELECTED = "transport_hyper_selected"
+ATTR_TRANSPORT_HYPER_FALLBACK_REASON = "transport_hyper_fallback_reason"
+ATTR_TRANSPORT_SOLARFLOW_SELECTION = "transport_solarflow_selection"
+ATTR_TRANSPORT_SOLARFLOW_SELECTED = "transport_solarflow_selected"
+ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON = "transport_solarflow_fallback_reason"

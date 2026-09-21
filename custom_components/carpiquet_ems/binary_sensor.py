@@ -3,6 +3,12 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("transport_hyper_metadata_ready", "Transport Hyper Metadata Ready", ATTR_TRANSPORT_HYPER_METADATA_READY),
+    ("transport_hyper_execution_ready", "Transport Hyper Execution Ready", ATTR_TRANSPORT_HYPER_EXECUTION_READY),
+    ("transport_solarflow_metadata_ready", "Transport SolarFlow Metadata Ready", ATTR_TRANSPORT_SOLARFLOW_METADATA_READY),
+    ("transport_solarflow_execution_ready", "Transport SolarFlow Execution Ready", ATTR_TRANSPORT_SOLARFLOW_EXECUTION_READY),
+    ("solarflow_local_http_reachable", "SolarFlow Local HTTP Reachable", ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE),
+    ("solarflow_local_http_qualified", "SolarFlow Local HTTP Qualified", ATTR_SOLARFLOW_LOCAL_HTTP_QUALIFIED),
     ("write_gate_execute_allowed", "Write Gate Execute Allowed", ATTR_WRITE_GATE_EXECUTE_ALLOWED),
     ("write_gate_master_lock", "Write Gate Master Lock", ATTR_WRITE_GATE_MASTER_LOCK),
     ("generic_authority", "Generic Authority", ATTR_GENERIC_AUTHORITY),

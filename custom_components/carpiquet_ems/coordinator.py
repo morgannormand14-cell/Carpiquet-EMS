@@ -17,10 +17,15 @@ from .command_pipeline import CommandRequest, SafetyContext, evaluate_command
 from .safety_state_machine import SafetyStateMachine, STATE_SHADOW_ACTIVE
 from .zendure_command_adapter import prepare_commands
 from .write_gate import WriteGateInput, evaluate_write_gate
+from .zendure_execution_transport import resolve_execution_transports, probe_solarflow_local_report
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
-from .zendure_discovery import discover_zendure_inventory, compare_zendure_inventories
+from .zendure_discovery import (
+    discover_zendure_inventory,
+    compare_zendure_inventories,
+    enrich_validated_inventory_routing_metadata,
+)
 from .automation_engine import DISPLAY_REASON, DISPLAY_STATE
 from .const import *
 from .topology import valid_numeric
@@ -95,7 +100,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         # validated during the config flow without querying the registries again.
         confirmed_inventory = self.config.get("zendure_inventory")
         if isinstance(confirmed_inventory, dict):
-            self._zendure_discovery = dict(confirmed_inventory)
+            self._zendure_discovery = enrich_validated_inventory_routing_metadata(
+                hass, dict(confirmed_inventory)
+            )
             self._zendure_discovery.update({
                 "trigger": "installation",
                 "periodic_discovery": False,
@@ -110,6 +117,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "systems_count": 0, "batteries_count": 0, "systems": [],
             }
         self._pending_zendure_discovery = None
+        self._solarflow_local_probe = None
+        self._hyper_transport_selection = TRANSPORT_MODE_AUTO
+        self._solarflow_transport_selection = TRANSPORT_MODE_AUTO
         self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
@@ -121,6 +131,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
     async def async_initialize(self):
         await self.hass.async_add_executor_job(self._session.finalize_orphaned_sessions)
+        self._solarflow_local_probe = await probe_solarflow_local_report(self.hass, self._zendure_discovery)
         stored = await self._store.async_load()
         if isinstance(stored, dict):
             values = stored.get("values")
@@ -162,6 +173,55 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         if isinstance(self._zendure_discovery, dict):
             self._zendure_discovery.pop("pending_reconciliation", None)
 
+
+    @property
+    def hyper_transport_selection(self):
+        return self._hyper_transport_selection
+
+    @property
+    def solarflow_transport_selection(self):
+        return self._solarflow_transport_selection
+
+    async def async_set_hyper_transport_selection(self, option):
+        if option not in TRANSPORT_HYPER_OPTIONS:
+            raise ValueError(f"Unsupported Hyper transport selection: {option}")
+        self._hyper_transport_selection = option
+        await self.async_request_refresh()
+
+    async def async_set_solarflow_transport_selection(self, option):
+        if option not in TRANSPORT_SOLARFLOW_OPTIONS:
+            raise ValueError(f"Unsupported SolarFlow transport selection: {option}")
+        self._solarflow_transport_selection = option
+        await self.async_request_refresh()
+
+    def _transport_policy_diagnostics(self):
+        hyper_selected = "MQTT"
+        hyper_reason = "AUTO: only MQTT candidate is available" if self._hyper_transport_selection == TRANSPORT_MODE_AUTO else "Manual MQTT selection"
+
+        probe = self._solarflow_local_probe
+        local_ok = bool(probe and probe.qualified)
+        if self._solarflow_transport_selection == TRANSPORT_MODE_AUTO:
+            if local_ok:
+                solar_selected = "LOCAL_HTTP"
+                solar_reason = "AUTO: qualified local HTTP preferred"
+            else:
+                solar_selected = "MQTT"
+                solar_reason = "AUTO fallback: local HTTP not qualified"
+        elif self._solarflow_transport_selection == TRANSPORT_MODE_LOCAL_HTTP:
+            solar_selected = "LOCAL_HTTP" if local_ok else "BLOCKED"
+            solar_reason = "Manual Local HTTP selection" if local_ok else "Manual Local HTTP unavailable: no automatic fallback"
+        else:
+            solar_selected = "MQTT"
+            solar_reason = "Manual MQTT selection"
+
+        return {
+            ATTR_TRANSPORT_HYPER_SELECTION: self._hyper_transport_selection,
+            ATTR_TRANSPORT_HYPER_SELECTED: hyper_selected,
+            ATTR_TRANSPORT_HYPER_FALLBACK_REASON: hyper_reason,
+            ATTR_TRANSPORT_SOLARFLOW_SELECTION: self._solarflow_transport_selection,
+            ATTR_TRANSPORT_SOLARFLOW_SELECTED: solar_selected,
+            ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON: solar_reason,
+        }
 
     def _state(self, entity_id):
         return self.hass.states.get(entity_id)
@@ -871,6 +931,12 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 solarflow_would_execute=bool(adapter.solarflow.would_execute),
             ))
 
+            transports = resolve_execution_transports(
+                self._zendure_discovery,
+                adapter.hyper.hardware_plan.payload,
+                adapter.solarflow.hardware_plan.payload,
+            )
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1040,6 +1106,25 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_WRITE_GATE_MASTER_LOCK: write_gate.master_lock,
                 ATTR_WRITE_GATE_BLOCKERS: ", ".join(write_gate.blockers),
                 ATTR_WRITE_GATE_EVALUATED_AT: write_gate.evaluated_at,
+                ATTR_TRANSPORT_HYPER_KIND: transports["hyper"].kind,
+                ATTR_TRANSPORT_HYPER_SURFACE: transports["hyper"].public_surface,
+                ATTR_TRANSPORT_HYPER_TARGET: transports["hyper"].target,
+                ATTR_TRANSPORT_HYPER_METADATA_READY: transports["hyper"].metadata_ready,
+                ATTR_TRANSPORT_HYPER_EXECUTION_READY: transports["hyper"].execution_ready,
+                ATTR_TRANSPORT_HYPER_REASON: transports["hyper"].reason,
+                ATTR_TRANSPORT_SOLARFLOW_KIND: transports["solarflow"].kind,
+                ATTR_TRANSPORT_SOLARFLOW_SURFACE: transports["solarflow"].public_surface,
+                ATTR_TRANSPORT_SOLARFLOW_TARGET: transports["solarflow"].target,
+                ATTR_TRANSPORT_SOLARFLOW_METADATA_READY: transports["solarflow"].metadata_ready,
+                ATTR_TRANSPORT_SOLARFLOW_EXECUTION_READY: transports["solarflow"].execution_ready,
+                ATTR_TRANSPORT_SOLARFLOW_REASON: transports["solarflow"].reason,
+            **self._transport_policy_diagnostics(),
+                ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
+                ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
+                ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,
+                ATTR_SOLARFLOW_LOCAL_HTTP_QUALIFIED: self._solarflow_local_probe.qualified if self._solarflow_local_probe else False,
+                ATTR_SOLARFLOW_LOCAL_HTTP_STATUS: self._solarflow_local_probe.http_status if self._solarflow_local_probe and self._solarflow_local_probe.http_status is not None else "N/A",
+                ATTR_SOLARFLOW_LOCAL_HTTP_REASON: self._solarflow_local_probe.reason if self._solarflow_local_probe else "Probe not run",
                 ATTR_SHADOW_CYCLE: self._shadow_cycle,
                 ATTR_SHADOW_ACCEPTED: self._shadow_accepted,
                 ATTR_SHADOW_REJECTED: self._shadow_rejected,

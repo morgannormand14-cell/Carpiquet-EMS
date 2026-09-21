@@ -3,6 +3,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import (
     DOMAIN, CONTROL_MODE_OPTIONS,
     TRANSPORT_HYPER_OPTIONS, TRANSPORT_SOLARFLOW_OPTIONS,
+    ATTR_TRANSPORT_HYPER_SELECTED, ATTR_TRANSPORT_HYPER_FALLBACK_REASON,
+    ATTR_TRANSPORT_SOLARFLOW_SELECTED, ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON,
 )
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -85,7 +87,13 @@ class HyperTransportSelect(CoordinatorEntity, SelectEntity):
 
     @property
     def extra_state_attributes(self):
-        return {"execution_enabled": False, "write_locked": True}
+        diag = self.coordinator._transport_policy_diagnostics()
+        return {
+            "selected_transport": diag[ATTR_TRANSPORT_HYPER_SELECTED],
+            "selection_reason": diag[ATTR_TRANSPORT_HYPER_FALLBACK_REASON],
+            "execution_enabled": False,
+            "write_locked": True,
+        }
 
 
 class SolarFlowTransportSelect(CoordinatorEntity, SelectEntity):
@@ -107,4 +115,14 @@ class SolarFlowTransportSelect(CoordinatorEntity, SelectEntity):
 
     @property
     def extra_state_attributes(self):
-        return {"execution_enabled": False, "write_locked": True}
+        diag = self.coordinator._transport_policy_diagnostics()
+        return {
+            "selected_transport": diag[ATTR_TRANSPORT_SOLARFLOW_SELECTED],
+            "selection_reason": diag[ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON],
+            "local_http_qualified": bool(
+                self.coordinator._solarflow_local_probe
+                and self.coordinator._solarflow_local_probe.qualified
+            ),
+            "execution_enabled": False,
+            "write_locked": True,
+        }

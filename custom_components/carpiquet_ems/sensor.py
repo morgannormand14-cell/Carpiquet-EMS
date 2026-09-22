@@ -3,6 +3,14 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_executor_state", "Controlled Executor State", ATTR_EXECUTOR_STATE, None, None),
+    ("controlled_executor_hyper_target", "Controlled Executor Hyper Target", ATTR_EXECUTOR_HYPER_TARGET, None, None),
+    ("controlled_executor_hyper_envelope", "Controlled Executor Hyper Envelope", ATTR_EXECUTOR_HYPER_ENVELOPE, None, None),
+    ("controlled_executor_hyper_reason", "Controlled Executor Hyper Reason", ATTR_EXECUTOR_HYPER_REASON, None, None),
+    ("controlled_executor_solarflow_target", "Controlled Executor SolarFlow Target", ATTR_EXECUTOR_SOLARFLOW_TARGET, None, None),
+    ("controlled_executor_solarflow_envelope", "Controlled Executor SolarFlow Envelope", ATTR_EXECUTOR_SOLARFLOW_ENVELOPE, None, None),
+    ("controlled_executor_solarflow_reason", "Controlled Executor SolarFlow Reason", ATTR_EXECUTOR_SOLARFLOW_REASON, None, None),
+    ("controlled_executor_prepared_at", "Controlled Executor Prepared At", ATTR_EXECUTOR_PREPARED_AT, None, None),
     ("engine_authority", "Engine Authority", ATTR_ENGINE_AUTHORITY, None, None),
     ("generic_engine_mode", "Generic Engine Mode", ATTR_GENERIC_ENGINE_MODE, None, None),
     ("generic_authority", "Generic Authority", ATTR_GENERIC_AUTHORITY, None, None),
@@ -207,6 +215,9 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def native_value(self):
+        if self._data_key in (ATTR_EXECUTOR_HYPER_ENVELOPE, ATTR_EXECUTOR_SOLARFLOW_ENVELOPE):
+            value = self.coordinator.data.get(self._data_key)
+            return "PREPARED" if value and value not in ("None", "{}", "") else "NOT_PREPARED"
         return self.coordinator.data.get(self._data_key)
 
     @property
@@ -221,6 +232,12 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
+        if self._data_key in (ATTR_EXECUTOR_HYPER_ENVELOPE, ATTR_EXECUTOR_SOLARFLOW_ENVELOPE):
+            return {
+                "mode": "locked_dry_run",
+                "version": VERSION,
+                "envelope": self.coordinator.data.get(self._data_key),
+            }
         if self._data_key == ATTR_DATA_MODE:
             return {
                 "integration_version": VERSION,

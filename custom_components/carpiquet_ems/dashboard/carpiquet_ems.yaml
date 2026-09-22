@@ -278,7 +278,7 @@ views:
             content: |
               # 🔒 Contrôle matériel
               Console technique de validation instantanée.
-              **alpha.3.14 — LOCKED / DRY-RUN — aucune écriture Zendure**
+              **alpha.3.15 — Controlled Test Gate LOCKED — aucune écriture Zendure**
           - type: entities
             title: Moteur & sécurité
             show_header_toggle: false
@@ -307,6 +307,33 @@ views:
                 name: Execution Allowed
               - entity: binary_sensor.carpiquet_ems_controlled_executor_command_sent
                 name: Command Sent
+
+      - type: grid
+        title: Controlled Test Gate — alpha.3.15 🔒
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_controlled_test_gate_state
+                name: État Test Gate
+              - entity: binary_sensor.carpiquet_ems_controlled_test_gate_armed
+                name: Armé
+              - entity: sensor.carpiquet_ems_controlled_test_gate_device
+                name: Système ciblé
+              - entity: sensor.carpiquet_ems_controlled_test_gate_power
+                name: Puissance test
+              - entity: sensor.carpiquet_ems_controlled_test_gate_duration
+                name: Durée test
+              - entity: binary_sensor.carpiquet_ems_controlled_test_gate_execute_allowed
+                name: Exécution autorisée
+              - entity: binary_sensor.carpiquet_ems_controlled_test_gate_command_sent
+                name: Commande envoyée
+              - entity: binary_sensor.carpiquet_ems_controlled_test_gate_return_to_zero
+                name: Retour à 0 W obligatoire
+              - entity: sensor.carpiquet_ems_controlled_test_gate_blockers
+                name: Blockers Test Gate
+              - entity: sensor.carpiquet_ems_controlled_test_gate_evaluated_at
+                name: Dernière évaluation
 
       - type: grid
         title: Hyper 2000

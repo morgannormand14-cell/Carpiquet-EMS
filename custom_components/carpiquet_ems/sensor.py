@@ -3,6 +3,12 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_test_gate_state", "Controlled Test Gate State", ATTR_TEST_GATE_STATE, None, None),
+    ("controlled_test_gate_device", "Controlled Test Gate Device", ATTR_TEST_GATE_DEVICE, None, None),
+    ("controlled_test_gate_power", "Controlled Test Gate Requested Power", ATTR_TEST_GATE_POWER, "W", "power"),
+    ("controlled_test_gate_duration", "Controlled Test Gate Duration", ATTR_TEST_GATE_DURATION, "s", "duration"),
+    ("controlled_test_gate_blockers", "Controlled Test Gate Blockers", ATTR_TEST_GATE_BLOCKERS, None, None),
+    ("controlled_test_gate_evaluated_at", "Controlled Test Gate Evaluated At", ATTR_TEST_GATE_EVALUATED_AT, None, None),
     ("controlled_executor_state", "Controlled Executor State", ATTR_EXECUTOR_STATE, None, None),
     ("controlled_executor_hyper_target", "Controlled Executor Hyper Target", ATTR_EXECUTOR_HYPER_TARGET, None, None),
     ("controlled_executor_hyper_envelope", "Controlled Executor Hyper Envelope", ATTR_EXECUTOR_HYPER_ENVELOPE, None, None),

@@ -19,6 +19,7 @@ from .zendure_command_adapter import prepare_commands
 from .write_gate import WriteGateInput, evaluate_write_gate
 from .zendure_execution_transport import resolve_execution_transports, probe_solarflow_local_report
 from .zendure_controlled_executor import prepare_locked_execution
+from .controlled_test_gate import ControlledTestGateInput, evaluate_controlled_test_gate
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -950,6 +951,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ),
             )
 
+            # alpha.3.15 phase 1: wire the Controlled Test Gate into the runtime
+            # coordinator for observation only. There is deliberately no arming
+            # control and no I/O path in this phase.
+            test_gate = evaluate_controlled_test_gate(ControlledTestGateInput(
+                armed=False,
+                device="",
+                requested_power_w=0.0,
+                duration_seconds=0.0,
+                watchdog_ok=(command_decision.watchdog_state == "OK"),
+                safety_ok=bool(command_decision.safety_ok),
+                transport_ready=False,
+                executor_prepared=False,
+            ))
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1146,6 +1161,16 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_EXECUTOR_SOLARFLOW_TARGET: executor.solarflow.target,
                 ATTR_EXECUTOR_SOLARFLOW_ENVELOPE: str(executor.solarflow.envelope),
                 ATTR_EXECUTOR_SOLARFLOW_REASON: executor.solarflow.reason,
+                ATTR_TEST_GATE_STATE: test_gate.state,
+                ATTR_TEST_GATE_ARMED: test_gate.armed,
+                ATTR_TEST_GATE_EXECUTE_ALLOWED: test_gate.execute_allowed,
+                ATTR_TEST_GATE_COMMAND_SENT: test_gate.command_sent,
+                ATTR_TEST_GATE_RETURN_TO_ZERO: test_gate.return_to_zero_required,
+                ATTR_TEST_GATE_DEVICE: test_gate.device or "Aucun",
+                ATTR_TEST_GATE_POWER: test_gate.requested_power_w,
+                ATTR_TEST_GATE_DURATION: test_gate.duration_seconds,
+                ATTR_TEST_GATE_BLOCKERS: ", ".join(test_gate.blockers),
+                ATTR_TEST_GATE_EVALUATED_AT: test_gate.evaluated_at,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

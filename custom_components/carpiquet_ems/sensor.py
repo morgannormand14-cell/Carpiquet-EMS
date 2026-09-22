@@ -215,6 +215,9 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def native_value(self):
+        if self._data_key in (ATTR_EXECUTOR_HYPER_ENVELOPE, ATTR_EXECUTOR_SOLARFLOW_ENVELOPE):
+            value = self.coordinator.data.get(self._data_key)
+            return "PREPARED" if value and value not in ("None", "{}", "") else "NOT_PREPARED"
         return self.coordinator.data.get(self._data_key)
 
     @property
@@ -229,6 +232,12 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
+        if self._data_key in (ATTR_EXECUTOR_HYPER_ENVELOPE, ATTR_EXECUTOR_SOLARFLOW_ENVELOPE):
+            return {
+                "mode": "locked_dry_run",
+                "version": VERSION,
+                "envelope": self.coordinator.data.get(self._data_key),
+            }
         if self._data_key == ATTR_DATA_MODE:
             return {
                 "integration_version": VERSION,

@@ -264,6 +264,130 @@ views:
       # __CARPIQUET_BATTERY_CARDS__
 
 
+
+  - title: Contrôle matériel
+    path: hardware-control
+    icon: mdi:shield-lock-outline
+    type: sections
+    max_columns: 4
+    sections:
+      - type: grid
+        title: Validation rapide
+        cards:
+          - type: markdown
+            content: |
+              # 🔒 Contrôle matériel
+              Console technique de validation instantanée.
+              **alpha.3.14 — LOCKED / DRY-RUN — aucune écriture Zendure**
+          - type: entities
+            title: Moteur & sécurité
+            show_header_toggle: false
+            entities:
+              - entity: sensor.carpiquet_ems_engine_authority
+                name: Autorité moteur
+              - entity: sensor.carpiquet_ems_generic_engine_mode
+                name: Mode Generic Engine
+              - entity: sensor.carpiquet_ems_command_pipeline_state
+                name: Pipeline
+              - entity: sensor.carpiquet_ems_command_watchdog_state
+                name: Watchdog
+              - entity: sensor.carpiquet_ems_safety_state
+                name: Safety State
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_state
+                name: Controlled Executor
+              - entity: binary_sensor.carpiquet_ems_write_gate_master_lock
+                name: Master Lock
+              - entity: sensor.garage_carpiquet_ems_write_gate_state
+                name: Write Gate
+              - entity: binary_sensor.carpiquet_ems_controlled_executor_write_locked
+                name: Executor Write Locked
+              - entity: binary_sensor.carpiquet_ems_controlled_executor_execution_requested
+                name: Execution Requested
+              - entity: binary_sensor.carpiquet_ems_controlled_executor_execution_allowed
+                name: Execution Allowed
+              - entity: binary_sensor.carpiquet_ems_controlled_executor_command_sent
+                name: Command Sent
+
+      - type: grid
+        title: Hyper 2000
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_adapter_hyper_control_profile
+                name: Profil
+              - entity: sensor.garage_carpiquet_ems_hyper_selected_transport
+                name: Transport sélectionné
+              - entity: binary_sensor.carpiquet_ems_controlled_executor_hyper_prepared
+                name: Enveloppe préparée
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_hyper_target
+                name: Target
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_hyper_envelope
+                name: Enveloppe
+              - type: attribute
+                entity: sensor.garage_carpiquet_ems_controlled_executor_hyper_envelope
+                attribute: envelope
+                name: Détail enveloppe DRY-RUN
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_hyper_reason
+                name: Diagnostic
+              - entity: sensor.carpiquet_ems_requested_hyper_output
+                name: Demandé
+              - entity: sensor.carpiquet_ems_validated_hyper_output
+                name: Validé
+
+      - type: grid
+        title: SolarFlow 2400 Pro
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_adapter_solarflow_control_profile
+                name: Profil
+              - entity: sensor.garage_carpiquet_ems_solarflow_selected_transport
+                name: Transport sélectionné
+              - entity: binary_sensor.carpiquet_ems_solarflow_local_http_qualified
+                name: Local HTTP qualifié
+              - entity: binary_sensor.carpiquet_ems_controlled_executor_solarflow_prepared
+                name: Enveloppe préparée
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_target
+                name: Target
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_envelope
+                name: Enveloppe
+              - type: attribute
+                entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_envelope
+                attribute: envelope
+                name: Détail enveloppe DRY-RUN
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_reason
+                name: Diagnostic
+              - entity: sensor.carpiquet_ems_requested_solarflow_output
+                name: Demandé
+              - entity: sensor.carpiquet_ems_validated_solarflow_output
+                name: Validé
+
+      - type: grid
+        title: Sources critiques
+        cards:
+          - type: entities
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.carpiquet_ems_grid_source_fresh
+                name: Réseau frais
+              - entity: sensor.carpiquet_ems_grid_source_age
+                name: Âge réseau
+              - entity: sensor.carpiquet_ems_command_source_age
+                name: Âge source commande
+              - entity: sensor.carpiquet_ems_hyper_soc_source_age
+                name: Âge SOC Hyper
+              - entity: sensor.carpiquet_ems_solarflow_soc_source_age
+                name: Âge SOC SolarFlow
+              - entity: sensor.carpiquet_ems_hyper_pv_source_age
+                name: Âge PV Hyper
+              - entity: sensor.carpiquet_ems_solarflow_pv_source_age
+                name: Âge PV SolarFlow
+              - entity: sensor.garage_carpiquet_ems_write_gate_blockers
+                name: Blockers Write Gate
+
+
   - title: Paramètres
     path: settings
     icon: mdi:cog

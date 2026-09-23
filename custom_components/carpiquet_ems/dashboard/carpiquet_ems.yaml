@@ -314,15 +314,15 @@ views:
           - type: entities
             show_header_toggle: false
             entities:
-              - entity: sensor.carpiquet_ems_controlled_test_gate_state
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_state
                 name: État Test Gate
               - entity: binary_sensor.carpiquet_ems_controlled_test_gate_armed
                 name: Armé
-              - entity: sensor.carpiquet_ems_controlled_test_gate_device
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_device
                 name: Système ciblé
-              - entity: sensor.carpiquet_ems_controlled_test_gate_power
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_requested_power
                 name: Puissance test
-              - entity: sensor.carpiquet_ems_controlled_test_gate_duration
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_duration
                 name: Durée test
               - entity: binary_sensor.carpiquet_ems_controlled_test_gate_execute_allowed
                 name: Exécution autorisée
@@ -330,9 +330,9 @@ views:
                 name: Commande envoyée
               - entity: binary_sensor.carpiquet_ems_controlled_test_gate_return_to_zero
                 name: Retour à 0 W obligatoire
-              - entity: sensor.carpiquet_ems_controlled_test_gate_blockers
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_blockers
                 name: Blockers Test Gate
-              - entity: sensor.carpiquet_ems_controlled_test_gate_evaluated_at
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_evaluated_at
                 name: Dernière évaluation
 
       - type: grid

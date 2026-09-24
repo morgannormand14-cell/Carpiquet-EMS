@@ -13,6 +13,8 @@ BINARY_SENSORS = [
     ("controlled_executor_command_sent", "Controlled Executor Command Sent", ATTR_EXECUTOR_COMMAND_SENT),
     ("controlled_executor_hyper_prepared", "Controlled Executor Hyper Prepared", ATTR_EXECUTOR_HYPER_PREPARED),
     ("controlled_executor_solarflow_prepared", "Controlled Executor SolarFlow Prepared", ATTR_EXECUTOR_SOLARFLOW_PREPARED),
+    ("controlled_executor_solarflow_post_status_required", "Controlled Executor SolarFlow POST Status Required", ATTR_EXECUTOR_SOLARFLOW_POST_STATUS_REQUIRED),
+    ("controlled_executor_solarflow_report_confirmation_required", "Controlled Executor SolarFlow Report Confirmation Required", ATTR_EXECUTOR_SOLARFLOW_REPORT_CONFIRM_REQUIRED),
     ("transport_hyper_metadata_ready", "Transport Hyper Metadata Ready", ATTR_TRANSPORT_HYPER_METADATA_READY),
     ("transport_hyper_execution_ready", "Transport Hyper Execution Ready", ATTR_TRANSPORT_HYPER_EXECUTION_READY),
     ("transport_solarflow_metadata_ready", "Transport SolarFlow Metadata Ready", ATTR_TRANSPORT_SOLARFLOW_METADATA_READY),

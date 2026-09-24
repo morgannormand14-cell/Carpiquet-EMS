@@ -122,7 +122,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._solarflow_local_probe = None
         self._hyper_transport_selection = TRANSPORT_MODE_AUTO
         self._solarflow_transport_selection = TRANSPORT_MODE_AUTO
-        self._zendure_reconciliation = None
+        # alpha.3.15 phase 2: volatile test settings; reset on every HA reload.\n        self._test_gate_armed = False\n        self._test_gate_device = ""\n        self._test_gate_power_w = 0.0\n        self._test_gate_duration_seconds = 0.0\n        self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
             hass,
@@ -194,6 +194,43 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         if option not in TRANSPORT_SOLARFLOW_OPTIONS:
             raise ValueError(f"Unsupported SolarFlow transport selection: {option}")
         self._solarflow_transport_selection = option
+        await self.async_request_refresh()
+
+    @property
+    def test_gate_armed(self):
+        return bool(self._test_gate_armed)
+
+    @property
+    def test_gate_device(self):
+        return self._test_gate_device
+
+    @property
+    def test_gate_power_w(self):
+        return float(self._test_gate_power_w)
+
+    @property
+    def test_gate_duration_seconds(self):
+        return float(self._test_gate_duration_seconds)
+
+    async def async_set_test_gate_armed(self, armed):
+        self._test_gate_armed = bool(armed)
+        await self.async_request_refresh()
+
+    async def async_set_test_gate_device(self, device):
+        if device not in ("", "hyper", "solarflow"):
+            raise ValueError("Unsupported Controlled Test Gate device")
+        self._test_gate_device = device
+        self._test_gate_armed = False
+        await self.async_request_refresh()
+
+    async def async_set_test_gate_power(self, value):
+        self._test_gate_power_w = max(0.0, min(100.0, float(value)))
+        self._test_gate_armed = False
+        await self.async_request_refresh()
+
+    async def async_set_test_gate_duration(self, value):
+        self._test_gate_duration_seconds = max(0.0, min(10.0, float(value)))
+        self._test_gate_armed = False
         await self.async_request_refresh()
 
     def _transport_policy_diagnostics(self):
@@ -951,18 +988,26 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ),
             )
 
-            # alpha.3.15 phase 1: wire the Controlled Test Gate into the runtime
-            # coordinator for observation only. There is deliberately no arming
-            # control and no I/O path in this phase.
+            # alpha.3.15 phase 2: configurable and armable, but still no I/O path.
+            selected_test_execution = (
+                executor.hyper if self._test_gate_device == "hyper"
+                else executor.solarflow if self._test_gate_device == "solarflow"
+                else None
+            )
             test_gate = evaluate_controlled_test_gate(ControlledTestGateInput(
-                armed=False,
-                device="",
-                requested_power_w=0.0,
-                duration_seconds=0.0,
+                armed=self._test_gate_armed,
+                device=self._test_gate_device,
+                requested_power_w=self._test_gate_power_w,
+                duration_seconds=self._test_gate_duration_seconds,
                 watchdog_ok=(command_decision.watchdog_state == "OK"),
                 safety_ok=bool(command_decision.safety_ok),
-                transport_ready=False,
-                executor_prepared=False,
+                transport_ready=bool(
+                    selected_test_execution
+                    and selected_test_execution.selected_transport in ("MQTT", "LOCAL_HTTP")
+                ),
+                executor_prepared=bool(
+                    selected_test_execution and selected_test_execution.prepared
+                ),
             ))
 
             result_data = {

@@ -3,6 +3,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_test_gate_armed", "Controlled Test Gate Armed", ATTR_TEST_GATE_ARMED),
+    ("controlled_test_gate_execute_allowed", "Controlled Test Gate Execute Allowed", ATTR_TEST_GATE_EXECUTE_ALLOWED),
+    ("controlled_test_gate_command_sent", "Controlled Test Gate Command Sent", ATTR_TEST_GATE_COMMAND_SENT),
+    ("controlled_test_gate_return_to_zero", "Controlled Test Gate Return To Zero Required", ATTR_TEST_GATE_RETURN_TO_ZERO),
     ("controlled_executor_write_locked", "Controlled Executor Write Locked", ATTR_EXECUTOR_WRITE_LOCKED),
     ("controlled_executor_execution_requested", "Controlled Executor Execution Requested", ATTR_EXECUTOR_EXECUTION_REQUESTED),
     ("controlled_executor_execution_allowed", "Controlled Executor Execution Allowed", ATTR_EXECUTOR_EXECUTION_ALLOWED),

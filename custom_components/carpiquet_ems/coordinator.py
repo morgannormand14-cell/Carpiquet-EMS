@@ -19,6 +19,7 @@ from .zendure_command_adapter import prepare_commands
 from .write_gate import WriteGateInput, evaluate_write_gate
 from .zendure_execution_transport import resolve_execution_transports, probe_solarflow_local_report
 from .zendure_controlled_executor import prepare_locked_execution
+from .controlled_test_gate import ControlledTestGateInput, evaluate_controlled_test_gate
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -121,6 +122,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._solarflow_local_probe = None
         self._hyper_transport_selection = TRANSPORT_MODE_AUTO
         self._solarflow_transport_selection = TRANSPORT_MODE_AUTO
+        # alpha.3.15 phase 2: volatile test settings; reset on every HA reload.
+        self._test_gate_armed = False
+        self._test_gate_device = ""
+        self._test_gate_power_w = 0.0
+        self._test_gate_duration_seconds = 0.0
         self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
@@ -193,6 +199,43 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         if option not in TRANSPORT_SOLARFLOW_OPTIONS:
             raise ValueError(f"Unsupported SolarFlow transport selection: {option}")
         self._solarflow_transport_selection = option
+        await self.async_request_refresh()
+
+    @property
+    def test_gate_armed(self):
+        return bool(self._test_gate_armed)
+
+    @property
+    def test_gate_device(self):
+        return self._test_gate_device
+
+    @property
+    def test_gate_power_w(self):
+        return float(self._test_gate_power_w)
+
+    @property
+    def test_gate_duration_seconds(self):
+        return float(self._test_gate_duration_seconds)
+
+    async def async_set_test_gate_armed(self, armed):
+        self._test_gate_armed = bool(armed)
+        await self.async_request_refresh()
+
+    async def async_set_test_gate_device(self, device):
+        if device not in ("", "hyper", "solarflow"):
+            raise ValueError("Unsupported Controlled Test Gate device")
+        self._test_gate_device = device
+        self._test_gate_armed = False
+        await self.async_request_refresh()
+
+    async def async_set_test_gate_power(self, value):
+        self._test_gate_power_w = max(0.0, min(100.0, float(value)))
+        self._test_gate_armed = False
+        await self.async_request_refresh()
+
+    async def async_set_test_gate_duration(self, value):
+        self._test_gate_duration_seconds = max(0.0, min(10.0, float(value)))
+        self._test_gate_armed = False
         await self.async_request_refresh()
 
     def _transport_policy_diagnostics(self):
@@ -950,6 +993,28 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ),
             )
 
+            # alpha.3.15 phase 2: configurable and armable, but still no I/O path.
+            selected_test_execution = (
+                executor.hyper if self._test_gate_device == "hyper"
+                else executor.solarflow if self._test_gate_device == "solarflow"
+                else None
+            )
+            test_gate = evaluate_controlled_test_gate(ControlledTestGateInput(
+                armed=self._test_gate_armed,
+                device=self._test_gate_device,
+                requested_power_w=self._test_gate_power_w,
+                duration_seconds=self._test_gate_duration_seconds,
+                watchdog_ok=(command_decision.watchdog_state == "OK"),
+                safety_ok=bool(command_decision.safety_ok),
+                transport_ready=bool(
+                    selected_test_execution
+                    and selected_test_execution.selected_transport in ("MQTT", "LOCAL_HTTP")
+                ),
+                executor_prepared=bool(
+                    selected_test_execution and selected_test_execution.prepared
+                ),
+            ))
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1146,6 +1211,16 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_EXECUTOR_SOLARFLOW_TARGET: executor.solarflow.target,
                 ATTR_EXECUTOR_SOLARFLOW_ENVELOPE: str(executor.solarflow.envelope),
                 ATTR_EXECUTOR_SOLARFLOW_REASON: executor.solarflow.reason,
+                ATTR_TEST_GATE_STATE: test_gate.state,
+                ATTR_TEST_GATE_ARMED: test_gate.armed,
+                ATTR_TEST_GATE_EXECUTE_ALLOWED: test_gate.execute_allowed,
+                ATTR_TEST_GATE_COMMAND_SENT: test_gate.command_sent,
+                ATTR_TEST_GATE_RETURN_TO_ZERO: test_gate.return_to_zero_required,
+                ATTR_TEST_GATE_DEVICE: test_gate.device or "Aucun",
+                ATTR_TEST_GATE_POWER: test_gate.requested_power_w,
+                ATTR_TEST_GATE_DURATION: test_gate.duration_seconds,
+                ATTR_TEST_GATE_BLOCKERS: ", ".join(test_gate.blockers),
+                ATTR_TEST_GATE_EVALUATED_AT: test_gate.evaluated_at,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

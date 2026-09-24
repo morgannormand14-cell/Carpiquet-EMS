@@ -328,7 +328,7 @@ views:
                 name: Exécution autorisée
               - entity: binary_sensor.carpiquet_ems_controlled_test_gate_command_sent
                 name: Commande envoyée
-              - entity: binary_sensor.carpiquet_ems_controlled_test_gate_return_to_zero
+              - entity: binary_sensor.carpiquet_ems_controlled_test_gate_return_to_zero_required
                 name: Retour à 0 W obligatoire
               - entity: sensor.garage_carpiquet_ems_controlled_test_gate_blockers
                 name: Blockers Test Gate

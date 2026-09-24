@@ -9,7 +9,7 @@ from .const import (
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    entities = [SimulationReportSelect(coordinator, entry), ControlModeSelect(coordinator, entry)]
+    entities = [SimulationReportSelect(coordinator, entry), ControlModeSelect(coordinator, entry), ControlledTestDeviceSelect(coordinator, entry)]
     profiles = {
         str(system.get("control_profile") or "")
         for system in coordinator._zendure_discovery.get("systems", [])
@@ -126,3 +126,29 @@ class SolarFlowTransportSelect(CoordinatorEntity, SelectEntity):
             "execution_enabled": False,
             "write_locked": True,
         }
+
+
+class ControlledTestDeviceSelect(CoordinatorEntity, SelectEntity):
+    """Select one test target. Changing target always disarms the gate."""
+
+    def __init__(self, coordinator, entry):
+        super().__init__(coordinator)
+        self._attr_name = "Carpiquet EMS Controlled Test Device"
+        self._attr_unique_id = f"{entry.entry_id}_controlled_test_device"
+        self._attr_icon = "mdi:target"
+        self._attr_options = ["Aucun", "Hyper 2000", "SolarFlow 2400 Pro"]
+
+    @property
+    def current_option(self):
+        return {
+            "hyper": "Hyper 2000",
+            "solarflow": "SolarFlow 2400 Pro",
+        }.get(self.coordinator.test_gate_device, "Aucun")
+
+    async def async_select_option(self, option):
+        device = {
+            "Aucun": "",
+            "Hyper 2000": "hyper",
+            "SolarFlow 2400 Pro": "solarflow",
+        }[option]
+        await self.coordinator.async_set_test_gate_device(device)

@@ -383,3 +383,12 @@ ATTR_TEST_GATE_POWER = "controlled_test_gate_requested_power_w"
 ATTR_TEST_GATE_DURATION = "controlled_test_gate_duration_seconds"
 ATTR_TEST_GATE_BLOCKERS = "controlled_test_gate_blockers"
 ATTR_TEST_GATE_EVALUATED_AT = "controlled_test_gate_evaluated_at"
+
+# alpha.3.15 Phase 3A — Verified Local HTTP Executor diagnostics (still locked)
+ATTR_EXECUTOR_SOLARFLOW_VERIFY_STATE = "controlled_executor_solarflow_verify_state"
+ATTR_EXECUTOR_SOLARFLOW_VERIFY_TARGET = "controlled_executor_solarflow_verify_target"
+ATTR_EXECUTOR_SOLARFLOW_REPORT_TARGET = "controlled_executor_solarflow_report_target"
+ATTR_EXECUTOR_SOLARFLOW_REQUEST_ID = "controlled_executor_solarflow_request_id"
+ATTR_EXECUTOR_SOLARFLOW_EXPECTED_OUTPUT = "controlled_executor_solarflow_expected_output_w"
+ATTR_EXECUTOR_SOLARFLOW_POST_STATUS_REQUIRED = "controlled_executor_solarflow_post_status_required"
+ATTR_EXECUTOR_SOLARFLOW_REPORT_CONFIRM_REQUIRED = "controlled_executor_solarflow_report_confirmation_required"

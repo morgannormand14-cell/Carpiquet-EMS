@@ -4,7 +4,7 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 
 TEST_GATE_LOCKED = "LOCKED"
-TEST_GATE_READY_LOCKED = "READY_LOCKED"
+TEST_GATE_READY_LOCKED = "READY_LOCKED"\nTEST_GATE_ARMED_LOCKED = "ARMED_LOCKED"
 
 REASON_NOT_ARMED = "TEST_NOT_ARMED"
 REASON_NO_DEVICE = "NO_SINGLE_TEST_DEVICE"
@@ -46,7 +46,7 @@ class ControlledTestGateDecision:
 def evaluate_controlled_test_gate(context: ControlledTestGateInput) -> ControlledTestGateDecision:
     """Evaluate alpha.3.15 test conditions without permitting any hardware I/O.
 
-    Phase 1 is intentionally non-executable. Even a fully valid test request
+    Phase 2 supports an armed-but-locked state and remains non-executable. Even a fully valid test request
     remains behind GLOBAL_WRITE_LOCK until a later, explicitly approved phase.
     """
     blockers: list[str] = []
@@ -71,7 +71,7 @@ def evaluate_controlled_test_gate(context: ControlledTestGateInput) -> Controlle
     blockers.append(REASON_GLOBAL_LOCK)
 
     return ControlledTestGateDecision(
-        state=TEST_GATE_READY_LOCKED if functional_ready else TEST_GATE_LOCKED,
+        state=(TEST_GATE_READY_LOCKED if functional_ready else (TEST_GATE_ARMED_LOCKED if context.armed else TEST_GATE_LOCKED)),
         armed=context.armed,
         execute_allowed=False,
         command_sent=False,

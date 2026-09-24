@@ -4,7 +4,7 @@ from .const import DOMAIN
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([SimulationSwitch(coordinator, entry), AutomationEngineSwitch(coordinator, entry)])
+    async_add_entities([SimulationSwitch(coordinator, entry), AutomationEngineSwitch(coordinator, entry), ControlledTestArmSwitch(coordinator, entry)])
 
 class SimulationSwitch(CoordinatorEntity, SwitchEntity):
     def __init__(self, coordinator, entry):
@@ -30,3 +30,31 @@ class AutomationEngineSwitch(CoordinatorEntity, SwitchEntity):
         await self.coordinator.async_set_automation_enabled(True)
     async def async_turn_off(self, **kwargs):
         await self.coordinator.async_set_automation_enabled(False)
+
+
+class ControlledTestArmSwitch(CoordinatorEntity, SwitchEntity):
+    """Arm the test configuration only. This switch never grants execution."""
+
+    def __init__(self, coordinator, entry):
+        super().__init__(coordinator)
+        self._attr_name = "Carpiquet EMS Controlled Test Arm"
+        self._attr_unique_id = f"{entry.entry_id}_controlled_test_arm"
+        self._attr_icon = "mdi:shield-lock"
+
+    @property
+    def is_on(self):
+        return self.coordinator.test_gate_armed
+
+    async def async_turn_on(self, **kwargs):
+        await self.coordinator.async_set_test_gate_armed(True)
+
+    async def async_turn_off(self, **kwargs):
+        await self.coordinator.async_set_test_gate_armed(False)
+
+    @property
+    def extra_state_attributes(self):
+        return {
+            "execution_enabled": False,
+            "global_write_lock": True,
+            "note": "ARMED_LOCKED configuration only; no hardware I/O path",
+        }

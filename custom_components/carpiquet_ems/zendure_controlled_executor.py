@@ -5,12 +5,18 @@ from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
 
+import uuid
+
 EXECUTOR_LOCKED_DRY_RUN = "LOCKED_DRY_RUN"
 RESULT_PREPARED_LOCKED = "PREPARED_LOCKED"
 RESULT_NOT_PREPARED = "NOT_PREPARED"
 
 TRANSPORT_MQTT = "MQTT"
 TRANSPORT_LOCAL_HTTP = "LOCAL_HTTP"
+
+VERIFICATION_LOCKED_DRY_RUN = "LOCKED_DRY_RUN"
+VERIFICATION_POST_STATUS_REQUIRED = "POST_STATUS_REQUIRED"
+VERIFICATION_REPORT_CONFIRMATION_REQUIRED = "REPORT_CONFIRMATION_REQUIRED"
 
 
 @dataclass(frozen=True)
@@ -33,6 +39,22 @@ class PreparedExecution:
     state: str
     reason: str
     prepared_at: str
+
+
+@dataclass(frozen=True)
+class LocalHttpVerificationPlan:
+    """Read-only verification contract for a future controlled Local HTTP write."""
+
+    target: str
+    report_target: str
+    request_id: str
+    serial: str
+    expected_output_limit_w: int
+    post_status_required: bool
+    report_confirmation_required: bool
+    execution_allowed: bool
+    command_sent: bool
+    state: str
 
 
 @dataclass(frozen=True)
@@ -130,6 +152,30 @@ def _hyper_execution(
     )
 
 
+def _runtime_http_id() -> str:
+    """Generate a correlation id without performing I/O."""
+    return uuid.uuid4().hex
+
+
+def _solarflow_verification_plan(
+    *, host: str, serial: str, envelope: dict[str, Any]
+) -> LocalHttpVerificationPlan:
+    properties = envelope.get("properties") if isinstance(envelope, dict) else {}
+    expected = int((properties or {}).get("outputLimit") or 0)
+    return LocalHttpVerificationPlan(
+        target=f"http://{host}/properties/write",
+        report_target=f"http://{host}/properties/report",
+        request_id=str(envelope.get("id") or ""),
+        serial=serial,
+        expected_output_limit_w=expected,
+        post_status_required=True,
+        report_confirmation_required=True,
+        execution_allowed=False,
+        command_sent=False,
+        state=VERIFICATION_LOCKED_DRY_RUN,
+    )
+
+
 def _solarflow_execution(
     inventory: dict[str, Any],
     payload: dict[str, Any],
@@ -163,7 +209,7 @@ def _solarflow_execution(
                 selected_transport=selected_transport,
                 reason="SolarFlow Local HTTP metadata incomplete",
             )
-        envelope["id"] = "<runtime-http-id>"
+        envelope["id"] = _runtime_http_id()
         envelope["sn"] = serial
         return _locked(
             device="SolarFlow 2400 Pro",

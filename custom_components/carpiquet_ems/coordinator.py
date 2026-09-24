@@ -122,7 +122,12 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._solarflow_local_probe = None
         self._hyper_transport_selection = TRANSPORT_MODE_AUTO
         self._solarflow_transport_selection = TRANSPORT_MODE_AUTO
-        # alpha.3.15 phase 2: volatile test settings; reset on every HA reload.\n        self._test_gate_armed = False\n        self._test_gate_device = ""\n        self._test_gate_power_w = 0.0\n        self._test_gate_duration_seconds = 0.0\n        self._zendure_reconciliation = None
+        # alpha.3.15 phase 2: volatile test settings; reset on every HA reload.
+        self._test_gate_armed = False
+        self._test_gate_device = ""
+        self._test_gate_power_w = 0.0
+        self._test_gate_duration_seconds = 0.0
+        self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
             hass,

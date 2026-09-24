@@ -313,7 +313,17 @@ views:
         cards:
           - type: entities
             show_header_toggle: false
-            entities:\n              - entity: select.carpiquet_ems_controlled_test_device\n                name: Cible de test\n              - entity: number.carpiquet_ems_controlled_test_power\n                name: Puissance configurée\n              - entity: number.carpiquet_ems_controlled_test_duration\n                name: Durée configurée\n              - entity: switch.carpiquet_ems_controlled_test_arm\n                name: Armer le Test Gate\n              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_state\n                name: État Test Gate
+            entities:
+              - entity: select.carpiquet_ems_controlled_test_device
+                name: Cible de test
+              - entity: number.carpiquet_ems_controlled_test_power
+                name: Puissance configurée
+              - entity: number.carpiquet_ems_controlled_test_duration
+                name: Durée configurée
+              - entity: switch.carpiquet_ems_controlled_test_arm
+                name: Armer le Test Gate
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_state
+                name: État Test Gate
               - entity: binary_sensor.carpiquet_ems_controlled_test_gate_armed
                 name: Armé
               - entity: sensor.garage_carpiquet_ems_controlled_test_gate_device

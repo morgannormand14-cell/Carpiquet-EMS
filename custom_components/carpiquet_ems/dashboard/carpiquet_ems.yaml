@@ -458,6 +458,33 @@ views:
               - entity: binary_sensor.carpiquet_ems_controlled_transport_bridge_write_locked
                 name: Verrou écriture
 
+          - type: entities
+            title: 3B-9 — Feedback transport 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_feedback_state
+                name: État feedback
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_feedback_blockers
+                name: Blockers
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_feedback_expected_output
+                name: Puissance attendue
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_feedback_observed_output
+                name: Puissance observée
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_feedback_http_status
+                name: Statut HTTP
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_feedback_test_post_confirmed
+                name: POST test confirmé
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_feedback_test_output_confirmed
+                name: Sortie test confirmée
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_feedback_zero_post_confirmed
+                name: POST 0 W confirmé
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_feedback_zero_output_confirmed
+                name: Sortie 0 W confirmée
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_feedback_failure_detected
+                name: Échec détecté
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_feedback_write_locked
+                name: Verrou écriture
+
       - type: grid
         title: Hyper 2000
         cards:

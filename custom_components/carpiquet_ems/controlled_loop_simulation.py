@@ -56,6 +56,18 @@ def simulate_success_path() -> ControlledLoopSimulationResult:
 
     steps.append(_step("test_request", ControlledExecutionOrchestratorInput(safety_state=safety), "LOCKED"))
 
+    # POST acknowledgement first: the orchestrator must explicitly request
+    # report verification before accepting the observed output.
+    steps.append(_step(
+        "test_post_confirmed",
+        ControlledExecutionOrchestratorInput(
+            safety_state=safety,
+            test_post_confirmed=True,
+            test_output_confirmed=False,
+        ),
+        "VERIFY_PENDING_LOCKED",
+    ))
+
     test_loop = evaluate_controlled_feedback_loop(
         ControlledFeedbackLoopInput(
             safety_state=safety,
@@ -100,6 +112,21 @@ def simulate_success_path() -> ControlledLoopSimulationResult:
             bounded_duration_elapsed=True,
         )
     )
+    # Same rule for the mandatory zero return: POST acknowledgement must
+    # transition through VERIFY_REPORT_ZERO before zero output is accepted.
+    steps.append(_step(
+        "zero_post_confirmed",
+        ControlledExecutionOrchestratorInput(
+            safety_state=safety,
+            test_post_confirmed=True,
+            test_output_confirmed=True,
+            bounded_duration_elapsed=True,
+            zero_post_confirmed=True,
+            zero_output_confirmed=False,
+        ),
+        "VERIFY_PENDING_LOCKED",
+    ))
+
     steps.append(_step(
         "zero_confirmed",
         ControlledExecutionOrchestratorInput(
@@ -115,8 +142,10 @@ def simulate_success_path() -> ControlledLoopSimulationResult:
 
     expected = (
         ("TEST_READY_LOCKED", "POST_TEST_OUTPUT_LIMIT"),
+        ("TEST_VERIFY_LOCKED", "VERIFY_REPORT_OUTPUT"),
         ("TEST_VERIFY_LOCKED", "WAIT_BOUNDED_DURATION"),
         ("ZERO_REQUIRED_LOCKED", "POST_ZERO_OUTPUT_LIMIT"),
+        ("ZERO_VERIFY_LOCKED", "VERIFY_REPORT_ZERO"),
         ("COMPLETE_LOCKED", "RELOCK"),
     )
     observed = tuple((s.orchestrator_state, s.next_action) for s in steps)

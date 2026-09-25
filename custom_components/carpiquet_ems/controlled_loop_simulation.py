@@ -197,5 +197,83 @@ def simulate_failure_path() -> ControlledLoopSimulationResult:
     )
 
 
-def run_controlled_loop_simulation() -> tuple[ControlledLoopSimulationResult, ControlledLoopSimulationResult]:
-    return simulate_success_path(), simulate_failure_path()
+
+def _failure_result(scenario: str, step_name: str, context: ControlledExecutionOrchestratorInput) -> ControlledLoopSimulationResult:
+    step = _step(step_name, context, "FAILED_LOCKED")
+    lock_ok = step.write_locked and not step.execution_allowed and not step.command_sent
+    passed = (
+        step.orchestrator_state == "FAILED_LOCKED"
+        and step.next_action == "RETURN_ZERO_THEN_RELOCK"
+        and lock_ok
+    )
+    return ControlledLoopSimulationResult(
+        scenario=scenario,
+        passed=passed,
+        steps=(step,),
+        final_state=step.orchestrator_state,
+        global_write_lock_preserved=lock_ok,
+        real_transport_used=False,
+    )
+
+
+def simulate_degraded_paths() -> tuple[ControlledLoopSimulationResult, ...]:
+    """Safety-focused degraded scenarios; still pure in-memory simulation."""
+
+    safety = "READY_LOCKED"
+    return (
+        _failure_result(
+            "TEST_POST_FAILED",
+            "test_post_failed",
+            ControlledExecutionOrchestratorInput(safety_state=safety, failure_detected=True),
+        ),
+        _failure_result(
+            "TEST_REPORT_MISMATCH",
+            "test_report_mismatch",
+            ControlledExecutionOrchestratorInput(
+                safety_state=safety,
+                test_post_confirmed=True,
+                failure_detected=True,
+            ),
+        ),
+        _failure_result(
+            "TEST_TIMEOUT",
+            "test_timeout",
+            ControlledExecutionOrchestratorInput(
+                safety_state=safety,
+                test_post_confirmed=True,
+                test_output_confirmed=True,
+                failure_detected=True,
+            ),
+        ),
+        _failure_result(
+            "ZERO_POST_FAILED",
+            "zero_post_failed",
+            ControlledExecutionOrchestratorInput(
+                safety_state=safety,
+                test_post_confirmed=True,
+                test_output_confirmed=True,
+                bounded_duration_elapsed=True,
+                failure_detected=True,
+            ),
+        ),
+        _failure_result(
+            "ZERO_REPORT_NOT_CONFIRMED",
+            "zero_report_not_confirmed",
+            ControlledExecutionOrchestratorInput(
+                safety_state=safety,
+                test_post_confirmed=True,
+                test_output_confirmed=True,
+                bounded_duration_elapsed=True,
+                zero_post_confirmed=True,
+                failure_detected=True,
+            ),
+        ),
+    )
+
+
+def run_controlled_loop_simulation() -> tuple[
+    ControlledLoopSimulationResult,
+    ControlledLoopSimulationResult,
+    tuple[ControlledLoopSimulationResult, ...],
+]:
+    return simulate_success_path(), simulate_failure_path(), simulate_degraded_paths()

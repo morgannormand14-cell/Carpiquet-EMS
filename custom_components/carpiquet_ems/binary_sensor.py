@@ -3,6 +3,15 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_feedback_loop_test_post_confirmed", "Controlled Feedback Loop Test POST Confirmed", ATTR_FEEDBACK_LOOP_TEST_POST_CONFIRMED),
+    ("controlled_feedback_loop_test_output_confirmed", "Controlled Feedback Loop Test Output Confirmed", ATTR_FEEDBACK_LOOP_TEST_OUTPUT_CONFIRMED),
+    ("controlled_feedback_loop_bounded_duration_elapsed", "Controlled Feedback Loop Bounded Duration Elapsed", ATTR_FEEDBACK_LOOP_DURATION_ELAPSED),
+    ("controlled_feedback_loop_zero_post_confirmed", "Controlled Feedback Loop Zero POST Confirmed", ATTR_FEEDBACK_LOOP_ZERO_POST_CONFIRMED),
+    ("controlled_feedback_loop_zero_output_confirmed", "Controlled Feedback Loop Zero Output Confirmed", ATTR_FEEDBACK_LOOP_ZERO_OUTPUT_CONFIRMED),
+    ("controlled_feedback_loop_failure_detected", "Controlled Feedback Loop Failure Detected", ATTR_FEEDBACK_LOOP_FAILURE),
+    ("controlled_feedback_loop_reinjection_allowed", "Controlled Feedback Loop Reinjection Allowed", ATTR_FEEDBACK_LOOP_REINJECTION_ALLOWED),
+    ("controlled_feedback_loop_write_locked", "Controlled Feedback Loop Write Locked", ATTR_FEEDBACK_LOOP_WRITE_LOCKED),
+
     ("controlled_transport_feedback_test_post_confirmed", "Controlled Transport Feedback Test POST Confirmed", ATTR_TRANSPORT_FEEDBACK_TEST_POST_CONFIRMED),
     ("controlled_transport_feedback_test_output_confirmed", "Controlled Transport Feedback Test Output Confirmed", ATTR_TRANSPORT_FEEDBACK_TEST_OUTPUT_CONFIRMED),
     ("controlled_transport_feedback_zero_post_confirmed", "Controlled Transport Feedback Zero POST Confirmed", ATTR_TRANSPORT_FEEDBACK_ZERO_POST_CONFIRMED),

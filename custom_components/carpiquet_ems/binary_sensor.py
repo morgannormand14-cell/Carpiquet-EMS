@@ -3,6 +3,13 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_transport_bridge_call_requested", "Controlled Transport Bridge Call Requested", ATTR_TRANSPORT_BRIDGE_CALL_REQUESTED),
+    ("controlled_transport_bridge_call_allowed", "Controlled Transport Bridge Call Allowed", ATTR_TRANSPORT_BRIDGE_CALL_ALLOWED),
+    ("controlled_transport_bridge_call_sent", "Controlled Transport Bridge Call Sent", ATTR_TRANSPORT_BRIDGE_CALL_SENT),
+    ("controlled_transport_bridge_verification_requested", "Controlled Transport Bridge Verification Requested", ATTR_TRANSPORT_BRIDGE_VERIFY_REQUESTED),
+    ("controlled_transport_bridge_zero_return_selected", "Controlled Transport Bridge Zero Return Selected", ATTR_TRANSPORT_BRIDGE_ZERO_SELECTED),
+    ("controlled_transport_bridge_write_locked", "Controlled Transport Bridge Write Locked", ATTR_TRANSPORT_BRIDGE_WRITE_LOCKED),
+
     ("controlled_execution_orchestrator_test_post_requested", "Controlled Execution Orchestrator Test POST Requested", ATTR_EXEC_ORCH_TEST_POST_REQUESTED),
     ("controlled_execution_orchestrator_test_post_allowed", "Controlled Execution Orchestrator Test POST Allowed", ATTR_EXEC_ORCH_TEST_POST_ALLOWED),
     ("controlled_execution_orchestrator_test_post_sent", "Controlled Execution Orchestrator Test POST Sent", ATTR_EXEC_ORCH_TEST_POST_SENT),

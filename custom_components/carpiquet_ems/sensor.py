@@ -3,6 +3,11 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_execution_orchestrator_state", "Controlled Execution Orchestrator State", ATTR_EXEC_ORCH_STATE, None, None),
+    ("controlled_execution_orchestrator_blockers", "Controlled Execution Orchestrator Blockers", ATTR_EXEC_ORCH_BLOCKERS, None, None),
+    ("controlled_execution_orchestrator_next_action", "Controlled Execution Orchestrator Next Action", ATTR_EXEC_ORCH_NEXT_ACTION, None, None),
+    ("controlled_execution_orchestrator_evaluated_at", "Controlled Execution Orchestrator Evaluated At", ATTR_EXEC_ORCH_EVALUATED_AT, None, None),
+
     ("controlled_execution_safety_state", "Controlled Execution Safety State", ATTR_EXEC_SAFETY_STATE, None, None),
     ("controlled_execution_safety_blockers", "Controlled Execution Safety Blockers", ATTR_EXEC_SAFETY_BLOCKERS, None, None),
     ("controlled_execution_safety_max_power", "Controlled Execution Safety Max Test Power", ATTR_EXEC_SAFETY_MAX_POWER, "W", "power"),

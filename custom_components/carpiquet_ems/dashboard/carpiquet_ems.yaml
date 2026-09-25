@@ -528,6 +528,14 @@ views:
                 name: Verrou préservé — erreur
               - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_real_transport_used
                 name: Transport réel utilisé
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_degraded_all_passed
+                name: Tous scénarios dégradés validés
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_degraded_passed_count
+                name: Scénarios dégradés réussis
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_degraded_total_count
+                name: Scénarios dégradés testés
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_degraded_results
+                name: Détail scénarios dégradés
 
       - type: grid
         title: Hyper 2000

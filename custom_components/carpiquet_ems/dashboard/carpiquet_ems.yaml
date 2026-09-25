@@ -391,6 +391,73 @@ views:
               - entity: sensor.garage_carpiquet_ems_controlled_local_http_preparation_prepared_at
                 name: Préparé à
 
+          - type: entities
+            title: 3B-6 — Contrat de sécurité 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_state
+                name: État contrat
+              - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_blockers
+                name: Blockers
+              - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_max_power
+                name: Puissance test max
+              - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_max_duration
+                name: Durée test max
+              - entity: binary_sensor.carpiquet_ems_controlled_execution_safety_execution_allowed
+                name: Exécution autorisée
+              - entity: binary_sensor.carpiquet_ems_controlled_execution_safety_command_sent
+                name: Commande envoyée
+              - entity: binary_sensor.carpiquet_ems_controlled_execution_safety_zero_on_failure_required
+                name: Retour 0 W sur erreur requis
+              - entity: binary_sensor.carpiquet_ems_controlled_execution_safety_relock_required
+                name: Reverrouillage requis
+              - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_sequence
+                name: Séquence imposée
+
+          - type: entities
+            title: 3B-7 — Orchestrateur contrôlé 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_controlled_execution_orchestrator_state
+                name: État orchestrateur
+              - entity: sensor.garage_carpiquet_ems_controlled_execution_orchestrator_blockers
+                name: Blockers
+              - entity: sensor.garage_carpiquet_ems_controlled_execution_orchestrator_next_action
+                name: Prochaine action
+              - entity: binary_sensor.carpiquet_ems_controlled_execution_orchestrator_test_post_requested
+                name: POST test demandé
+              - entity: binary_sensor.carpiquet_ems_controlled_execution_orchestrator_test_post_allowed
+                name: POST test autorisé
+              - entity: binary_sensor.carpiquet_ems_controlled_execution_orchestrator_zero_post_requested
+                name: Retour 0 W demandé
+              - entity: binary_sensor.carpiquet_ems_controlled_execution_orchestrator_zero_post_allowed
+                name: Retour 0 W autorisé
+              - entity: binary_sensor.carpiquet_ems_controlled_execution_orchestrator_relock_required
+                name: Reverrouillage requis
+
+          - type: entities
+            title: 3B-8 — Pont transport contrôlé 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_bridge_state
+                name: État pont
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_bridge_blockers
+                name: Blockers
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_bridge_action
+                name: Action sélectionnée
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_bridge_method
+                name: Méthode préparée
+              - entity: sensor.garage_carpiquet_ems_controlled_transport_bridge_target
+                name: Target préparée
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_bridge_call_requested
+                name: Appel transport demandé
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_bridge_call_allowed
+                name: Appel transport autorisé
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_bridge_call_sent
+                name: Appel transport envoyé
+              - entity: binary_sensor.carpiquet_ems_controlled_transport_bridge_write_locked
+                name: Verrou écriture
+
       - type: grid
         title: Hyper 2000
         cards:

@@ -485,6 +485,31 @@ views:
               - entity: binary_sensor.carpiquet_ems_controlled_transport_feedback_write_locked
                 name: Verrou écriture
 
+          - type: entities
+            title: Boucle feedback contrôlée 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_controlled_feedback_loop_state
+                name: État boucle
+              - entity: sensor.garage_carpiquet_ems_controlled_feedback_loop_blockers
+                name: Blockers
+              - entity: binary_sensor.carpiquet_ems_controlled_feedback_loop_test_post_confirmed
+                name: POST test réinjectable
+              - entity: binary_sensor.carpiquet_ems_controlled_feedback_loop_test_output_confirmed
+                name: Sortie test réinjectable
+              - entity: binary_sensor.carpiquet_ems_controlled_feedback_loop_bounded_duration_elapsed
+                name: Durée bornée écoulée
+              - entity: binary_sensor.carpiquet_ems_controlled_feedback_loop_zero_post_confirmed
+                name: POST 0 W réinjectable
+              - entity: binary_sensor.carpiquet_ems_controlled_feedback_loop_zero_output_confirmed
+                name: Sortie 0 W réinjectable
+              - entity: binary_sensor.carpiquet_ems_controlled_feedback_loop_failure_detected
+                name: Échec réinjectable
+              - entity: binary_sensor.carpiquet_ems_controlled_feedback_loop_reinjection_allowed
+                name: Réinjection autorisée
+              - entity: binary_sensor.carpiquet_ems_controlled_feedback_loop_write_locked
+                name: Verrou écriture
+
       - type: grid
         title: Hyper 2000
         cards:

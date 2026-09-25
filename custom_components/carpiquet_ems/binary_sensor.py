@@ -3,6 +3,16 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_execution_safety_execution_allowed", "Controlled Execution Safety Execution Allowed", ATTR_EXEC_SAFETY_EXECUTION_ALLOWED),
+    ("controlled_execution_safety_command_sent", "Controlled Execution Safety Command Sent", ATTR_EXEC_SAFETY_COMMAND_SENT),
+    ("controlled_execution_safety_single_device_only", "Controlled Execution Safety Single Device Only", ATTR_EXEC_SAFETY_SINGLE_DEVICE_ONLY),
+    ("controlled_execution_safety_local_http_only", "Controlled Execution Safety Local HTTP Only", ATTR_EXEC_SAFETY_LOCAL_HTTP_ONLY),
+    ("controlled_execution_safety_watchdog_required", "Controlled Execution Safety Watchdog Required", ATTR_EXEC_SAFETY_WATCHDOG_REQUIRED),
+    ("controlled_execution_safety_verification_required", "Controlled Execution Safety Verification Required", ATTR_EXEC_SAFETY_VERIFICATION_REQUIRED),
+    ("controlled_execution_safety_zero_return_required", "Controlled Execution Safety Zero Return Required", ATTR_EXEC_SAFETY_ZERO_RETURN_REQUIRED),
+    ("controlled_execution_safety_zero_on_failure_required", "Controlled Execution Safety Zero On Failure Required", ATTR_EXEC_SAFETY_ZERO_ON_FAILURE_REQUIRED),
+    ("controlled_execution_safety_relock_required", "Controlled Execution Safety Relock Required", ATTR_EXEC_SAFETY_RELOCK_REQUIRED),
+
     ("controlled_test_gate_armed", "Controlled Test Gate Armed", ATTR_TEST_GATE_ARMED),
     ("controlled_test_gate_execute_allowed", "Controlled Test Gate Execute Allowed", ATTR_TEST_GATE_EXECUTE_ALLOWED),
     ("controlled_test_gate_command_sent", "Controlled Test Gate Command Sent", ATTR_TEST_GATE_COMMAND_SENT),

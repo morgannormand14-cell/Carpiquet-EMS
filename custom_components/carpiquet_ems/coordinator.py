@@ -21,6 +21,7 @@ from .zendure_execution_transport import resolve_execution_transports, probe_sol
 from .zendure_controlled_executor import prepare_locked_execution
 from .controlled_test_gate import ControlledTestGateInput, evaluate_controlled_test_gate
 from .controlled_test_sequence import ControlledTestSequenceInput, evaluate_controlled_test_sequence
+from .controlled_local_http_execution import prepare_controlled_local_http_execution
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1040,6 +1041,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 verification_ready=bool(executor.solarflow_verification),
             ))
 
+            # Phase 3B-5: construct the exact test + mandatory-zero Local HTTP
+            # request descriptions. This is data preparation only: the returned
+            # objects contain no network primitive and GLOBAL_WRITE_LOCK remains set.
+            local_http_preparation = prepare_controlled_local_http_execution(
+                sequence_state=test_sequence.state,
+                executor_prepared=bool(executor.solarflow.prepared),
+                target=executor.solarflow.target,
+                report_target=(
+                    executor.solarflow_verification.report_target
+                    if executor.solarflow_verification else ""
+                ),
+                envelope=executor.solarflow.envelope,
+            )
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1265,6 +1280,17 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_TEST_SEQUENCE_ZERO_WRITE_SENT: test_sequence.zero_write_sent,
                 ATTR_TEST_SEQUENCE_RELOCK_REQUIRED: test_sequence.relock_required,
                 ATTR_TEST_SEQUENCE_EVALUATED_AT: test_sequence.evaluated_at,
+                ATTR_LOCAL_HTTP_PREP_STATE: local_http_preparation.state,
+                ATTR_LOCAL_HTTP_PREP_BLOCKERS: ", ".join(local_http_preparation.blockers),
+                ATTR_LOCAL_HTTP_PREP_WRITE_LOCKED: local_http_preparation.write_locked,
+                ATTR_LOCAL_HTTP_PREP_TEST_TARGET: local_http_preparation.test_request.target,
+                ATTR_LOCAL_HTTP_PREP_TEST_BODY: str(local_http_preparation.test_request.json_body),
+                ATTR_LOCAL_HTTP_PREP_TEST_PREPARED: local_http_preparation.test_request.prepared,
+                ATTR_LOCAL_HTTP_PREP_ZERO_TARGET: local_http_preparation.zero_request.target,
+                ATTR_LOCAL_HTTP_PREP_ZERO_BODY: str(local_http_preparation.zero_request.json_body),
+                ATTR_LOCAL_HTTP_PREP_ZERO_PREPARED: local_http_preparation.zero_request.prepared,
+                ATTR_LOCAL_HTTP_PREP_REPORT_TARGET: local_http_preparation.report_target,
+                ATTR_LOCAL_HTTP_PREP_PREPARED_AT: local_http_preparation.prepared_at,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

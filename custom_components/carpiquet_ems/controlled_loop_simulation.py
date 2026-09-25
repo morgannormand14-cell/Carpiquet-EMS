@@ -10,6 +10,10 @@ from .controlled_feedback_loop import (
     ControlledFeedbackLoopInput,
     evaluate_controlled_feedback_loop,
 )
+from .controlled_transport_feedback import (
+    ControlledTransportFeedbackInput,
+    evaluate_controlled_transport_feedback,
+)
 
 GLOBAL_LOCK = "GLOBAL_WRITE_LOCK"
 
@@ -270,6 +274,83 @@ def simulate_degraded_paths() -> tuple[ControlledLoopSimulationResult, ...]:
         ),
     )
 
+
+
+def validate_feedback_edge_cases() -> tuple[bool, tuple[str, ...]]:
+    """Validate 3B-9 fail-safe semantics used by the degraded scenarios."""
+
+    cases: list[tuple[str, bool]] = []
+
+    missing_status = evaluate_controlled_transport_feedback(
+        ControlledTransportFeedbackInput(
+            bridge_state="BRIDGE_READY_LOCKED",
+            bridge_action="VERIFY_REPORT_OUTPUT",
+            expected_output_w=50.0,
+            transport_result_available=True,
+            http_status=None,
+            report_available=True,
+            report_output_w=50.0,
+        )
+    )
+    cases.append(("MISSING_HTTP_STATUS_BLOCKED", (
+        missing_status.state == "VERIFY_PENDING_LOCKED"
+        and not missing_status.feedback_ready
+        and not missing_status.test_post_confirmed
+    )))
+
+    zero_unconfirmed = evaluate_controlled_transport_feedback(
+        ControlledTransportFeedbackInput(
+            bridge_state="BRIDGE_READY_LOCKED",
+            bridge_action="VERIFY_REPORT_ZERO",
+            expected_output_w=0.0,
+            transport_result_available=True,
+            http_status=200,
+            report_available=False,
+            report_output_w=None,
+        )
+    )
+    cases.append(("ZERO_REPORT_MISSING_BLOCKED", (
+        zero_unconfirmed.state == "VERIFY_PENDING_LOCKED"
+        and not zero_unconfirmed.feedback_ready
+        and not zero_unconfirmed.zero_output_confirmed
+    )))
+
+    zero_mismatch = evaluate_controlled_transport_feedback(
+        ControlledTransportFeedbackInput(
+            bridge_state="BRIDGE_READY_LOCKED",
+            bridge_action="VERIFY_REPORT_ZERO",
+            expected_output_w=0.0,
+            transport_result_available=True,
+            http_status=200,
+            report_available=True,
+            report_output_w=10.0,
+        )
+    )
+    cases.append(("ZERO_REPORT_MISMATCH_FAILED", (
+        zero_mismatch.state == "FAILED_LOCKED"
+        and zero_mismatch.failure_detected
+        and not zero_mismatch.feedback_ready
+    )))
+
+    bridge_locked = evaluate_controlled_transport_feedback(
+        ControlledTransportFeedbackInput(
+            bridge_state="LOCKED",
+            bridge_action="VERIFY_REPORT_OUTPUT",
+            expected_output_w=50.0,
+            transport_result_available=True,
+            http_status=200,
+            report_available=True,
+            report_output_w=50.0,
+        )
+    )
+    cases.append(("BRIDGE_NOT_READY_LOCKED", (
+        bridge_locked.state == "LOCKED"
+        and not bridge_locked.feedback_ready
+    )))
+
+    return all(ok for _, ok in cases), tuple(
+        f"{name}={'PASS' if ok else 'FAIL'}" for name, ok in cases
+    )
 
 def run_controlled_loop_simulation() -> tuple[
     ControlledLoopSimulationResult,

@@ -128,6 +128,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._test_gate_device = ""
         self._test_gate_power_w = 0.0
         self._test_gate_duration_seconds = 0.0
+        # Phase 3B Step 4: volatile authorization simulation; never enables hardware I/O.
+        self._test_sequence_authorized = False
         self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
@@ -203,6 +205,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         await self.async_request_refresh()
 
     @property
+    def test_sequence_authorized(self):
+        return bool(self._test_sequence_authorized)
+
+    async def async_set_test_sequence_authorized(self, authorized):
+        self._test_sequence_authorized = bool(authorized)
+        await self.async_request_refresh()
+
+    @property
     def test_gate_armed(self):
         return bool(self._test_gate_armed)
 
@@ -227,16 +237,19 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             raise ValueError("Unsupported Controlled Test Gate device")
         self._test_gate_device = device
         self._test_gate_armed = False
+        self._test_sequence_authorized = False
         await self.async_request_refresh()
 
     async def async_set_test_gate_power(self, value):
         self._test_gate_power_w = max(0.0, min(100.0, float(value)))
         self._test_gate_armed = False
+        self._test_sequence_authorized = False
         await self.async_request_refresh()
 
     async def async_set_test_gate_duration(self, value):
         self._test_gate_duration_seconds = max(0.0, min(10.0, float(value)))
         self._test_gate_armed = False
+        self._test_sequence_authorized = False
         await self.async_request_refresh()
 
     def _transport_policy_diagnostics(self):
@@ -1020,7 +1033,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             # Explicit write authorization and all confirmation inputs remain false;
             # this is diagnostics-only and cannot request or send hardware I/O.
             test_sequence = evaluate_controlled_test_sequence(ControlledTestSequenceInput(
-                explicit_write_authorized=False,
+                explicit_write_authorized=self._test_sequence_authorized,
                 device=self._test_gate_device,
                 selected_transport=str(transport_policy[ATTR_TRANSPORT_SOLARFLOW_SELECTED]),
                 gate_ready=(test_gate.state == "READY_LOCKED"),

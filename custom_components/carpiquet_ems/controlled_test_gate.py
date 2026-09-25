@@ -16,6 +16,7 @@ REASON_SAFETY = "SAFETY_NOT_OK"
 REASON_TRANSPORT = "TRANSPORT_NOT_READY"
 REASON_EXECUTOR = "EXECUTOR_NOT_PREPARED"
 REASON_GLOBAL_LOCK = "GLOBAL_WRITE_LOCK"
+REASON_WRITE_AUTHORIZATION = "EXPLICIT_WRITE_AUTHORIZATION_REQUIRED"
 
 
 @dataclass(frozen=True)
@@ -28,6 +29,7 @@ class ControlledTestGateInput:
     safety_ok: bool
     transport_ready: bool
     executor_prepared: bool
+    explicit_write_authorized: bool = False
 
 
 @dataclass(frozen=True)
@@ -42,6 +44,8 @@ class ControlledTestGateDecision:
     duration_seconds: float
     blockers: tuple[str, ...]
     evaluated_at: str
+    explicit_write_authorized: bool = False
+    authorization_scope: str = "NONE"
 
 
 def evaluate_controlled_test_gate(context: ControlledTestGateInput) -> ControlledTestGateDecision:
@@ -69,6 +73,8 @@ def evaluate_controlled_test_gate(context: ControlledTestGateInput) -> Controlle
         blockers.append(REASON_EXECUTOR)
 
     functional_ready = not blockers
+    if not context.explicit_write_authorized:
+        blockers.append(REASON_WRITE_AUTHORIZATION)
     blockers.append(REASON_GLOBAL_LOCK)
 
     return ControlledTestGateDecision(
@@ -82,4 +88,6 @@ def evaluate_controlled_test_gate(context: ControlledTestGateInput) -> Controlle
         duration_seconds=float(context.duration_seconds),
         blockers=tuple(blockers),
         evaluated_at=datetime.now(timezone.utc).isoformat(),
+        explicit_write_authorized=bool(context.explicit_write_authorized),
+        authorization_scope=("SOLARFLOW_LOCAL_HTTP_SINGLE_TEST" if context.explicit_write_authorized and context.device == "solarflow" else "NONE"),
     )

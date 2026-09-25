@@ -22,6 +22,10 @@ from .zendure_controlled_executor import prepare_locked_execution
 from .controlled_test_gate import ControlledTestGateInput, evaluate_controlled_test_gate
 from .controlled_test_sequence import ControlledTestSequenceInput, evaluate_controlled_test_sequence
 from .controlled_local_http_execution import prepare_controlled_local_http_execution
+from .controlled_execution_safety import (
+    ControlledExecutionSafetyInput,
+    evaluate_controlled_execution_safety,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1055,6 +1059,23 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 envelope=executor.solarflow.envelope,
             )
 
+            # Phase 3B-6: evaluate the complete safety contract for the future
+            # single SolarFlow Local HTTP test. This remains diagnostics-only:
+            # execution_allowed and command_sent are hard-false in the contract.
+            execution_safety = evaluate_controlled_execution_safety(
+                ControlledExecutionSafetyInput(
+                    preparation_state=local_http_preparation.state,
+                    preparation_write_locked=local_http_preparation.write_locked,
+                    test_request_prepared=local_http_preparation.test_request.prepared,
+                    zero_request_prepared=local_http_preparation.zero_request.prepared,
+                    report_target=local_http_preparation.report_target,
+                    requested_power_w=self._test_gate_power_w,
+                    duration_seconds=self._test_gate_duration_seconds,
+                    watchdog_ok=(command_decision.watchdog_state == "OK"),
+                    safety_ok=bool(command_decision.safety_ok),
+                )
+            )
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1291,6 +1312,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_LOCAL_HTTP_PREP_ZERO_PREPARED: local_http_preparation.zero_request.prepared,
                 ATTR_LOCAL_HTTP_PREP_REPORT_TARGET: local_http_preparation.report_target,
                 ATTR_LOCAL_HTTP_PREP_PREPARED_AT: local_http_preparation.prepared_at,
+                ATTR_EXEC_SAFETY_STATE: execution_safety.state,
+                ATTR_EXEC_SAFETY_BLOCKERS: ", ".join(execution_safety.blockers),
+                ATTR_EXEC_SAFETY_EXECUTION_ALLOWED: execution_safety.execution_allowed,
+                ATTR_EXEC_SAFETY_COMMAND_SENT: execution_safety.command_sent,
+                ATTR_EXEC_SAFETY_SINGLE_DEVICE_ONLY: execution_safety.single_device_only,
+                ATTR_EXEC_SAFETY_LOCAL_HTTP_ONLY: execution_safety.local_http_only,
+                ATTR_EXEC_SAFETY_MAX_POWER: execution_safety.max_test_power_w,
+                ATTR_EXEC_SAFETY_MAX_DURATION: execution_safety.max_duration_seconds,
+                ATTR_EXEC_SAFETY_WATCHDOG_REQUIRED: execution_safety.watchdog_required,
+                ATTR_EXEC_SAFETY_VERIFICATION_REQUIRED: execution_safety.verification_required,
+                ATTR_EXEC_SAFETY_ZERO_RETURN_REQUIRED: execution_safety.zero_return_required,
+                ATTR_EXEC_SAFETY_ZERO_ON_FAILURE_REQUIRED: execution_safety.zero_on_failure_required,
+                ATTR_EXEC_SAFETY_RELOCK_REQUIRED: execution_safety.relock_required,
+                ATTR_EXEC_SAFETY_SEQUENCE: " -> ".join(execution_safety.sequence),
+                ATTR_EXEC_SAFETY_EVALUATED_AT: execution_safety.evaluated_at,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

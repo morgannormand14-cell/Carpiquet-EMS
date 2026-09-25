@@ -406,3 +406,17 @@ ATTR_TEST_SEQUENCE_ZERO_WRITE_ALLOWED = "controlled_test_sequence_zero_write_all
 ATTR_TEST_SEQUENCE_ZERO_WRITE_SENT = "controlled_test_sequence_zero_write_sent"
 ATTR_TEST_SEQUENCE_RELOCK_REQUIRED = "controlled_test_sequence_relock_required"
 ATTR_TEST_SEQUENCE_EVALUATED_AT = "controlled_test_sequence_evaluated_at"
+
+
+# alpha.3.15 Phase 3B-5 — Controlled Local HTTP Execution Preparation (locked)
+ATTR_LOCAL_HTTP_PREP_STATE = "controlled_local_http_preparation_state"
+ATTR_LOCAL_HTTP_PREP_BLOCKERS = "controlled_local_http_preparation_blockers"
+ATTR_LOCAL_HTTP_PREP_WRITE_LOCKED = "controlled_local_http_preparation_write_locked"
+ATTR_LOCAL_HTTP_PREP_TEST_TARGET = "controlled_local_http_preparation_test_target"
+ATTR_LOCAL_HTTP_PREP_TEST_BODY = "controlled_local_http_preparation_test_body"
+ATTR_LOCAL_HTTP_PREP_TEST_PREPARED = "controlled_local_http_preparation_test_prepared"
+ATTR_LOCAL_HTTP_PREP_ZERO_TARGET = "controlled_local_http_preparation_zero_target"
+ATTR_LOCAL_HTTP_PREP_ZERO_BODY = "controlled_local_http_preparation_zero_body"
+ATTR_LOCAL_HTTP_PREP_ZERO_PREPARED = "controlled_local_http_preparation_zero_prepared"
+ATTR_LOCAL_HTTP_PREP_REPORT_TARGET = "controlled_local_http_preparation_report_target"
+ATTR_LOCAL_HTTP_PREP_PREPARED_AT = "controlled_local_http_preparation_prepared_at"

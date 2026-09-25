@@ -67,6 +67,7 @@ class ExecutorResult:
     hyper: PreparedExecution
     solarflow: PreparedExecution
     prepared_at: str
+    solarflow_verification: LocalHttpVerificationPlan | None = None
 
 
 def _now() -> str:
@@ -103,6 +104,7 @@ def _locked(
         state=RESULT_PREPARED_LOCKED if prepared else RESULT_NOT_PREPARED,
         reason=reason,
         prepared_at=_now(),
+        solarflow_verification=verification,
     )
 
 
@@ -263,6 +265,15 @@ def prepare_locked_execution(
         inventory, solarflow_payload, solarflow_selected_transport,
         solarflow_local_http_qualified,
     )
+    verification = None
+    if solar.prepared and solar.selected_transport == TRANSPORT_LOCAL_HTTP:
+        system = _system_by_profile(inventory, "zensdk_ac")
+        if system:
+            host = str(system.get("local_host") or "")
+            serial = str(system.get("serial_number") or system.get("serial") or "")
+            if host and serial:
+                verification = _solarflow_verification_plan(host=host, serial=serial, envelope=solar.envelope)
+
     return ExecutorResult(
         state=EXECUTOR_LOCKED_DRY_RUN,
         write_locked=True,

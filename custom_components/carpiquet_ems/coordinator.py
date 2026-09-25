@@ -30,6 +30,10 @@ from .controlled_execution_orchestrator import (
     ControlledExecutionOrchestratorInput,
     evaluate_controlled_execution_orchestrator,
 )
+from .controlled_transport_bridge import (
+    ControlledTransportBridgeInput,
+    prepare_controlled_transport_bridge,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1089,6 +1093,25 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Phase 3B-8: bridge the locked orchestrator decision to the
+            # prepared HTTP request descriptions. This selects data only and
+            # deliberately has no transport/write primitive.
+            transport_bridge = prepare_controlled_transport_bridge(
+                ControlledTransportBridgeInput(
+                    orchestrator_state=execution_orchestrator.state,
+                    orchestrator_next_action=execution_orchestrator.next_action,
+                    preparation_state=local_http_preparation.state,
+                    safety_state=execution_safety.state,
+                    test_request_prepared=local_http_preparation.test_request.prepared,
+                    zero_request_prepared=local_http_preparation.zero_request.prepared,
+                    test_target=local_http_preparation.test_request.target,
+                    test_body=local_http_preparation.test_request.json_body,
+                    zero_target=local_http_preparation.zero_request.target,
+                    zero_body=local_http_preparation.zero_request.json_body,
+                    report_target=local_http_preparation.report_target,
+                )
+            )
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1356,6 +1379,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_EXEC_ORCH_EXECUTION_ALLOWED: execution_orchestrator.execution_allowed,
                 ATTR_EXEC_ORCH_COMMAND_SENT: execution_orchestrator.command_sent,
                 ATTR_EXEC_ORCH_EVALUATED_AT: execution_orchestrator.evaluated_at,
+                ATTR_TRANSPORT_BRIDGE_STATE: transport_bridge.state,
+                ATTR_TRANSPORT_BRIDGE_BLOCKERS: ", ".join(transport_bridge.blockers),
+                ATTR_TRANSPORT_BRIDGE_ACTION: transport_bridge.action,
+                ATTR_TRANSPORT_BRIDGE_METHOD: transport_bridge.method,
+                ATTR_TRANSPORT_BRIDGE_TARGET: transport_bridge.target,
+                ATTR_TRANSPORT_BRIDGE_BODY: str(transport_bridge.json_body),
+                ATTR_TRANSPORT_BRIDGE_REPORT_TARGET: transport_bridge.report_target,
+                ATTR_TRANSPORT_BRIDGE_CALL_REQUESTED: transport_bridge.transport_call_requested,
+                ATTR_TRANSPORT_BRIDGE_CALL_ALLOWED: transport_bridge.transport_call_allowed,
+                ATTR_TRANSPORT_BRIDGE_CALL_SENT: transport_bridge.transport_call_sent,
+                ATTR_TRANSPORT_BRIDGE_VERIFY_REQUESTED: transport_bridge.verification_requested,
+                ATTR_TRANSPORT_BRIDGE_ZERO_SELECTED: transport_bridge.zero_return_selected,
+                ATTR_TRANSPORT_BRIDGE_WRITE_LOCKED: transport_bridge.write_locked,
+                ATTR_TRANSPORT_BRIDGE_EVALUATED_AT: transport_bridge.evaluated_at,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

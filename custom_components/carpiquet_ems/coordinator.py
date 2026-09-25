@@ -34,6 +34,10 @@ from .controlled_transport_bridge import (
     ControlledTransportBridgeInput,
     prepare_controlled_transport_bridge,
 )
+from .controlled_transport_feedback import (
+    ControlledTransportFeedbackInput,
+    evaluate_controlled_transport_feedback,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1112,6 +1116,22 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Phase 3B-9: model feedback interpretation with no real
+            # transport result connected yet. This deliberately remains pending
+            # and cannot advance the physical execution chain.
+            expected_feedback_output = (
+                0.0
+                if transport_bridge.zero_return_selected
+                else float(_test_gate_power_w)
+            )
+            transport_feedback = evaluate_controlled_transport_feedback(
+                ControlledTransportFeedbackInput(
+                    bridge_state=transport_bridge.state,
+                    bridge_action=transport_bridge.action,
+                    expected_output_w=expected_feedback_output,
+                )
+            )
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1393,6 +1413,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_TRANSPORT_BRIDGE_ZERO_SELECTED: transport_bridge.zero_return_selected,
                 ATTR_TRANSPORT_BRIDGE_WRITE_LOCKED: transport_bridge.write_locked,
                 ATTR_TRANSPORT_BRIDGE_EVALUATED_AT: transport_bridge.evaluated_at,
+                ATTR_TRANSPORT_FEEDBACK_STATE: transport_feedback.state,
+                ATTR_TRANSPORT_FEEDBACK_BLOCKERS: ", ".join(transport_feedback.blockers),
+                ATTR_TRANSPORT_FEEDBACK_TEST_POST_CONFIRMED: transport_feedback.test_post_confirmed,
+                ATTR_TRANSPORT_FEEDBACK_TEST_OUTPUT_CONFIRMED: transport_feedback.test_output_confirmed,
+                ATTR_TRANSPORT_FEEDBACK_ZERO_POST_CONFIRMED: transport_feedback.zero_post_confirmed,
+                ATTR_TRANSPORT_FEEDBACK_ZERO_OUTPUT_CONFIRMED: transport_feedback.zero_output_confirmed,
+                ATTR_TRANSPORT_FEEDBACK_FAILURE: transport_feedback.failure_detected,
+                ATTR_TRANSPORT_FEEDBACK_REPORT_REQUIRED: transport_feedback.report_confirmation_required,
+                ATTR_TRANSPORT_FEEDBACK_EXPECTED_OUTPUT: transport_feedback.expected_output_w,
+                ATTR_TRANSPORT_FEEDBACK_OBSERVED_OUTPUT: transport_feedback.observed_output_w,
+                ATTR_TRANSPORT_FEEDBACK_HTTP_STATUS: transport_feedback.http_status,
+                ATTR_TRANSPORT_FEEDBACK_READY: transport_feedback.feedback_ready,
+                ATTR_TRANSPORT_FEEDBACK_WRITE_LOCKED: transport_feedback.write_locked,
+                ATTR_TRANSPORT_FEEDBACK_EVALUATED_AT: transport_feedback.evaluated_at,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

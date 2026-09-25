@@ -536,6 +536,10 @@ views:
                 name: Scénarios dégradés testés
               - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_degraded_results
                 name: Détail scénarios dégradés
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_edge_cases_passed
+                name: Cas limites feedback validés
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_edge_case_results
+                name: Détail cas limites
 
       - type: grid
         title: Hyper 2000

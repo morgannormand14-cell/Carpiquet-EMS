@@ -104,7 +104,6 @@ def _locked(
         state=RESULT_PREPARED_LOCKED if prepared else RESULT_NOT_PREPARED,
         reason=reason,
         prepared_at=_now(),
-        solarflow_verification=verification,
     )
 
 
@@ -283,4 +282,5 @@ def prepare_locked_execution(
         hyper=hyper,
         solarflow=solar,
         prepared_at=_now(),
+        solarflow_verification=verification,
     )

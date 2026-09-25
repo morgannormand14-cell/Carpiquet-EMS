@@ -4,7 +4,7 @@ from .const import DOMAIN
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([SimulationSwitch(coordinator, entry), AutomationEngineSwitch(coordinator, entry), ControlledTestArmSwitch(coordinator, entry)])
+    async_add_entities([SimulationSwitch(coordinator, entry), AutomationEngineSwitch(coordinator, entry), ControlledTestArmSwitch(coordinator, entry), ControlledTestAuthorizationSimulationSwitch(coordinator, entry)])
 
 class SimulationSwitch(CoordinatorEntity, SwitchEntity):
     def __init__(self, coordinator, entry):
@@ -57,4 +57,33 @@ class ControlledTestArmSwitch(CoordinatorEntity, SwitchEntity):
             "execution_enabled": False,
             "global_write_lock": True,
             "note": "ARMED_LOCKED configuration only; no hardware I/O path",
+        }
+
+
+class ControlledTestAuthorizationSimulationSwitch(CoordinatorEntity, SwitchEntity):
+    """Simulate explicit Phase 3B authorization without enabling hardware writes."""
+
+    def __init__(self, coordinator, entry):
+        super().__init__(coordinator)
+        self._attr_name = "Carpiquet EMS Controlled Test Authorization Simulation"
+        self._attr_unique_id = f"{entry.entry_id}_controlled_test_authorization_simulation"
+        self._attr_icon = "mdi:shield-check-outline"
+
+    @property
+    def is_on(self):
+        return self.coordinator.test_sequence_authorized
+
+    async def async_turn_on(self, **kwargs):
+        await self.coordinator.async_set_test_sequence_authorized(True)
+
+    async def async_turn_off(self, **kwargs):
+        await self.coordinator.async_set_test_sequence_authorized(False)
+
+    @property
+    def extra_state_attributes(self):
+        return {
+            "simulation_only": True,
+            "execution_enabled": False,
+            "global_write_lock": True,
+            "note": "Phase 3B Step 4 authorization simulation only; no hardware I/O path",
         }

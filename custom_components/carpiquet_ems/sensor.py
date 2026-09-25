@@ -3,6 +3,10 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_loop_sim_degraded_passed_count", "Controlled Loop Simulation Degraded Passed Count", ATTR_LOOP_SIM_DEGRADED_PASSED_COUNT, None, None),
+    ("controlled_loop_sim_degraded_total_count", "Controlled Loop Simulation Degraded Total Count", ATTR_LOOP_SIM_DEGRADED_TOTAL_COUNT, None, None),
+    ("controlled_loop_sim_degraded_results", "Controlled Loop Simulation Degraded Results", ATTR_LOOP_SIM_DEGRADED_RESULTS, None, None),
+
     ("controlled_loop_sim_success_final_state", "Controlled Loop Simulation Success Final State", ATTR_LOOP_SIM_SUCCESS_FINAL_STATE, None, None),
     ("controlled_loop_sim_failure_final_state", "Controlled Loop Simulation Failure Final State", ATTR_LOOP_SIM_FAILURE_FINAL_STATE, None, None),
 

@@ -500,3 +500,12 @@ ATTR_FEEDBACK_LOOP_FAILURE = "controlled_feedback_loop_failure_detected"
 ATTR_FEEDBACK_LOOP_REINJECTION_ALLOWED = "controlled_feedback_loop_reinjection_allowed"
 ATTR_FEEDBACK_LOOP_WRITE_LOCKED = "controlled_feedback_loop_write_locked"
 ATTR_FEEDBACK_LOOP_EVALUATED_AT = "controlled_feedback_loop_evaluated_at"
+
+# Phase 3B — complete locked feedback-loop simulation bench
+ATTR_LOOP_SIM_SUCCESS_PASSED = "controlled_loop_sim_success_passed"
+ATTR_LOOP_SIM_SUCCESS_FINAL_STATE = "controlled_loop_sim_success_final_state"
+ATTR_LOOP_SIM_SUCCESS_LOCK_PRESERVED = "controlled_loop_sim_success_lock_preserved"
+ATTR_LOOP_SIM_FAILURE_PASSED = "controlled_loop_sim_failure_passed"
+ATTR_LOOP_SIM_FAILURE_FINAL_STATE = "controlled_loop_sim_failure_final_state"
+ATTR_LOOP_SIM_FAILURE_LOCK_PRESERVED = "controlled_loop_sim_failure_lock_preserved"
+ATTR_LOOP_SIM_REAL_TRANSPORT_USED = "controlled_loop_sim_real_transport_used"

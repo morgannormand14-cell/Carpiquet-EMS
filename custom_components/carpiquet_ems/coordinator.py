@@ -26,6 +26,10 @@ from .controlled_execution_safety import (
     ControlledExecutionSafetyInput,
     evaluate_controlled_execution_safety,
 )
+from .controlled_execution_orchestrator import (
+    ControlledExecutionOrchestratorInput,
+    evaluate_controlled_execution_orchestrator,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1076,6 +1080,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Phase 3B-7: model the future execution lifecycle without I/O.
+            # All confirmation inputs remain false until a later, separately
+            # approved phase; GLOBAL_WRITE_LOCK is still authoritative.
+            execution_orchestrator = evaluate_controlled_execution_orchestrator(
+                ControlledExecutionOrchestratorInput(
+                    safety_state=execution_safety.state,
+                )
+            )
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1327,6 +1340,22 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_EXEC_SAFETY_RELOCK_REQUIRED: execution_safety.relock_required,
                 ATTR_EXEC_SAFETY_SEQUENCE: " -> ".join(execution_safety.sequence),
                 ATTR_EXEC_SAFETY_EVALUATED_AT: execution_safety.evaluated_at,
+                ATTR_EXEC_ORCH_STATE: execution_orchestrator.state,
+                ATTR_EXEC_ORCH_BLOCKERS: ", ".join(execution_orchestrator.blockers),
+                ATTR_EXEC_ORCH_NEXT_ACTION: execution_orchestrator.next_action,
+                ATTR_EXEC_ORCH_TEST_POST_REQUESTED: execution_orchestrator.test_post_requested,
+                ATTR_EXEC_ORCH_TEST_POST_ALLOWED: execution_orchestrator.test_post_allowed,
+                ATTR_EXEC_ORCH_TEST_POST_SENT: execution_orchestrator.test_post_sent,
+                ATTR_EXEC_ORCH_REPORT_VERIFY_REQUESTED: execution_orchestrator.report_verification_requested,
+                ATTR_EXEC_ORCH_WAIT_REQUESTED: execution_orchestrator.wait_requested,
+                ATTR_EXEC_ORCH_ZERO_POST_REQUESTED: execution_orchestrator.zero_post_requested,
+                ATTR_EXEC_ORCH_ZERO_POST_ALLOWED: execution_orchestrator.zero_post_allowed,
+                ATTR_EXEC_ORCH_ZERO_POST_SENT: execution_orchestrator.zero_post_sent,
+                ATTR_EXEC_ORCH_ZERO_VERIFY_REQUESTED: execution_orchestrator.zero_verification_requested,
+                ATTR_EXEC_ORCH_RELOCK_REQUIRED: execution_orchestrator.relock_required,
+                ATTR_EXEC_ORCH_EXECUTION_ALLOWED: execution_orchestrator.execution_allowed,
+                ATTR_EXEC_ORCH_COMMAND_SENT: execution_orchestrator.command_sent,
+                ATTR_EXEC_ORCH_EVALUATED_AT: execution_orchestrator.evaluated_at,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

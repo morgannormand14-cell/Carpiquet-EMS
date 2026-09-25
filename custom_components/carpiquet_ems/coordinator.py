@@ -1154,7 +1154,12 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
             # Pure in-memory Phase 3B simulation bench. It exercises the
             # success and failure state-machine paths without transport I/O.
-            loop_sim_success, loop_sim_failure = run_controlled_loop_simulation()
+            loop_sim_success, loop_sim_failure, loop_sim_degraded = run_controlled_loop_simulation()
+            loop_sim_degraded_passed = sum(1 for item in loop_sim_degraded if item.passed)
+            loop_sim_degraded_summary = ", ".join(
+                f"{item.scenario}={'PASS' if item.passed else 'FAIL'}"
+                for item in loop_sim_degraded
+            )
 
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
@@ -1469,8 +1474,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_LOOP_SIM_FAILURE_FINAL_STATE: loop_sim_failure.final_state,
                 ATTR_LOOP_SIM_FAILURE_LOCK_PRESERVED: loop_sim_failure.global_write_lock_preserved,
                 ATTR_LOOP_SIM_REAL_TRANSPORT_USED: (
-                    loop_sim_success.real_transport_used or loop_sim_failure.real_transport_used
+                    loop_sim_success.real_transport_used
+                    or loop_sim_failure.real_transport_used
+                    or any(item.real_transport_used for item in loop_sim_degraded)
                 ),
+                ATTR_LOOP_SIM_DEGRADED_ALL_PASSED: all(item.passed for item in loop_sim_degraded),
+                ATTR_LOOP_SIM_DEGRADED_PASSED_COUNT: loop_sim_degraded_passed,
+                ATTR_LOOP_SIM_DEGRADED_TOTAL_COUNT: len(loop_sim_degraded),
+                ATTR_LOOP_SIM_DEGRADED_RESULTS: loop_sim_degraded_summary,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

@@ -20,6 +20,7 @@ from .write_gate import WriteGateInput, evaluate_write_gate
 from .zendure_execution_transport import resolve_execution_transports, probe_solarflow_local_report
 from .zendure_controlled_executor import prepare_locked_execution
 from .controlled_test_gate import ControlledTestGateInput, evaluate_controlled_test_gate
+from .controlled_test_sequence import ControlledTestSequenceInput, evaluate_controlled_test_sequence
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1015,6 +1016,17 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ),
             ))
 
+            # alpha.3.15 Phase 3B Step 3: observe the future SolarFlow test lifecycle.
+            # Explicit write authorization and all confirmation inputs remain false;
+            # this is diagnostics-only and cannot request or send hardware I/O.
+            test_sequence = evaluate_controlled_test_sequence(ControlledTestSequenceInput(
+                explicit_write_authorized=False,
+                device=self._test_gate_device,
+                selected_transport=str(transport_policy[ATTR_TRANSPORT_SOLARFLOW_SELECTED]),
+                gate_ready=(test_gate.state == "READY_LOCKED"),
+                verification_ready=bool(executor.solarflow_verification),
+            ))
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1228,6 +1240,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_TEST_GATE_DURATION: test_gate.duration_seconds,
                 ATTR_TEST_GATE_BLOCKERS: ", ".join(test_gate.blockers),
                 ATTR_TEST_GATE_EVALUATED_AT: test_gate.evaluated_at,
+                ATTR_TEST_SEQUENCE_STATE: test_sequence.state,
+                ATTR_TEST_SEQUENCE_BLOCKERS: ", ".join(test_sequence.blockers),
+                ATTR_TEST_SEQUENCE_TEST_WRITE_REQUESTED: test_sequence.test_write_requested,
+                ATTR_TEST_SEQUENCE_TEST_WRITE_ALLOWED: test_sequence.test_write_allowed,
+                ATTR_TEST_SEQUENCE_TEST_WRITE_SENT: test_sequence.test_write_sent,
+                ATTR_TEST_SEQUENCE_VERIFICATION_REQUIRED: test_sequence.verification_required,
+                ATTR_TEST_SEQUENCE_RETURN_TO_ZERO_REQUIRED: test_sequence.return_to_zero_required,
+                ATTR_TEST_SEQUENCE_ZERO_WRITE_REQUESTED: test_sequence.zero_write_requested,
+                ATTR_TEST_SEQUENCE_ZERO_WRITE_ALLOWED: test_sequence.zero_write_allowed,
+                ATTR_TEST_SEQUENCE_ZERO_WRITE_SENT: test_sequence.zero_write_sent,
+                ATTR_TEST_SEQUENCE_RELOCK_REQUIRED: test_sequence.relock_required,
+                ATTR_TEST_SEQUENCE_EVALUATED_AT: test_sequence.evaluated_at,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

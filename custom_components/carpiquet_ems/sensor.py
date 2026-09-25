@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_test_sequence_state", "Controlled Test Sequence State", ATTR_TEST_SEQUENCE_STATE, None, None),
+    ("controlled_test_sequence_blockers", "Controlled Test Sequence Blockers", ATTR_TEST_SEQUENCE_BLOCKERS, None, None),
+    ("controlled_test_sequence_evaluated_at", "Controlled Test Sequence Evaluated At", ATTR_TEST_SEQUENCE_EVALUATED_AT, None, None),
     ("controlled_test_gate_state", "Controlled Test Gate State", ATTR_TEST_GATE_STATE, None, None),
     ("controlled_test_gate_device", "Controlled Test Gate Device", ATTR_TEST_GATE_DEVICE, None, None),
     ("controlled_test_gate_power", "Controlled Test Gate Requested Power", ATTR_TEST_GATE_POWER, "W", "power"),

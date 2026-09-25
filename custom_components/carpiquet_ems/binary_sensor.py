@@ -3,6 +3,15 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_transport_feedback_test_post_confirmed", "Controlled Transport Feedback Test POST Confirmed", ATTR_TRANSPORT_FEEDBACK_TEST_POST_CONFIRMED),
+    ("controlled_transport_feedback_test_output_confirmed", "Controlled Transport Feedback Test Output Confirmed", ATTR_TRANSPORT_FEEDBACK_TEST_OUTPUT_CONFIRMED),
+    ("controlled_transport_feedback_zero_post_confirmed", "Controlled Transport Feedback Zero POST Confirmed", ATTR_TRANSPORT_FEEDBACK_ZERO_POST_CONFIRMED),
+    ("controlled_transport_feedback_zero_output_confirmed", "Controlled Transport Feedback Zero Output Confirmed", ATTR_TRANSPORT_FEEDBACK_ZERO_OUTPUT_CONFIRMED),
+    ("controlled_transport_feedback_failure_detected", "Controlled Transport Feedback Failure Detected", ATTR_TRANSPORT_FEEDBACK_FAILURE),
+    ("controlled_transport_feedback_report_confirmation_required", "Controlled Transport Feedback Report Confirmation Required", ATTR_TRANSPORT_FEEDBACK_REPORT_REQUIRED),
+    ("controlled_transport_feedback_ready", "Controlled Transport Feedback Ready", ATTR_TRANSPORT_FEEDBACK_READY),
+    ("controlled_transport_feedback_write_locked", "Controlled Transport Feedback Write Locked", ATTR_TRANSPORT_FEEDBACK_WRITE_LOCKED),
+
     ("controlled_transport_bridge_call_requested", "Controlled Transport Bridge Call Requested", ATTR_TRANSPORT_BRIDGE_CALL_REQUESTED),
     ("controlled_transport_bridge_call_allowed", "Controlled Transport Bridge Call Allowed", ATTR_TRANSPORT_BRIDGE_CALL_ALLOWED),
     ("controlled_transport_bridge_call_sent", "Controlled Transport Bridge Call Sent", ATTR_TRANSPORT_BRIDGE_CALL_SENT),

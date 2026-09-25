@@ -509,3 +509,8 @@ ATTR_LOOP_SIM_FAILURE_PASSED = "controlled_loop_sim_failure_passed"
 ATTR_LOOP_SIM_FAILURE_FINAL_STATE = "controlled_loop_sim_failure_final_state"
 ATTR_LOOP_SIM_FAILURE_LOCK_PRESERVED = "controlled_loop_sim_failure_lock_preserved"
 ATTR_LOOP_SIM_REAL_TRANSPORT_USED = "controlled_loop_sim_real_transport_used"
+
+ATTR_LOOP_SIM_DEGRADED_ALL_PASSED = "controlled_loop_sim_degraded_all_passed"
+ATTR_LOOP_SIM_DEGRADED_PASSED_COUNT = "controlled_loop_sim_degraded_passed_count"
+ATTR_LOOP_SIM_DEGRADED_TOTAL_COUNT = "controlled_loop_sim_degraded_total_count"
+ATTR_LOOP_SIM_DEGRADED_RESULTS = "controlled_loop_sim_degraded_results"

@@ -3,6 +3,14 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_local_http_preparation_state", "Controlled Local HTTP Preparation State", ATTR_LOCAL_HTTP_PREP_STATE, None, None),
+    ("controlled_local_http_preparation_blockers", "Controlled Local HTTP Preparation Blockers", ATTR_LOCAL_HTTP_PREP_BLOCKERS, None, None),
+    ("controlled_local_http_preparation_test_target", "Controlled Local HTTP Test Target", ATTR_LOCAL_HTTP_PREP_TEST_TARGET, None, None),
+    ("controlled_local_http_preparation_test_body", "Controlled Local HTTP Test Body", ATTR_LOCAL_HTTP_PREP_TEST_BODY, None, None),
+    ("controlled_local_http_preparation_zero_target", "Controlled Local HTTP Zero Target", ATTR_LOCAL_HTTP_PREP_ZERO_TARGET, None, None),
+    ("controlled_local_http_preparation_zero_body", "Controlled Local HTTP Zero Body", ATTR_LOCAL_HTTP_PREP_ZERO_BODY, None, None),
+    ("controlled_local_http_preparation_report_target", "Controlled Local HTTP Report Target", ATTR_LOCAL_HTTP_PREP_REPORT_TARGET, None, None),
+    ("controlled_local_http_preparation_prepared_at", "Controlled Local HTTP Preparation Prepared At", ATTR_LOCAL_HTTP_PREP_PREPARED_AT, None, None),
     ("controlled_test_sequence_state", "Controlled Test Sequence State", ATTR_TEST_SEQUENCE_STATE, None, None),
     ("controlled_test_sequence_blockers", "Controlled Test Sequence Blockers", ATTR_TEST_SEQUENCE_BLOCKERS, None, None),
     ("controlled_test_sequence_evaluated_at", "Controlled Test Sequence Evaluated At", ATTR_TEST_SEQUENCE_EVALUATED_AT, None, None),

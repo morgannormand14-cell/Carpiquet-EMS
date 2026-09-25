@@ -3,6 +3,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_loop_sim_degraded_all_passed", "Controlled Loop Simulation Degraded All Passed", ATTR_LOOP_SIM_DEGRADED_ALL_PASSED),
+
     ("controlled_loop_sim_success_passed", "Controlled Loop Simulation Success Passed", ATTR_LOOP_SIM_SUCCESS_PASSED),
     ("controlled_loop_sim_success_lock_preserved", "Controlled Loop Simulation Success Lock Preserved", ATTR_LOOP_SIM_SUCCESS_LOCK_PRESERVED),
     ("controlled_loop_sim_failure_passed", "Controlled Loop Simulation Failure Passed", ATTR_LOOP_SIM_FAILURE_PASSED),

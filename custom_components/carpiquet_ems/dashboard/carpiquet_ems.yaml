@@ -370,6 +370,27 @@ views:
               - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_evaluated_at
                 name: Évaluation séquence
 
+          - type: entities
+            title: 3B-5 — Préparation HTTP locale 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_controlled_local_http_preparation_state
+                name: État préparation
+              - entity: sensor.garage_carpiquet_ems_controlled_local_http_preparation_blockers
+                name: Blockers
+              - entity: sensor.garage_carpiquet_ems_controlled_local_http_test_target
+                name: Target test
+              - entity: sensor.garage_carpiquet_ems_controlled_local_http_test_body
+                name: Payload test préparé
+              - entity: sensor.garage_carpiquet_ems_controlled_local_http_zero_target
+                name: Target retour 0 W
+              - entity: sensor.garage_carpiquet_ems_controlled_local_http_zero_body
+                name: Payload retour 0 W préparé
+              - entity: sensor.garage_carpiquet_ems_controlled_local_http_report_target
+                name: Target vérification GET
+              - entity: sensor.garage_carpiquet_ems_controlled_local_http_preparation_prepared_at
+                name: Préparé à
+
       - type: grid
         title: Hyper 2000
         cards:

@@ -38,6 +38,10 @@ from .controlled_transport_feedback import (
     ControlledTransportFeedbackInput,
     evaluate_controlled_transport_feedback,
 )
+from .controlled_feedback_loop import (
+    ControlledFeedbackLoopInput,
+    evaluate_controlled_feedback_loop,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1132,6 +1136,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Controlled feedback loop: map 3B-9 facts back toward 3B-7,
+            # but keep reinjection disabled. This proves the feedback contract
+            # without creating a cyclic execution path or enabling writes.
+            feedback_loop = evaluate_controlled_feedback_loop(
+                ControlledFeedbackLoopInput(
+                    safety_state=execution_safety.state,
+                    feedback_state=transport_feedback.state,
+                    feedback_test_post_confirmed=transport_feedback.test_post_confirmed,
+                    feedback_test_output_confirmed=transport_feedback.test_output_confirmed,
+                    feedback_zero_post_confirmed=transport_feedback.zero_post_confirmed,
+                    feedback_zero_output_confirmed=transport_feedback.zero_output_confirmed,
+                    feedback_failure_detected=transport_feedback.failure_detected,
+                )
+            )
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1427,6 +1446,17 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_TRANSPORT_FEEDBACK_READY: transport_feedback.feedback_ready,
                 ATTR_TRANSPORT_FEEDBACK_WRITE_LOCKED: transport_feedback.write_locked,
                 ATTR_TRANSPORT_FEEDBACK_EVALUATED_AT: transport_feedback.evaluated_at,
+                ATTR_FEEDBACK_LOOP_STATE: feedback_loop.state,
+                ATTR_FEEDBACK_LOOP_BLOCKERS: ", ".join(feedback_loop.blockers),
+                ATTR_FEEDBACK_LOOP_TEST_POST_CONFIRMED: feedback_loop.test_post_confirmed,
+                ATTR_FEEDBACK_LOOP_TEST_OUTPUT_CONFIRMED: feedback_loop.test_output_confirmed,
+                ATTR_FEEDBACK_LOOP_DURATION_ELAPSED: feedback_loop.bounded_duration_elapsed,
+                ATTR_FEEDBACK_LOOP_ZERO_POST_CONFIRMED: feedback_loop.zero_post_confirmed,
+                ATTR_FEEDBACK_LOOP_ZERO_OUTPUT_CONFIRMED: feedback_loop.zero_output_confirmed,
+                ATTR_FEEDBACK_LOOP_FAILURE: feedback_loop.failure_detected,
+                ATTR_FEEDBACK_LOOP_REINJECTION_ALLOWED: feedback_loop.reinjection_allowed,
+                ATTR_FEEDBACK_LOOP_WRITE_LOCKED: feedback_loop.write_locked,
+                ATTR_FEEDBACK_LOOP_EVALUATED_AT: feedback_loop.evaluated_at,
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

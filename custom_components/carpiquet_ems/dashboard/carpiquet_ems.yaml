@@ -347,6 +347,8 @@ views:
             title: Séquence contrôlée 3B — simulation 🔒
             show_header_toggle: false
             entities:
+              - entity: switch.carpiquet_ems_controlled_test_authorization_simulation
+                name: Autorisation 3B simulée
               - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_state
                 name: État séquence
               - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_blockers

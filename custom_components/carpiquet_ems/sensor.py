@@ -3,6 +3,13 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_transport_feedback_state", "Controlled Transport Feedback State", ATTR_TRANSPORT_FEEDBACK_STATE, None, None),
+    ("controlled_transport_feedback_blockers", "Controlled Transport Feedback Blockers", ATTR_TRANSPORT_FEEDBACK_BLOCKERS, None, None),
+    ("controlled_transport_feedback_expected_output", "Controlled Transport Feedback Expected Output", ATTR_TRANSPORT_FEEDBACK_EXPECTED_OUTPUT, "W", "power"),
+    ("controlled_transport_feedback_observed_output", "Controlled Transport Feedback Observed Output", ATTR_TRANSPORT_FEEDBACK_OBSERVED_OUTPUT, "W", "power"),
+    ("controlled_transport_feedback_http_status", "Controlled Transport Feedback HTTP Status", ATTR_TRANSPORT_FEEDBACK_HTTP_STATUS, None, None),
+    ("controlled_transport_feedback_evaluated_at", "Controlled Transport Feedback Evaluated At", ATTR_TRANSPORT_FEEDBACK_EVALUATED_AT, None, None),
+
     ("controlled_transport_bridge_state", "Controlled Transport Bridge State", ATTR_TRANSPORT_BRIDGE_STATE, None, None),
     ("controlled_transport_bridge_blockers", "Controlled Transport Bridge Blockers", ATTR_TRANSPORT_BRIDGE_BLOCKERS, None, None),
     ("controlled_transport_bridge_action", "Controlled Transport Bridge Action", ATTR_TRANSPORT_BRIDGE_ACTION, None, None),

@@ -42,6 +42,7 @@ from .controlled_feedback_loop import (
     ControlledFeedbackLoopInput,
     evaluate_controlled_feedback_loop,
 )
+from .controlled_loop_simulation import run_controlled_loop_simulation
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1151,6 +1152,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Pure in-memory Phase 3B simulation bench. It exercises the
+            # success and failure state-machine paths without transport I/O.
+            loop_sim_success, loop_sim_failure = run_controlled_loop_simulation()
+
             result_data = {
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
@@ -1457,6 +1462,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_FEEDBACK_LOOP_REINJECTION_ALLOWED: feedback_loop.reinjection_allowed,
                 ATTR_FEEDBACK_LOOP_WRITE_LOCKED: feedback_loop.write_locked,
                 ATTR_FEEDBACK_LOOP_EVALUATED_AT: feedback_loop.evaluated_at,
+                ATTR_LOOP_SIM_SUCCESS_PASSED: loop_sim_success.passed,
+                ATTR_LOOP_SIM_SUCCESS_FINAL_STATE: loop_sim_success.final_state,
+                ATTR_LOOP_SIM_SUCCESS_LOCK_PRESERVED: loop_sim_success.global_write_lock_preserved,
+                ATTR_LOOP_SIM_FAILURE_PASSED: loop_sim_failure.passed,
+                ATTR_LOOP_SIM_FAILURE_FINAL_STATE: loop_sim_failure.final_state,
+                ATTR_LOOP_SIM_FAILURE_LOCK_PRESERVED: loop_sim_failure.global_write_lock_preserved,
+                ATTR_LOOP_SIM_REAL_TRANSPORT_USED: (
+                    loop_sim_success.real_transport_used or loop_sim_failure.real_transport_used
+                ),
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

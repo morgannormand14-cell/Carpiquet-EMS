@@ -356,5 +356,14 @@ def run_controlled_loop_simulation() -> tuple[
     ControlledLoopSimulationResult,
     ControlledLoopSimulationResult,
     tuple[ControlledLoopSimulationResult, ...],
+    bool,
+    tuple[str, ...],
 ]:
-    return simulate_success_path(), simulate_failure_path(), simulate_degraded_paths()
+    edge_cases_passed, edge_case_results = validate_feedback_edge_cases()
+    return (
+        simulate_success_path(),
+        simulate_failure_path(),
+        simulate_degraded_paths(),
+        edge_cases_passed,
+        edge_case_results,
+    )

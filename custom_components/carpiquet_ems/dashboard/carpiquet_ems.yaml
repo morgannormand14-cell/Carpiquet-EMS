@@ -510,6 +510,25 @@ views:
               - entity: binary_sensor.carpiquet_ems_controlled_feedback_loop_write_locked
                 name: Verrou écriture
 
+          - type: entities
+            title: Banc simulation boucle complète 🧪🔒
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_success_passed
+                name: Scénario nominal validé
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_success_final_state
+                name: État final nominal
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_success_lock_preserved
+                name: Verrou préservé — nominal
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_failure_passed
+                name: Scénario erreur validé
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_failure_final_state
+                name: État final erreur
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_failure_lock_preserved
+                name: Verrou préservé — erreur
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_real_transport_used
+                name: Transport réel utilisé
+
       - type: grid
         title: Hyper 2000
         cards:

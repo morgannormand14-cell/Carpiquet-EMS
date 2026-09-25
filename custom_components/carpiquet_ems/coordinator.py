@@ -1154,7 +1154,13 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
             # Pure in-memory Phase 3B simulation bench. It exercises the
             # success and failure state-machine paths without transport I/O.
-            loop_sim_success, loop_sim_failure, loop_sim_degraded = run_controlled_loop_simulation()
+            (
+                loop_sim_success,
+                loop_sim_failure,
+                loop_sim_degraded,
+                loop_sim_edge_cases_passed,
+                loop_sim_edge_case_results,
+            ) = run_controlled_loop_simulation()
             loop_sim_degraded_passed = sum(1 for item in loop_sim_degraded if item.passed)
             loop_sim_degraded_summary = ", ".join(
                 f"{item.scenario}={'PASS' if item.passed else 'FAIL'}"
@@ -1482,6 +1488,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_LOOP_SIM_DEGRADED_PASSED_COUNT: loop_sim_degraded_passed,
                 ATTR_LOOP_SIM_DEGRADED_TOTAL_COUNT: len(loop_sim_degraded),
                 ATTR_LOOP_SIM_DEGRADED_RESULTS: loop_sim_degraded_summary,
+                ATTR_LOOP_SIM_EDGE_CASES_PASSED: loop_sim_edge_cases_passed,
+                ATTR_LOOP_SIM_EDGE_CASE_RESULTS: ", ".join(loop_sim_edge_case_results),
                 ATTR_SOLARFLOW_LOCAL_HTTP_HOST: self._solarflow_local_probe.host if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_TARGET: self._solarflow_local_probe.target if self._solarflow_local_probe else "",
                 ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE: self._solarflow_local_probe.reachable if self._solarflow_local_probe else False,

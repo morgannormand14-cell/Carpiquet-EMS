@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_loop_sim_success_final_state", "Controlled Loop Simulation Success Final State", ATTR_LOOP_SIM_SUCCESS_FINAL_STATE, None, None),
+    ("controlled_loop_sim_failure_final_state", "Controlled Loop Simulation Failure Final State", ATTR_LOOP_SIM_FAILURE_FINAL_STATE, None, None),
+
     ("controlled_feedback_loop_state", "Controlled Feedback Loop State", ATTR_FEEDBACK_LOOP_STATE, None, None),
     ("controlled_feedback_loop_blockers", "Controlled Feedback Loop Blockers", ATTR_FEEDBACK_LOOP_BLOCKERS, None, None),
     ("controlled_feedback_loop_evaluated_at", "Controlled Feedback Loop Evaluated At", ATTR_FEEDBACK_LOOP_EVALUATED_AT, None, None),

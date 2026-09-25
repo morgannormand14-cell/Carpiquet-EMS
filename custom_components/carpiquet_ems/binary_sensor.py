@@ -3,6 +3,19 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_execution_orchestrator_test_post_requested", "Controlled Execution Orchestrator Test POST Requested", ATTR_EXEC_ORCH_TEST_POST_REQUESTED),
+    ("controlled_execution_orchestrator_test_post_allowed", "Controlled Execution Orchestrator Test POST Allowed", ATTR_EXEC_ORCH_TEST_POST_ALLOWED),
+    ("controlled_execution_orchestrator_test_post_sent", "Controlled Execution Orchestrator Test POST Sent", ATTR_EXEC_ORCH_TEST_POST_SENT),
+    ("controlled_execution_orchestrator_report_verification_requested", "Controlled Execution Orchestrator Report Verification Requested", ATTR_EXEC_ORCH_REPORT_VERIFY_REQUESTED),
+    ("controlled_execution_orchestrator_wait_requested", "Controlled Execution Orchestrator Wait Requested", ATTR_EXEC_ORCH_WAIT_REQUESTED),
+    ("controlled_execution_orchestrator_zero_post_requested", "Controlled Execution Orchestrator Zero POST Requested", ATTR_EXEC_ORCH_ZERO_POST_REQUESTED),
+    ("controlled_execution_orchestrator_zero_post_allowed", "Controlled Execution Orchestrator Zero POST Allowed", ATTR_EXEC_ORCH_ZERO_POST_ALLOWED),
+    ("controlled_execution_orchestrator_zero_post_sent", "Controlled Execution Orchestrator Zero POST Sent", ATTR_EXEC_ORCH_ZERO_POST_SENT),
+    ("controlled_execution_orchestrator_zero_verification_requested", "Controlled Execution Orchestrator Zero Verification Requested", ATTR_EXEC_ORCH_ZERO_VERIFY_REQUESTED),
+    ("controlled_execution_orchestrator_relock_required", "Controlled Execution Orchestrator Relock Required", ATTR_EXEC_ORCH_RELOCK_REQUIRED),
+    ("controlled_execution_orchestrator_execution_allowed", "Controlled Execution Orchestrator Execution Allowed", ATTR_EXEC_ORCH_EXECUTION_ALLOWED),
+    ("controlled_execution_orchestrator_command_sent", "Controlled Execution Orchestrator Command Sent", ATTR_EXEC_ORCH_COMMAND_SENT),
+
     ("controlled_execution_safety_execution_allowed", "Controlled Execution Safety Execution Allowed", ATTR_EXEC_SAFETY_EXECUTION_ALLOWED),
     ("controlled_execution_safety_command_sent", "Controlled Execution Safety Command Sent", ATTR_EXEC_SAFETY_COMMAND_SENT),
     ("controlled_execution_safety_single_device_only", "Controlled Execution Safety Single Device Only", ATTR_EXEC_SAFETY_SINGLE_DEVICE_ONLY),

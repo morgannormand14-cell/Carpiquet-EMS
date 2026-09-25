@@ -394,6 +394,20 @@ views:
                 name: Détail enveloppe DRY-RUN
               - entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_reason
                 name: Diagnostic
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_verify_state
+                name: État vérification
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_verify_target
+                name: Target écriture vérifiée
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_report_target
+                name: Target confirmation
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_request_id
+                name: Request ID
+              - entity: sensor.garage_carpiquet_ems_controlled_executor_solarflow_expected_output
+                name: Sortie attendue
+              - entity: binary_sensor.carpiquet_ems_controlled_executor_solarflow_post_status_required
+                name: Statut POST obligatoire
+              - entity: binary_sensor.carpiquet_ems_controlled_executor_solarflow_report_confirmation_required
+                name: Confirmation report obligatoire
               - entity: sensor.carpiquet_ems_requested_solarflow_output
                 name: Demandé
               - entity: sensor.carpiquet_ems_validated_solarflow_output

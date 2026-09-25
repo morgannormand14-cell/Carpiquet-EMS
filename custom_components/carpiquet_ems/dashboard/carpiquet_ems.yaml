@@ -343,6 +343,31 @@ views:
               - entity: sensor.garage_carpiquet_ems_controlled_test_gate_evaluated_at
                 name: Dernière évaluation
 
+          - type: entities
+            title: Séquence contrôlée 3B — simulation 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_state
+                name: État séquence
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_blockers
+                name: Blockers séquence
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_test_status
+                name: Autorisation test
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_test_sent_status
+                name: Test envoyé
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_verification_status
+                name: Vérification requise
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_zero_return_status
+                name: Retour 0 W requis
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_zero_status
+                name: Autorisation retour 0 W
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_zero_sent_status
+                name: Retour 0 W envoyé
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_relock_status
+                name: Reverrouillage requis
+              - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_evaluated_at
+                name: Évaluation séquence
+
       - type: grid
         title: Hyper 2000
         cards:

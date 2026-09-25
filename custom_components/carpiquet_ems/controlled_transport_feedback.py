@@ -63,32 +63,9 @@ def evaluate_controlled_transport_feedback(
     test_flow = action in ("POST_TEST_OUTPUT_LIMIT", "VERIFY_REPORT_OUTPUT", "WAIT_BOUNDED_DURATION")
     zero_flow = action in ("POST_ZERO_OUTPUT_LIMIT", "VERIFY_REPORT_ZERO", "RETURN_ZERO_THEN_RELOCK")
 
-    if context.bridge_state != "BRIDGE_READY_LOCKED":
+    bridge_ready = context.bridge_state == "BRIDGE_READY_LOCKED"
+    if not bridge_ready:
         blockers.append(REASON_BRIDGE_NOT_READY)
-
-    if context.failure_detected:
-        state = STATE_FAILED_LOCKED
-    elif not context.transport_result_available:
-        blockers.append(REASON_NO_RESULT)
-        state = STATE_VERIFY_PENDING_LOCKED if (test_flow or zero_flow) else STATE_UNKNOWN_LOCKED
-    elif context.http_status is not None and not (200 <= context.http_status < 300):
-        blockers.append(REASON_HTTP_STATUS)
-        state = STATE_FAILED_LOCKED
-    elif not context.report_available:
-        blockers.append(REASON_REPORT_MISSING)
-        state = STATE_VERIFY_PENDING_LOCKED
-    elif context.report_output_w is None:
-        blockers.append(REASON_REPORT_MISSING)
-        state = STATE_VERIFY_PENDING_LOCKED
-    elif abs(float(context.report_output_w) - float(context.expected_output_w)) > 1.0:
-        blockers.append(REASON_OUTPUT_MISMATCH)
-        state = STATE_FAILED_LOCKED
-    elif zero_flow:
-        state = STATE_ZERO_CONFIRMED_LOCKED
-    elif test_flow:
-        state = STATE_TEST_CONFIRMED_LOCKED
-    else:
-        state = STATE_UNKNOWN_LOCKED
 
     http_ok = bool(
         context.transport_result_available
@@ -100,6 +77,32 @@ def evaluate_controlled_transport_feedback(
         and context.report_output_w is not None
         and abs(float(context.report_output_w) - float(context.expected_output_w)) <= 1.0
     )
+
+    if context.failure_detected:
+        state = STATE_FAILED_LOCKED
+    elif not bridge_ready:
+        state = STATE_LOCKED
+    elif not context.transport_result_available:
+        blockers.append(REASON_NO_RESULT)
+        state = STATE_VERIFY_PENDING_LOCKED if (test_flow or zero_flow) else STATE_UNKNOWN_LOCKED
+    elif context.http_status is None:
+        blockers.append(REASON_HTTP_STATUS)
+        state = STATE_VERIFY_PENDING_LOCKED
+    elif not http_ok:
+        blockers.append(REASON_HTTP_STATUS)
+        state = STATE_FAILED_LOCKED
+    elif not context.report_available or context.report_output_w is None:
+        blockers.append(REASON_REPORT_MISSING)
+        state = STATE_VERIFY_PENDING_LOCKED
+    elif not output_ok:
+        blockers.append(REASON_OUTPUT_MISMATCH)
+        state = STATE_FAILED_LOCKED
+    elif zero_flow:
+        state = STATE_ZERO_CONFIRMED_LOCKED
+    elif test_flow:
+        state = STATE_TEST_CONFIRMED_LOCKED
+    else:
+        state = STATE_UNKNOWN_LOCKED
 
     blockers.append(REASON_GLOBAL_LOCK)
 

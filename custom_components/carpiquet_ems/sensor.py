@@ -3,6 +3,13 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_execution_safety_state", "Controlled Execution Safety State", ATTR_EXEC_SAFETY_STATE, None, None),
+    ("controlled_execution_safety_blockers", "Controlled Execution Safety Blockers", ATTR_EXEC_SAFETY_BLOCKERS, None, None),
+    ("controlled_execution_safety_max_power", "Controlled Execution Safety Max Test Power", ATTR_EXEC_SAFETY_MAX_POWER, "W", "power"),
+    ("controlled_execution_safety_max_duration", "Controlled Execution Safety Max Duration", ATTR_EXEC_SAFETY_MAX_DURATION, "s", "duration"),
+    ("controlled_execution_safety_sequence", "Controlled Execution Safety Sequence", ATTR_EXEC_SAFETY_SEQUENCE, None, None),
+    ("controlled_execution_safety_evaluated_at", "Controlled Execution Safety Evaluated At", ATTR_EXEC_SAFETY_EVALUATED_AT, None, None),
+
     ("controlled_local_http_preparation_state", "Controlled Local HTTP Preparation State", ATTR_LOCAL_HTTP_PREP_STATE, None, None),
     ("controlled_local_http_preparation_blockers", "Controlled Local HTTP Preparation Blockers", ATTR_LOCAL_HTTP_PREP_BLOCKERS, None, None),
     ("controlled_local_http_preparation_test_target", "Controlled Local HTTP Test Target", ATTR_LOCAL_HTTP_PREP_TEST_TARGET, None, None),

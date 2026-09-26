@@ -399,7 +399,7 @@ views:
                 name: État contrat
               - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_blockers
                 name: Blockers
-              - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_max_power
+              - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_max_test_power
                 name: Puissance test max
               - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_max_duration
                 name: Durée test max
@@ -514,31 +514,31 @@ views:
             title: Banc simulation boucle complète 🧪🔒
             show_header_toggle: false
             entities:
-              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_success_passed
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_simulation_success_passed
                 name: Scénario nominal validé
-              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_success_final_state
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_simulation_success_final_state
                 name: État final nominal
-              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_success_lock_preserved
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_simulation_success_lock_preserved
                 name: Verrou préservé — nominal
-              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_failure_passed
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_simulation_failure_passed
                 name: Scénario erreur validé
-              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_failure_final_state
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_simulation_failure_final_state
                 name: État final erreur
-              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_failure_lock_preserved
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_simulation_failure_lock_preserved
                 name: Verrou préservé — erreur
-              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_real_transport_used
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_simulation_real_transport_used
                 name: Transport réel utilisé
-              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_degraded_all_passed
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_simulation_degraded_all_passed
                 name: Tous scénarios dégradés validés
-              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_degraded_passed_count
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_simulation_degraded_passed_count
                 name: Scénarios dégradés réussis
-              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_degraded_total_count
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_simulation_degraded_total_count
                 name: Scénarios dégradés testés
-              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_degraded_results
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_simulation_degraded_results
                 name: Détail scénarios dégradés
-              - entity: binary_sensor.carpiquet_ems_controlled_loop_sim_edge_cases_passed
+              - entity: binary_sensor.carpiquet_ems_controlled_loop_simulation_edge_cases_passed
                 name: Cas limites feedback validés
-              - entity: sensor.garage_carpiquet_ems_controlled_loop_sim_edge_case_results
+              - entity: sensor.garage_carpiquet_ems_controlled_loop_simulation_edge_case_results
                 name: Détail cas limites
 
       - type: grid

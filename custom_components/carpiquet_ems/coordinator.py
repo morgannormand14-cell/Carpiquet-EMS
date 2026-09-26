@@ -1127,7 +1127,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             expected_feedback_output = (
                 0.0
                 if transport_bridge.zero_return_selected
-                else float(_test_gate_power_w)
+                else float(self._test_gate_power_w)
             )
             transport_feedback = evaluate_controlled_transport_feedback(
                 ControlledTransportFeedbackInput(

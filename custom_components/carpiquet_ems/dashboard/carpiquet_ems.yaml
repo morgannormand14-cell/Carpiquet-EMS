@@ -314,7 +314,7 @@ views:
         cards:
           - type: entities
             grid_options:
-              columns: 4
+              columns: 12
             show_header_toggle: false
             entities:
               - entity: select.carpiquet_ems_controlled_test_device
@@ -346,6 +346,10 @@ views:
               - entity: sensor.garage_carpiquet_ems_controlled_test_gate_evaluated_at
                 name: Dernière évaluation
 
+      - type: grid
+        column_span: 4
+        title: Chaîne 3B — préparation & sécurité
+        cards:
           - type: entities
             grid_options:
               columns: 4
@@ -423,6 +427,10 @@ views:
               - entity: sensor.garage_carpiquet_ems_controlled_execution_safety_sequence
                 name: Séquence imposée
 
+      - type: grid
+        column_span: 4
+        title: Chaîne 3B — orchestration & feedback
+        cards:
           - type: entities
             grid_options:
               columns: 4
@@ -500,6 +508,10 @@ views:
               - entity: binary_sensor.carpiquet_ems_controlled_transport_feedback_write_locked
                 name: Verrou écriture
 
+      - type: grid
+        column_span: 4
+        title: Validation & lecture réelle
+        cards:
           - type: entities
             grid_options:
               columns: 4
@@ -591,6 +603,10 @@ views:
               - entity: sensor.garage_carpiquet_ems_controlled_real_readback_evaluated_at
                 name: Dernière lecture
 
+      - type: grid
+        column_span: 4
+        title: Sources critiques
+        cards:
           - type: entities
             grid_options:
               columns: 4

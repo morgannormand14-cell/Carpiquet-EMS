@@ -269,7 +269,7 @@ views:
     path: hardware-control
     icon: mdi:shield-lock-outline
     type: sections
-    max_columns: 4
+    max_columns: 3
     sections:
       - type: grid
         title: Validation rapide
@@ -281,12 +281,10 @@ views:
               **alpha.3.15 — Controlled Test Gate LOCKED — aucune écriture Zendure**
 
       - type: grid
-        column_span: 4
+        column_span: 3
         title: Sécurité & contrôle
         cards:
           - type: entities
-            grid_options:
-              columns: 4
             title: Moteur & sécurité
             show_header_toggle: false
             entities:
@@ -316,8 +314,6 @@ views:
                 name: Command Sent
 
           - type: entities
-            grid_options:
-              columns: 4
             show_header_toggle: false
             entities:
               - entity: select.carpiquet_ems_controlled_test_device
@@ -350,8 +346,6 @@ views:
                 name: Dernière évaluation
 
           - type: entities
-            grid_options:
-              columns: 4
             title: Sources critiques
             show_header_toggle: false
             entities:
@@ -373,12 +367,10 @@ views:
                 name: Blockers Write Gate
 
       - type: grid
-        column_span: 4
+        column_span: 3
         title: Chaîne 3B — préparation & sécurité
         cards:
           - type: entities
-            grid_options:
-              columns: 4
             title: Séquence contrôlée 3B — simulation 🔒
             show_header_toggle: false
             entities:
@@ -406,8 +398,6 @@ views:
                 name: Évaluation séquence
 
           - type: entities
-            grid_options:
-              columns: 4
             title: 3B-5 — Préparation HTTP locale 🔒
             show_header_toggle: false
             entities:
@@ -429,8 +419,6 @@ views:
                 name: Préparé à
 
           - type: entities
-            grid_options:
-              columns: 4
             title: 3B-6 — Contrat de sécurité 🔒
             show_header_toggle: false
             entities:
@@ -454,12 +442,10 @@ views:
                 name: Séquence imposée
 
       - type: grid
-        column_span: 4
+        column_span: 3
         title: Chaîne 3B — orchestration & feedback
         cards:
           - type: entities
-            grid_options:
-              columns: 4
             title: 3B-7 — Orchestrateur contrôlé 🔒
             show_header_toggle: false
             entities:
@@ -481,8 +467,6 @@ views:
                 name: Reverrouillage requis
 
           - type: entities
-            grid_options:
-              columns: 4
             title: 3B-8 — Pont transport contrôlé 🔒
             show_header_toggle: false
             entities:
@@ -506,8 +490,6 @@ views:
                 name: Verrou écriture
 
           - type: entities
-            grid_options:
-              columns: 4
             title: 3B-9 — Feedback transport 🔒
             show_header_toggle: false
             entities:
@@ -535,12 +517,10 @@ views:
                 name: Verrou écriture
 
       - type: grid
-        column_span: 4
+        column_span: 3
         title: Validation & lecture réelle
         cards:
           - type: entities
-            grid_options:
-              columns: 4
             title: Boucle feedback contrôlée 🔒
             show_header_toggle: false
             entities:
@@ -566,8 +546,6 @@ views:
                 name: Verrou écriture
 
           - type: entities
-            grid_options:
-              columns: 4
             title: Banc simulation boucle complète 🧪🔒
             show_header_toggle: false
             entities:
@@ -599,8 +577,6 @@ views:
                 name: Détail cas limites
 
           - type: entities
-            grid_options:
-              columns: 4
             title: 3B-10 — Lecture réelle GET 🔒
             show_header_toggle: false
             entities:

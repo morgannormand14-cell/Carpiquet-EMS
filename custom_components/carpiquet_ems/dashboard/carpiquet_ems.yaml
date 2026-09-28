@@ -309,9 +309,7 @@ views:
                 name: Command Sent
 
       - type: grid
-        column_span: 12
-        grid_options:
-          columns: 12
+        column_span: 4
         title: Controlled Test Gate — alpha.3.15 🔒
         cards:
           - type: entities
@@ -349,9 +347,7 @@ views:
                 name: Dernière évaluation
 
       - type: grid
-        column_span: 12
-        grid_options:
-          columns: 12
+        column_span: 4
         title: Chaîne 3B — préparation & sécurité
         cards:
           - type: entities
@@ -432,9 +428,7 @@ views:
                 name: Séquence imposée
 
       - type: grid
-        column_span: 12
-        grid_options:
-          columns: 12
+        column_span: 4
         title: Chaîne 3B — orchestration & feedback
         cards:
           - type: entities
@@ -515,9 +509,7 @@ views:
                 name: Verrou écriture
 
       - type: grid
-        column_span: 12
-        grid_options:
-          columns: 12
+        column_span: 4
         title: Validation & lecture réelle
         cards:
           - type: entities
@@ -612,9 +604,7 @@ views:
                 name: Dernière lecture
 
       - type: grid
-        column_span: 12
-        grid_options:
-          columns: 12
+        column_span: 4
         title: Sources critiques
         cards:
           - type: entities

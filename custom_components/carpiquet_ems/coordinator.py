@@ -44,6 +44,10 @@ from .controlled_feedback_loop import (
 )
 from .controlled_loop_simulation import run_controlled_loop_simulation
 from .controlled_real_readback import read_solarflow_report_locked
+from .controlled_readback_feedback import (
+    ControlledReadbackFeedbackInput,
+    evaluate_controlled_readback_feedback,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1134,9 +1138,19 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 self.hass, readback_target
             )
 
-            # Phase 3B-9 consumes the real report observation, but there is
-            # still deliberately no POST transport result.  Therefore feedback
-            # cannot confirm a write or advance the physical execution chain.
+            # Phase 3B-11: one-way, locked adapter from the real GET readback
+            # into 3B-9. A GET 200 can forward report data, but it can never be
+            # treated as proof of a POST /properties/write.
+            readback_feedback = evaluate_controlled_readback_feedback(
+                ControlledReadbackFeedbackInput(
+                    readback_state=real_readback.state,
+                    read_confirmed=real_readback.read_confirmed,
+                    report_available=real_readback.report_available,
+                    observed_output_w=real_readback.observed_output_w,
+                    http_status=real_readback.http_status,
+                )
+            )
+
             expected_feedback_output = (
                 0.0
                 if transport_bridge.zero_return_selected
@@ -1147,8 +1161,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     bridge_state=transport_bridge.state,
                     bridge_action=transport_bridge.action,
                     expected_output_w=expected_feedback_output,
-                    report_available=real_readback.report_available,
-                    report_output_w=real_readback.observed_output_w,
+                    transport_result_available=readback_feedback.transport_result_available,
+                    http_status=readback_feedback.transport_http_status,
+                    report_available=readback_feedback.report_available,
+                    report_output_w=readback_feedback.observed_output_w,
                 )
             )
 
@@ -1195,6 +1211,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_REAL_READBACK_WRITE_LOCKED: real_readback.write_locked,
                 ATTR_REAL_READBACK_REINJECTION_ALLOWED: real_readback.reinjection_allowed,
                 ATTR_REAL_READBACK_EVALUATED_AT: real_readback.evaluated_at,
+                ATTR_READBACK_FEEDBACK_STATE: readback_feedback.state,
+                ATTR_READBACK_FEEDBACK_BLOCKERS: ", ".join(readback_feedback.blockers),
+                ATTR_READBACK_FEEDBACK_REPORT_FORWARDED: readback_feedback.report_forwarded,
+                ATTR_READBACK_FEEDBACK_OBSERVED_OUTPUT: readback_feedback.observed_output_w,
+                ATTR_READBACK_FEEDBACK_READ_HTTP_STATUS: readback_feedback.read_http_status,
+                ATTR_READBACK_FEEDBACK_TRANSPORT_RESULT_AVAILABLE: readback_feedback.transport_result_available,
+                ATTR_READBACK_FEEDBACK_WRITE_LOCKED: readback_feedback.write_locked,
+                ATTR_READBACK_FEEDBACK_REINJECTION_ALLOWED: readback_feedback.reinjection_allowed,
+                ATTR_READBACK_FEEDBACK_EVALUATED_AT: readback_feedback.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

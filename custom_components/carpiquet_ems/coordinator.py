@@ -1126,8 +1126,12 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             # /properties/report endpoint.  This observation is deliberately
             # one-way: it cannot authorize/reinject execution and the helper
             # contains no POST/write primitive.
+            readback_target = (
+                local_http_preparation.report_target
+                or str(getattr(self._solarflow_local_probe, "target", "") or "")
+            )
             real_readback = await read_solarflow_report_locked(
-                self.hass, local_http_preparation.report_target
+                self.hass, readback_target
             )
 
             # Phase 3B-9 consumes the real report observation, but there is

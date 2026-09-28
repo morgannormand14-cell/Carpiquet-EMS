@@ -3,6 +3,13 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_command_readback_correlation_context_available", "Command Readback Correlation Context Available", ATTR_COMMAND_READBACK_CORRELATION_CONTEXT_AVAILABLE),
+    ("controlled_command_readback_correlation_observation_available", "Command Readback Correlation Observation Available", ATTR_COMMAND_READBACK_CORRELATION_OBSERVATION_AVAILABLE),
+    ("controlled_command_readback_correlation_output_match", "Command Readback Correlation Output Match", ATTR_COMMAND_READBACK_CORRELATION_OUTPUT_MATCH),
+    ("controlled_command_readback_correlation_post_proof", "Command Readback Correlation POST Proof", ATTR_COMMAND_READBACK_CORRELATION_POST_PROOF),
+    ("controlled_command_readback_correlation_confirmed", "Command Readback Correlation Confirmed", ATTR_COMMAND_READBACK_CORRELATION_CONFIRMED),
+    ("controlled_command_readback_correlation_write_locked", "Command Readback Correlation Write Locked", ATTR_COMMAND_READBACK_CORRELATION_WRITE_LOCKED),
+    ("controlled_command_readback_correlation_reinjection_allowed", "Command Readback Correlation Reinjection Allowed", ATTR_COMMAND_READBACK_CORRELATION_REINJECTION_ALLOWED),
     ("controlled_readback_feedback_report_forwarded", "Controlled Readback Feedback Report Forwarded", ATTR_READBACK_FEEDBACK_REPORT_FORWARDED),
     ("controlled_readback_feedback_transport_result_available", "Controlled Readback Feedback Transport Result Available", ATTR_READBACK_FEEDBACK_TRANSPORT_RESULT_AVAILABLE),
     ("controlled_readback_feedback_write_locked", "Controlled Readback Feedback Write Locked", ATTR_READBACK_FEEDBACK_WRITE_LOCKED),

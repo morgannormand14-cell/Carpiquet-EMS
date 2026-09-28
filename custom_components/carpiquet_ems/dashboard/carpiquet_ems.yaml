@@ -309,6 +309,7 @@ views:
                 name: Command Sent
 
       - type: grid
+        column_span: 3
         title: Controlled Test Gate — alpha.3.15 🔒
         cards:
           - type: entities
@@ -344,6 +345,8 @@ views:
                 name: Dernière évaluation
 
           - type: entities
+            grid_options:
+              columns: 4
             title: Séquence contrôlée 3B — simulation 🔒
             show_header_toggle: false
             entities:
@@ -371,6 +374,8 @@ views:
                 name: Évaluation séquence
 
           - type: entities
+            grid_options:
+              columns: 4
             title: 3B-5 — Préparation HTTP locale 🔒
             show_header_toggle: false
             entities:
@@ -392,6 +397,8 @@ views:
                 name: Préparé à
 
           - type: entities
+            grid_options:
+              columns: 4
             title: 3B-6 — Contrat de sécurité 🔒
             show_header_toggle: false
             entities:
@@ -415,6 +422,8 @@ views:
                 name: Séquence imposée
 
           - type: entities
+            grid_options:
+              columns: 4
             title: 3B-7 — Orchestrateur contrôlé 🔒
             show_header_toggle: false
             entities:
@@ -436,6 +445,8 @@ views:
                 name: Reverrouillage requis
 
           - type: entities
+            grid_options:
+              columns: 4
             title: 3B-8 — Pont transport contrôlé 🔒
             show_header_toggle: false
             entities:
@@ -459,6 +470,8 @@ views:
                 name: Verrou écriture
 
           - type: entities
+            grid_options:
+              columns: 4
             title: 3B-9 — Feedback transport 🔒
             show_header_toggle: false
             entities:
@@ -486,6 +499,8 @@ views:
                 name: Verrou écriture
 
           - type: entities
+            grid_options:
+              columns: 4
             title: Boucle feedback contrôlée 🔒
             show_header_toggle: false
             entities:
@@ -511,6 +526,8 @@ views:
                 name: Verrou écriture
 
           - type: entities
+            grid_options:
+              columns: 4
             title: Banc simulation boucle complète 🧪🔒
             show_header_toggle: false
             entities:
@@ -540,6 +557,60 @@ views:
                 name: Cas limites feedback validés
               - entity: sensor.garage_carpiquet_ems_controlled_loop_simulation_edge_case_results
                 name: Détail cas limites
+
+          - type: entities
+            grid_options:
+              columns: 4
+            title: Sources critiques
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.carpiquet_ems_grid_source_fresh
+                name: Réseau frais
+              - entity: sensor.carpiquet_ems_grid_source_age
+                name: Âge réseau
+              - entity: sensor.carpiquet_ems_command_source_age
+                name: Âge source commande
+              - entity: sensor.carpiquet_ems_hyper_soc_source_age
+                name: Âge SOC Hyper
+              - entity: sensor.carpiquet_ems_solarflow_soc_source_age
+                name: Âge SOC SolarFlow
+              - entity: sensor.carpiquet_ems_hyper_pv_source_age
+                name: Âge PV Hyper
+              - entity: sensor.carpiquet_ems_solarflow_pv_source_age
+                name: Âge PV SolarFlow
+              - entity: sensor.garage_carpiquet_ems_write_gate_blockers
+                name: Blockers Write Gate
+
+          - type: entities
+            grid_options:
+              columns: 4
+            title: 3B-10 — Lecture réelle GET 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_controlled_real_readback_state
+                name: État lecture réelle
+              - entity: sensor.garage_carpiquet_ems_controlled_real_readback_blockers
+                name: Blockers
+              - entity: sensor.garage_carpiquet_ems_controlled_real_readback_target
+                name: Target GET
+              - entity: sensor.garage_carpiquet_ems_controlled_real_readback_http_status
+                name: Statut HTTP GET
+              - entity: sensor.garage_carpiquet_ems_controlled_real_readback_observed_output
+                name: Output observé
+              - entity: binary_sensor.carpiquet_ems_controlled_real_readback_attempted
+                name: GET tenté
+              - entity: binary_sensor.carpiquet_ems_controlled_real_readback_reachable
+                name: Endpoint joignable
+              - entity: binary_sensor.carpiquet_ems_controlled_real_readback_report_available
+                name: Rapport disponible
+              - entity: binary_sensor.carpiquet_ems_controlled_real_readback_confirmed
+                name: Lecture confirmée
+              - entity: binary_sensor.carpiquet_ems_controlled_real_readback_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_controlled_real_readback_reinjection_allowed
+                name: Réinjection autorisée
+              - entity: sensor.garage_carpiquet_ems_controlled_real_readback_evaluated_at
+                name: Dernière lecture
 
       - type: grid
         title: Hyper 2000
@@ -611,31 +682,7 @@ views:
               - entity: sensor.carpiquet_ems_validated_solarflow_output
                 name: Validé
 
-      - type: grid
-        title: Sources critiques
-        cards:
-          - type: entities
-            show_header_toggle: false
-            entities:
-              - entity: binary_sensor.carpiquet_ems_grid_source_fresh
-                name: Réseau frais
-              - entity: sensor.carpiquet_ems_grid_source_age
-                name: Âge réseau
-              - entity: sensor.carpiquet_ems_command_source_age
-                name: Âge source commande
-              - entity: sensor.carpiquet_ems_hyper_soc_source_age
-                name: Âge SOC Hyper
-              - entity: sensor.carpiquet_ems_solarflow_soc_source_age
-                name: Âge SOC SolarFlow
-              - entity: sensor.carpiquet_ems_hyper_pv_source_age
-                name: Âge PV Hyper
-              - entity: sensor.carpiquet_ems_solarflow_pv_source_age
-                name: Âge PV SolarFlow
-              - entity: sensor.garage_carpiquet_ems_write_gate_blockers
-                name: Blockers Write Gate
-
-
-  - title: Paramètres
+\n\n  - title: Paramètres
     path: settings
     icon: mdi:cog
     type: sections

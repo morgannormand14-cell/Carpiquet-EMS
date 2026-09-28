@@ -3,6 +3,12 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_real_readback_state", "Controlled Real Readback State", ATTR_REAL_READBACK_STATE, None, None),
+    ("controlled_real_readback_blockers", "Controlled Real Readback Blockers", ATTR_REAL_READBACK_BLOCKERS, None, None),
+    ("controlled_real_readback_target", "Controlled Real Readback Target", ATTR_REAL_READBACK_TARGET, None, None),
+    ("controlled_real_readback_http_status", "Controlled Real Readback HTTP Status", ATTR_REAL_READBACK_HTTP_STATUS, None, None),
+    ("controlled_real_readback_observed_output", "Controlled Real Readback Observed Output", ATTR_REAL_READBACK_OBSERVED_OUTPUT, "W", "power"),
+    ("controlled_real_readback_evaluated_at", "Controlled Real Readback Evaluated At", ATTR_REAL_READBACK_EVALUATED_AT, None, None),
     ("controlled_loop_sim_edge_case_results", "Controlled Loop Simulation Edge Case Results", ATTR_LOOP_SIM_EDGE_CASE_RESULTS, None, None),
     ("controlled_loop_sim_degraded_passed_count", "Controlled Loop Simulation Degraded Passed Count", ATTR_LOOP_SIM_DEGRADED_PASSED_COUNT, None, None),
     ("controlled_loop_sim_degraded_total_count", "Controlled Loop Simulation Degraded Total Count", ATTR_LOOP_SIM_DEGRADED_TOTAL_COUNT, None, None),

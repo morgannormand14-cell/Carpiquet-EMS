@@ -48,6 +48,10 @@ from .controlled_readback_feedback import (
     ControlledReadbackFeedbackInput,
     evaluate_controlled_readback_feedback,
 )
+from .controlled_command_readback_correlation import (
+    ControlledCommandReadbackCorrelationInput,
+    evaluate_controlled_command_readback_correlation,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1168,6 +1172,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Phase 3B-12: strict command/readback correlation. The current
+            # locked transport has no independent POST proof, therefore a
+            # matching GET observation can never confirm causality or unlock
+            # reinjection.
+            command_readback_correlation = evaluate_controlled_command_readback_correlation(
+                ControlledCommandReadbackCorrelationInput(
+                    bridge_state=transport_bridge.state,
+                    bridge_action=transport_bridge.action,
+                    expected_output_w=expected_feedback_output,
+                    report_forwarded=readback_feedback.report_forwarded,
+                    observed_output_w=readback_feedback.observed_output_w,
+                    post_proof_available=readback_feedback.transport_result_available,
+                )
+            )
+
             # Controlled feedback loop: map 3B-9 facts back toward 3B-7,
             # but keep reinjection disabled. This proves the feedback contract
             # without creating a cyclic execution path or enabling writes.
@@ -1220,6 +1239,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_READBACK_FEEDBACK_WRITE_LOCKED: readback_feedback.write_locked,
                 ATTR_READBACK_FEEDBACK_REINJECTION_ALLOWED: readback_feedback.reinjection_allowed,
                 ATTR_READBACK_FEEDBACK_EVALUATED_AT: readback_feedback.evaluated_at,
+                ATTR_COMMAND_READBACK_CORRELATION_STATE: command_readback_correlation.state,
+                ATTR_COMMAND_READBACK_CORRELATION_BLOCKERS: ", ".join(command_readback_correlation.blockers),
+                ATTR_COMMAND_READBACK_CORRELATION_CONTEXT_AVAILABLE: command_readback_correlation.command_context_available,
+                ATTR_COMMAND_READBACK_CORRELATION_OBSERVATION_AVAILABLE: command_readback_correlation.observation_available,
+                ATTR_COMMAND_READBACK_CORRELATION_EXPECTED_OUTPUT: command_readback_correlation.expected_output_w,
+                ATTR_COMMAND_READBACK_CORRELATION_OBSERVED_OUTPUT: command_readback_correlation.observed_output_w,
+                ATTR_COMMAND_READBACK_CORRELATION_OUTPUT_MATCH: command_readback_correlation.output_matches_expected,
+                ATTR_COMMAND_READBACK_CORRELATION_POST_PROOF: command_readback_correlation.post_proof_available,
+                ATTR_COMMAND_READBACK_CORRELATION_CONFIRMED: command_readback_correlation.correlation_confirmed,
+                ATTR_COMMAND_READBACK_CORRELATION_WRITE_LOCKED: command_readback_correlation.write_locked,
+                ATTR_COMMAND_READBACK_CORRELATION_REINJECTION_ALLOWED: command_readback_correlation.reinjection_allowed,
+                ATTR_COMMAND_READBACK_CORRELATION_EVALUATED_AT: command_readback_correlation.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

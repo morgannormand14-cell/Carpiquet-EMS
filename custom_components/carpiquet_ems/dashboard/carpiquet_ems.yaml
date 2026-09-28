@@ -606,6 +606,33 @@ views:
                 name: Dernière lecture
 
       - type: grid
+        column_span: 3
+        title: 3B-11 — Raccordement GET → feedback 🔒
+        cards:
+          - type: entities
+            title: Adaptateur lecture réelle → 3B-9 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_controlled_readback_feedback_state
+                name: État adaptateur
+              - entity: sensor.garage_carpiquet_ems_controlled_readback_feedback_blockers
+                name: Blockers
+              - entity: binary_sensor.carpiquet_ems_controlled_readback_feedback_report_forwarded
+                name: Rapport GET transmis à 3B-9
+              - entity: sensor.garage_carpiquet_ems_controlled_readback_feedback_observed_output
+                name: Output GET transmis
+              - entity: sensor.garage_carpiquet_ems_controlled_readback_feedback_read_http_status
+                name: Statut HTTP lecture
+              - entity: binary_sensor.carpiquet_ems_controlled_readback_feedback_transport_result_available
+                name: Preuve POST disponible
+              - entity: binary_sensor.carpiquet_ems_controlled_readback_feedback_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_controlled_readback_feedback_reinjection_allowed
+                name: Réinjection autorisée
+              - entity: sensor.garage_carpiquet_ems_controlled_readback_feedback_evaluated_at
+                name: Dernière évaluation
+
+      - type: grid
         title: Hyper 2000
         cards:
           - type: entities

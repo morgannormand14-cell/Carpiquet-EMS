@@ -309,10 +309,12 @@ views:
                 name: Command Sent
 
       - type: grid
-        column_span: 3
+        column_span: 4
         title: Controlled Test Gate — alpha.3.15 🔒
         cards:
           - type: entities
+            grid_options:
+              columns: 4
             show_header_toggle: false
             entities:
               - entity: select.carpiquet_ems_controlled_test_device
@@ -561,29 +563,6 @@ views:
           - type: entities
             grid_options:
               columns: 4
-            title: Sources critiques
-            show_header_toggle: false
-            entities:
-              - entity: binary_sensor.carpiquet_ems_grid_source_fresh
-                name: Réseau frais
-              - entity: sensor.carpiquet_ems_grid_source_age
-                name: Âge réseau
-              - entity: sensor.carpiquet_ems_command_source_age
-                name: Âge source commande
-              - entity: sensor.carpiquet_ems_hyper_soc_source_age
-                name: Âge SOC Hyper
-              - entity: sensor.carpiquet_ems_solarflow_soc_source_age
-                name: Âge SOC SolarFlow
-              - entity: sensor.carpiquet_ems_hyper_pv_source_age
-                name: Âge PV Hyper
-              - entity: sensor.carpiquet_ems_solarflow_pv_source_age
-                name: Âge PV SolarFlow
-              - entity: sensor.garage_carpiquet_ems_write_gate_blockers
-                name: Blockers Write Gate
-
-          - type: entities
-            grid_options:
-              columns: 4
             title: 3B-10 — Lecture réelle GET 🔒
             show_header_toggle: false
             entities:
@@ -611,6 +590,29 @@ views:
                 name: Réinjection autorisée
               - entity: sensor.garage_carpiquet_ems_controlled_real_readback_evaluated_at
                 name: Dernière lecture
+
+          - type: entities
+            grid_options:
+              columns: 4
+            title: Sources critiques
+            show_header_toggle: false
+            entities:
+              - entity: binary_sensor.carpiquet_ems_grid_source_fresh
+                name: Réseau frais
+              - entity: sensor.carpiquet_ems_grid_source_age
+                name: Âge réseau
+              - entity: sensor.carpiquet_ems_command_source_age
+                name: Âge source commande
+              - entity: sensor.carpiquet_ems_hyper_soc_source_age
+                name: Âge SOC Hyper
+              - entity: sensor.carpiquet_ems_solarflow_soc_source_age
+                name: Âge SOC SolarFlow
+              - entity: sensor.carpiquet_ems_hyper_pv_source_age
+                name: Âge PV Hyper
+              - entity: sensor.carpiquet_ems_solarflow_pv_source_age
+                name: Âge PV SolarFlow
+              - entity: sensor.garage_carpiquet_ems_write_gate_blockers
+                name: Blockers Write Gate
 
       - type: grid
         title: Hyper 2000

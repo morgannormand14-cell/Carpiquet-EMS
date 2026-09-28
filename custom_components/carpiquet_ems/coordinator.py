@@ -43,6 +43,7 @@ from .controlled_feedback_loop import (
     evaluate_controlled_feedback_loop,
 )
 from .controlled_loop_simulation import run_controlled_loop_simulation
+from .controlled_real_readback import read_solarflow_report_locked
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1121,9 +1122,17 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
-            # Phase 3B-9: model feedback interpretation with no real
-            # transport result connected yet. This deliberately remains pending
-            # and cannot advance the physical execution chain.
+            # Phase 3B-10: perform a real read-only GET of the SolarFlow
+            # /properties/report endpoint.  This observation is deliberately
+            # one-way: it cannot authorize/reinject execution and the helper
+            # contains no POST/write primitive.
+            real_readback = await read_solarflow_report_locked(
+                self.hass, local_http_preparation.report_target
+            )
+
+            # Phase 3B-9 consumes the real report observation, but there is
+            # still deliberately no POST transport result.  Therefore feedback
+            # cannot confirm a write or advance the physical execution chain.
             expected_feedback_output = (
                 0.0
                 if transport_bridge.zero_return_selected
@@ -1134,6 +1143,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     bridge_state=transport_bridge.state,
                     bridge_action=transport_bridge.action,
                     expected_output_w=expected_feedback_output,
+                    report_available=real_readback.report_available,
+                    report_output_w=real_readback.observed_output_w,
                 )
             )
 
@@ -1168,6 +1179,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             )
 
             result_data = {
+                ATTR_REAL_READBACK_STATE: real_readback.state,
+                ATTR_REAL_READBACK_BLOCKERS: ", ".join(real_readback.blockers),
+                ATTR_REAL_READBACK_TARGET: real_readback.target,
+                ATTR_REAL_READBACK_HTTP_STATUS: real_readback.http_status,
+                ATTR_REAL_READBACK_OBSERVED_OUTPUT: real_readback.observed_output_w,
+                ATTR_REAL_READBACK_ATTEMPTED: real_readback.attempted,
+                ATTR_REAL_READBACK_REACHABLE: real_readback.reachable,
+                ATTR_REAL_READBACK_REPORT_AVAILABLE: real_readback.report_available,
+                ATTR_REAL_READBACK_CONFIRMED: real_readback.read_confirmed,
+                ATTR_REAL_READBACK_WRITE_LOCKED: real_readback.write_locked,
+                ATTR_REAL_READBACK_REINJECTION_ALLOWED: real_readback.reinjection_allowed,
+                ATTR_REAL_READBACK_EVALUATED_AT: real_readback.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

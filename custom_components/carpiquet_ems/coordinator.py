@@ -52,6 +52,10 @@ from .controlled_command_readback_correlation import (
     ControlledCommandReadbackCorrelationInput,
     evaluate_controlled_command_readback_correlation,
 )
+from .controlled_transport_command_proof import (
+    ControlledTransportCommandProofInput,
+    evaluate_controlled_transport_command_proof,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1187,6 +1191,22 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Phase 3B-13: strict evidence gate for transport/command proof.
+            # Prepared/requested actions are not execution proof. In this locked
+            # phase call_allowed/call_sent and independent POST proof remain false,
+            # so the proof chain cannot complete or authorize reinjection.
+            transport_command_proof = evaluate_controlled_transport_command_proof(
+                ControlledTransportCommandProofInput(
+                    command_context_available=command_readback_correlation.command_context_available,
+                    transport_call_requested=transport_bridge.call_requested,
+                    transport_call_allowed=transport_bridge.call_allowed,
+                    transport_call_sent=transport_bridge.call_sent,
+                    transport_result_available=readback_feedback.transport_result_available,
+                    post_proof_available=command_readback_correlation.post_proof_available,
+                    correlation_confirmed=command_readback_correlation.correlation_confirmed,
+                )
+            )
+
             # Controlled feedback loop: map 3B-9 facts back toward 3B-7,
             # but keep reinjection disabled. This proves the feedback contract
             # without creating a cyclic execution path or enabling writes.
@@ -1251,6 +1271,19 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_COMMAND_READBACK_CORRELATION_WRITE_LOCKED: command_readback_correlation.write_locked,
                 ATTR_COMMAND_READBACK_CORRELATION_REINJECTION_ALLOWED: command_readback_correlation.reinjection_allowed,
                 ATTR_COMMAND_READBACK_CORRELATION_EVALUATED_AT: command_readback_correlation.evaluated_at,
+                ATTR_TRANSPORT_COMMAND_PROOF_STATE: transport_command_proof.state,
+                ATTR_TRANSPORT_COMMAND_PROOF_BLOCKERS: ", ".join(transport_command_proof.blockers),
+                ATTR_TRANSPORT_COMMAND_PROOF_CONTEXT_AVAILABLE: transport_command_proof.command_context_available,
+                ATTR_TRANSPORT_COMMAND_PROOF_CALL_REQUESTED: transport_command_proof.transport_call_requested,
+                ATTR_TRANSPORT_COMMAND_PROOF_CALL_ALLOWED: transport_command_proof.transport_call_allowed,
+                ATTR_TRANSPORT_COMMAND_PROOF_CALL_SENT: transport_command_proof.transport_call_sent,
+                ATTR_TRANSPORT_COMMAND_PROOF_RESULT_AVAILABLE: transport_command_proof.transport_result_available,
+                ATTR_TRANSPORT_COMMAND_PROOF_POST_PROOF: transport_command_proof.post_proof_available,
+                ATTR_TRANSPORT_COMMAND_PROOF_CORRELATION_CONFIRMED: transport_command_proof.correlation_confirmed,
+                ATTR_TRANSPORT_COMMAND_PROOF_CHAIN_COMPLETE: transport_command_proof.proof_chain_complete,
+                ATTR_TRANSPORT_COMMAND_PROOF_WRITE_LOCKED: transport_command_proof.write_locked,
+                ATTR_TRANSPORT_COMMAND_PROOF_REINJECTION_ALLOWED: transport_command_proof.reinjection_allowed,
+                ATTR_TRANSPORT_COMMAND_PROOF_EVALUATED_AT: transport_command_proof.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

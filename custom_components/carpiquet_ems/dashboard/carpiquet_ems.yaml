@@ -665,31 +665,31 @@ views:
             title: 3B-13 — Preuve transport / commande 🔒
             show_header_toggle: false
             entities:
-              - entity: sensor.garage_carpiquet_ems_controlled_transport_command_proof_state
+              - entity: sensor.garage_carpiquet_ems_transport_command_proof_state
                 name: État preuve
-              - entity: sensor.garage_carpiquet_ems_controlled_transport_command_proof_blockers
+              - entity: sensor.garage_carpiquet_ems_transport_command_proof_blockers
                 name: Blockers
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_context_available
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_context_available
                 name: Contexte commande disponible
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_call_requested
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_call_requested
                 name: Appel transport demandé
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_call_allowed
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_call_allowed
                 name: Appel transport autorisé
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_call_sent
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_call_sent
                 name: Appel transport envoyé
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_result_available
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_result_available
                 name: Résultat transport disponible
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_post_proof
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_post_proof
                 name: Preuve POST indépendante
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_correlation_confirmed
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_correlation_confirmed
                 name: Corrélation confirmée
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_chain_complete
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_chain_complete
                 name: Chaîne de preuve complète
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_write_locked
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_write_locked
                 name: Verrou écriture
-              - entity: binary_sensor.carpiquet_ems_controlled_transport_command_proof_reinjection_allowed
+              - entity: binary_sensor.carpiquet_ems_transport_command_proof_reinjection_allowed
                 name: Réinjection autorisée
-              - entity: sensor.garage_carpiquet_ems_controlled_transport_command_proof_evaluated_at
+              - entity: sensor.garage_carpiquet_ems_transport_command_proof_evaluated_at
                 name: Dernière évaluation
 
       - type: grid

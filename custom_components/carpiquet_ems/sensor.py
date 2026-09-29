@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_transport_command_proof_state", "Transport Command Proof State", ATTR_TRANSPORT_COMMAND_PROOF_STATE, None, None),
+    ("controlled_transport_command_proof_blockers", "Transport Command Proof Blockers", ATTR_TRANSPORT_COMMAND_PROOF_BLOCKERS, None, None),
+    ("controlled_transport_command_proof_evaluated_at", "Transport Command Proof Evaluated At", ATTR_TRANSPORT_COMMAND_PROOF_EVALUATED_AT, None, None),
     ("controlled_command_readback_correlation_state", "Command Readback Correlation State", ATTR_COMMAND_READBACK_CORRELATION_STATE, None, None),
     ("controlled_command_readback_correlation_blockers", "Command Readback Correlation Blockers", ATTR_COMMAND_READBACK_CORRELATION_BLOCKERS, None, None),
     ("controlled_command_readback_correlation_expected_output", "Command Readback Correlation Expected Output", ATTR_COMMAND_READBACK_CORRELATION_EXPECTED_OUTPUT, "W", "power"),

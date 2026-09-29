@@ -3,6 +3,16 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_transport_command_proof_context_available", "Transport Command Proof Context Available", ATTR_TRANSPORT_COMMAND_PROOF_CONTEXT_AVAILABLE),
+    ("controlled_transport_command_proof_call_requested", "Transport Command Proof Call Requested", ATTR_TRANSPORT_COMMAND_PROOF_CALL_REQUESTED),
+    ("controlled_transport_command_proof_call_allowed", "Transport Command Proof Call Allowed", ATTR_TRANSPORT_COMMAND_PROOF_CALL_ALLOWED),
+    ("controlled_transport_command_proof_call_sent", "Transport Command Proof Call Sent", ATTR_TRANSPORT_COMMAND_PROOF_CALL_SENT),
+    ("controlled_transport_command_proof_result_available", "Transport Command Proof Result Available", ATTR_TRANSPORT_COMMAND_PROOF_RESULT_AVAILABLE),
+    ("controlled_transport_command_proof_post_proof", "Transport Command Proof POST Proof", ATTR_TRANSPORT_COMMAND_PROOF_POST_PROOF),
+    ("controlled_transport_command_proof_correlation_confirmed", "Transport Command Proof Correlation Confirmed", ATTR_TRANSPORT_COMMAND_PROOF_CORRELATION_CONFIRMED),
+    ("controlled_transport_command_proof_chain_complete", "Transport Command Proof Chain Complete", ATTR_TRANSPORT_COMMAND_PROOF_CHAIN_COMPLETE),
+    ("controlled_transport_command_proof_write_locked", "Transport Command Proof Write Locked", ATTR_TRANSPORT_COMMAND_PROOF_WRITE_LOCKED),
+    ("controlled_transport_command_proof_reinjection_allowed", "Transport Command Proof Reinjection Allowed", ATTR_TRANSPORT_COMMAND_PROOF_REINJECTION_ALLOWED),
     ("controlled_command_readback_correlation_context_available", "Command Readback Correlation Context Available", ATTR_COMMAND_READBACK_CORRELATION_CONTEXT_AVAILABLE),
     ("controlled_command_readback_correlation_observation_available", "Command Readback Correlation Observation Available", ATTR_COMMAND_READBACK_CORRELATION_OBSERVATION_AVAILABLE),
     ("controlled_command_readback_correlation_output_match", "Command Readback Correlation Output Match", ATTR_COMMAND_READBACK_CORRELATION_OUTPUT_MATCH),

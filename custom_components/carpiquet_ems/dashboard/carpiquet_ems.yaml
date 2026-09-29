@@ -640,29 +640,29 @@ views:
             title: Corrélation stricte commande / GET 🔒
             show_header_toggle: false
             entities:
-              - entity: sensor.garage_carpiquet_ems_controlled_command_readback_correlation_state
+              - entity: sensor.garage_carpiquet_ems_command_readback_correlation_state
                 name: État corrélation
-              - entity: sensor.garage_carpiquet_ems_controlled_command_readback_correlation_blockers
+              - entity: sensor.garage_carpiquet_ems_command_readback_correlation_blockers
                 name: Blockers
-              - entity: binary_sensor.carpiquet_ems_controlled_command_readback_correlation_context_available
+              - entity: binary_sensor.carpiquet_ems_command_readback_correlation_context_available
                 name: Contexte commande corrélable
-              - entity: binary_sensor.carpiquet_ems_controlled_command_readback_correlation_observation_available
+              - entity: binary_sensor.carpiquet_ems_command_readback_correlation_observation_available
                 name: Observation GET disponible
-              - entity: sensor.garage_carpiquet_ems_controlled_command_readback_correlation_expected_output
+              - entity: sensor.garage_carpiquet_ems_command_readback_correlation_expected_output
                 name: Output attendu
-              - entity: sensor.garage_carpiquet_ems_controlled_command_readback_correlation_observed_output
+              - entity: sensor.garage_carpiquet_ems_command_readback_correlation_observed_output
                 name: Output observé
-              - entity: binary_sensor.carpiquet_ems_controlled_command_readback_correlation_output_match
+              - entity: binary_sensor.carpiquet_ems_command_readback_correlation_output_match
                 name: Output conforme
-              - entity: binary_sensor.carpiquet_ems_controlled_command_readback_correlation_post_proof
+              - entity: binary_sensor.carpiquet_ems_command_readback_correlation_post_proof
                 name: Preuve POST indépendante
-              - entity: binary_sensor.carpiquet_ems_controlled_command_readback_correlation_confirmed
+              - entity: binary_sensor.carpiquet_ems_command_readback_correlation_confirmed
                 name: Corrélation confirmée
-              - entity: binary_sensor.carpiquet_ems_controlled_command_readback_correlation_write_locked
+              - entity: binary_sensor.carpiquet_ems_command_readback_correlation_write_locked
                 name: Verrou écriture
-              - entity: binary_sensor.carpiquet_ems_controlled_command_readback_correlation_reinjection_allowed
+              - entity: binary_sensor.carpiquet_ems_command_readback_correlation_reinjection_allowed
                 name: Réinjection autorisée
-              - entity: sensor.garage_carpiquet_ems_controlled_command_readback_correlation_evaluated_at
+              - entity: sensor.garage_carpiquet_ems_command_readback_correlation_evaluated_at
                 name: Dernière évaluation
 
       - type: grid

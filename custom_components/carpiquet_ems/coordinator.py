@@ -1198,9 +1198,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             transport_command_proof = evaluate_controlled_transport_command_proof(
                 ControlledTransportCommandProofInput(
                     command_context_available=command_readback_correlation.command_context_available,
-                    transport_call_requested=transport_bridge.call_requested,
-                    transport_call_allowed=transport_bridge.call_allowed,
-                    transport_call_sent=transport_bridge.call_sent,
+                    transport_call_requested=transport_bridge.transport_call_requested,
+                    transport_call_allowed=transport_bridge.transport_call_allowed,
+                    transport_call_sent=transport_bridge.transport_call_sent,
                     transport_result_available=readback_feedback.transport_result_available,
                     post_proof_available=command_readback_correlation.post_proof_available,
                     correlation_confirmed=command_readback_correlation.correlation_confirmed,

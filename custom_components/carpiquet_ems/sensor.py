@@ -3,6 +3,12 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_command_trace_state", "Command Trace State", ATTR_COMMAND_TRACE_STATE, None, None),
+    ("controlled_command_trace_blockers", "Command Trace Blockers", ATTR_COMMAND_TRACE_BLOCKERS, None, None),
+    ("controlled_command_trace_action", "Command Trace Action", ATTR_COMMAND_TRACE_ACTION, None, None),
+    ("controlled_command_trace_request_id", "Command Trace Request ID", ATTR_COMMAND_TRACE_REQUEST_ID, None, None),
+    ("controlled_command_trace_fingerprint", "Command Trace Fingerprint", ATTR_COMMAND_TRACE_FINGERPRINT, None, None),
+    ("controlled_command_trace_evaluated_at", "Command Trace Evaluated At", ATTR_COMMAND_TRACE_EVALUATED_AT, None, None),
     ("controlled_transport_command_proof_state", "Transport Command Proof State", ATTR_TRANSPORT_COMMAND_PROOF_STATE, None, None),
     ("controlled_transport_command_proof_blockers", "Transport Command Proof Blockers", ATTR_TRANSPORT_COMMAND_PROOF_BLOCKERS, None, None),
     ("controlled_transport_command_proof_evaluated_at", "Transport Command Proof Evaluated At", ATTR_TRANSPORT_COMMAND_PROOF_EVALUATED_AT, None, None),

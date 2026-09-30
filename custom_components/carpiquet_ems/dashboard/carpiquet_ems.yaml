@@ -693,6 +693,45 @@ views:
                 name: Dernière évaluation
 
       - type: grid
+        column_span: 3
+        title: 3B-14 — identité & traçabilité commande 🔒
+        cards:
+          - type: entities
+            title: 3B-14 — Trace immuable de commande 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_command_trace_state
+                name: État trace
+              - entity: sensor.garage_carpiquet_ems_command_trace_blockers
+                name: Blockers
+              - entity: binary_sensor.carpiquet_ems_command_trace_context_available
+                name: Contexte commande disponible
+              - entity: sensor.garage_carpiquet_ems_command_trace_action
+                name: Action liée
+              - entity: binary_sensor.carpiquet_ems_command_trace_request_prepared
+                name: Requête préparée
+              - entity: sensor.garage_carpiquet_ems_command_trace_request_id
+                name: Request ID
+              - entity: sensor.garage_carpiquet_ems_command_trace_fingerprint
+                name: Empreinte SHA-256
+              - entity: binary_sensor.carpiquet_ems_command_trace_identity_bound
+                name: Identité liée
+              - entity: binary_sensor.carpiquet_ems_command_trace_call_sent
+                name: Appel transport envoyé
+              - entity: binary_sensor.carpiquet_ems_command_trace_result_available
+                name: Résultat transport disponible
+              - entity: binary_sensor.carpiquet_ems_command_trace_post_proof
+                name: Preuve POST indépendante
+              - entity: binary_sensor.carpiquet_ems_command_trace_authenticated_proof
+                name: Preuve transport authentifiée
+              - entity: binary_sensor.carpiquet_ems_command_trace_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_command_trace_reinjection_allowed
+                name: Réinjection autorisée
+              - entity: sensor.garage_carpiquet_ems_command_trace_evaluated_at
+                name: Dernière évaluation
+
+      - type: grid
         title: Hyper 2000
         cards:
           - type: entities

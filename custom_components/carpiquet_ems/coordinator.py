@@ -56,6 +56,10 @@ from .controlled_transport_command_proof import (
     ControlledTransportCommandProofInput,
     evaluate_controlled_transport_command_proof,
 )
+from .controlled_command_trace import (
+    ControlledCommandTraceInput,
+    evaluate_controlled_command_trace,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1207,6 +1211,27 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Phase 3B-14: bind the prepared command to an immutable,
+            # deterministic trace identity. This remains diagnostic-only:
+            # it cannot send the request or create transport proof.
+            command_trace = evaluate_controlled_command_trace(
+                ControlledCommandTraceInput(
+                    command_context_available=command_readback_correlation.command_context_available,
+                    action=transport_bridge.action,
+                    method=transport_bridge.method,
+                    target=transport_bridge.target,
+                    json_body=transport_bridge.json_body,
+                    request_prepared=(
+                        transport_bridge.state == "BRIDGE_READY_LOCKED"
+                        and bool(transport_bridge.target)
+                        and bool(transport_bridge.json_body)
+                    ),
+                    transport_call_sent=transport_bridge.transport_call_sent,
+                    transport_result_available=readback_feedback.transport_result_available,
+                    post_proof_available=command_readback_correlation.post_proof_available,
+                )
+            )
+
             # Controlled feedback loop: map 3B-9 facts back toward 3B-7,
             # but keep reinjection disabled. This proves the feedback contract
             # without creating a cyclic execution path or enabling writes.
@@ -1284,6 +1309,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_TRANSPORT_COMMAND_PROOF_WRITE_LOCKED: transport_command_proof.write_locked,
                 ATTR_TRANSPORT_COMMAND_PROOF_REINJECTION_ALLOWED: transport_command_proof.reinjection_allowed,
                 ATTR_TRANSPORT_COMMAND_PROOF_EVALUATED_AT: transport_command_proof.evaluated_at,
+                ATTR_COMMAND_TRACE_STATE: command_trace.state,
+                ATTR_COMMAND_TRACE_BLOCKERS: ", ".join(command_trace.blockers),
+                ATTR_COMMAND_TRACE_CONTEXT_AVAILABLE: command_trace.command_context_available,
+                ATTR_COMMAND_TRACE_ACTION: command_trace.action,
+                ATTR_COMMAND_TRACE_REQUEST_PREPARED: command_trace.request_prepared,
+                ATTR_COMMAND_TRACE_REQUEST_ID: command_trace.request_id,
+                ATTR_COMMAND_TRACE_FINGERPRINT: command_trace.request_fingerprint,
+                ATTR_COMMAND_TRACE_IDENTITY_BOUND: command_trace.identity_bound,
+                ATTR_COMMAND_TRACE_CALL_SENT: command_trace.transport_call_sent,
+                ATTR_COMMAND_TRACE_RESULT_AVAILABLE: command_trace.transport_result_available,
+                ATTR_COMMAND_TRACE_POST_PROOF: command_trace.post_proof_available,
+                ATTR_COMMAND_TRACE_AUTHENTICATED_PROOF: command_trace.authenticated_transport_proof,
+                ATTR_COMMAND_TRACE_WRITE_LOCKED: command_trace.write_locked,
+                ATTR_COMMAND_TRACE_REINJECTION_ALLOWED: command_trace.reinjection_allowed,
+                ATTR_COMMAND_TRACE_EVALUATED_AT: command_trace.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

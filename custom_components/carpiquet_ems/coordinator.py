@@ -60,6 +60,10 @@ from .controlled_command_trace import (
     ControlledCommandTraceInput,
     evaluate_controlled_command_trace,
 )
+from .controlled_evidence_binding import (
+    ControlledEvidenceBindingInput,
+    evaluate_controlled_evidence_binding,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1232,6 +1236,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Phase 3B-15: bind the immutable 3B-14 identity to evidence
+            # already available from transport/readback. This remains a one-way,
+            # diagnostic contract and cannot authorize or send a command.
+            evidence_binding = evaluate_controlled_evidence_binding(
+                ControlledEvidenceBindingInput(
+                    trace_identity_bound=command_trace.identity_bound,
+                    request_id=command_trace.request_id,
+                    request_fingerprint=command_trace.request_fingerprint,
+                    authenticated_transport_proof=command_trace.authenticated_transport_proof,
+                    readback_observation_available=command_readback_correlation.observation_available,
+                    correlation_confirmed=command_readback_correlation.correlation_confirmed,
+                )
+            )
+
             # Controlled feedback loop: map 3B-9 facts back toward 3B-7,
             # but keep reinjection disabled. This proves the feedback contract
             # without creating a cyclic execution path or enabling writes.
@@ -1324,6 +1342,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_COMMAND_TRACE_WRITE_LOCKED: command_trace.write_locked,
                 ATTR_COMMAND_TRACE_REINJECTION_ALLOWED: command_trace.reinjection_allowed,
                 ATTR_COMMAND_TRACE_EVALUATED_AT: command_trace.evaluated_at,
+                ATTR_EVIDENCE_BINDING_STATE: evidence_binding.state,
+                ATTR_EVIDENCE_BINDING_BLOCKERS: ", ".join(evidence_binding.blockers),
+                ATTR_EVIDENCE_BINDING_TRACE_IDENTITY: evidence_binding.trace_identity_bound,
+                ATTR_EVIDENCE_BINDING_REQUEST_ID: evidence_binding.request_id,
+                ATTR_EVIDENCE_BINDING_FINGERPRINT: evidence_binding.request_fingerprint,
+                ATTR_EVIDENCE_BINDING_TRANSPORT_PROOF: evidence_binding.transport_proof_bound,
+                ATTR_EVIDENCE_BINDING_READBACK: evidence_binding.readback_bound,
+                ATTR_EVIDENCE_BINDING_CORRELATION: evidence_binding.correlation_bound,
+                ATTR_EVIDENCE_BINDING_CHAIN_COMPLETE: evidence_binding.evidence_chain_complete,
+                ATTR_EVIDENCE_BINDING_WRITE_LOCKED: evidence_binding.write_locked,
+                ATTR_EVIDENCE_BINDING_REINJECTION_ALLOWED: evidence_binding.reinjection_allowed,
+                ATTR_EVIDENCE_BINDING_EVALUATED_AT: evidence_binding.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

@@ -3,6 +3,15 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_command_trace_context_available", "Command Trace Context Available", ATTR_COMMAND_TRACE_CONTEXT_AVAILABLE),
+    ("controlled_command_trace_request_prepared", "Command Trace Request Prepared", ATTR_COMMAND_TRACE_REQUEST_PREPARED),
+    ("controlled_command_trace_identity_bound", "Command Trace Identity Bound", ATTR_COMMAND_TRACE_IDENTITY_BOUND),
+    ("controlled_command_trace_call_sent", "Command Trace Call Sent", ATTR_COMMAND_TRACE_CALL_SENT),
+    ("controlled_command_trace_result_available", "Command Trace Result Available", ATTR_COMMAND_TRACE_RESULT_AVAILABLE),
+    ("controlled_command_trace_post_proof", "Command Trace POST Proof", ATTR_COMMAND_TRACE_POST_PROOF),
+    ("controlled_command_trace_authenticated_proof", "Command Trace Authenticated Proof", ATTR_COMMAND_TRACE_AUTHENTICATED_PROOF),
+    ("controlled_command_trace_write_locked", "Command Trace Write Locked", ATTR_COMMAND_TRACE_WRITE_LOCKED),
+    ("controlled_command_trace_reinjection_allowed", "Command Trace Reinjection Allowed", ATTR_COMMAND_TRACE_REINJECTION_ALLOWED),
     ("controlled_transport_command_proof_context_available", "Transport Command Proof Context Available", ATTR_TRANSPORT_COMMAND_PROOF_CONTEXT_AVAILABLE),
     ("controlled_transport_command_proof_call_requested", "Transport Command Proof Call Requested", ATTR_TRANSPORT_COMMAND_PROOF_CALL_REQUESTED),
     ("controlled_transport_command_proof_call_allowed", "Transport Command Proof Call Allowed", ATTR_TRANSPORT_COMMAND_PROOF_CALL_ALLOWED),

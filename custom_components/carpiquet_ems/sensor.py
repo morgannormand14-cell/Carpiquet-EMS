@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_evidence_chain_validation_state", "Evidence Chain Validation State", ATTR_EVIDENCE_CHAIN_VALIDATION_STATE, None, None),
+    ("controlled_evidence_chain_validation_blockers", "Evidence Chain Validation Blockers", ATTR_EVIDENCE_CHAIN_VALIDATION_BLOCKERS, None, None),
+    ("controlled_evidence_chain_validation_evaluated_at", "Evidence Chain Validation Evaluated At", ATTR_EVIDENCE_CHAIN_VALIDATION_EVALUATED_AT, None, None),
     ("controlled_evidence_binding_state", "Evidence Binding State", ATTR_EVIDENCE_BINDING_STATE, None, None),
     ("controlled_evidence_binding_blockers", "Evidence Binding Blockers", ATTR_EVIDENCE_BINDING_BLOCKERS, None, None),
     ("controlled_evidence_binding_request_id", "Evidence Binding Request ID", ATTR_EVIDENCE_BINDING_REQUEST_ID, None, None),

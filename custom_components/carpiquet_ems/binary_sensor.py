@@ -3,6 +3,16 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_evidence_chain_validation_trace_identity", "Evidence Chain Validation Trace Identity", ATTR_EVIDENCE_CHAIN_VALIDATION_TRACE_IDENTITY),
+    ("controlled_evidence_chain_validation_binding_ready", "Evidence Chain Validation Binding Ready", ATTR_EVIDENCE_CHAIN_VALIDATION_BINDING_READY),
+    ("controlled_evidence_chain_validation_transport_proof", "Evidence Chain Validation Transport Proof", ATTR_EVIDENCE_CHAIN_VALIDATION_TRANSPORT_PROOF),
+    ("controlled_evidence_chain_validation_readback", "Evidence Chain Validation Readback", ATTR_EVIDENCE_CHAIN_VALIDATION_READBACK),
+    ("controlled_evidence_chain_validation_correlation", "Evidence Chain Validation Correlation", ATTR_EVIDENCE_CHAIN_VALIDATION_CORRELATION),
+    ("controlled_evidence_chain_validation_chain_valid", "Evidence Chain Validation Chain Valid", ATTR_EVIDENCE_CHAIN_VALIDATION_CHAIN_VALID),
+    ("controlled_evidence_chain_validation_safety_preserved", "Evidence Chain Validation Safety Preserved", ATTR_EVIDENCE_CHAIN_VALIDATION_SAFETY_PRESERVED),
+    ("controlled_evidence_chain_validation_execution_admissible", "Evidence Chain Validation Execution Admissible", ATTR_EVIDENCE_CHAIN_VALIDATION_EXECUTION_ADMISSIBLE),
+    ("controlled_evidence_chain_validation_write_locked", "Evidence Chain Validation Write Locked", ATTR_EVIDENCE_CHAIN_VALIDATION_WRITE_LOCKED),
+    ("controlled_evidence_chain_validation_reinjection_allowed", "Evidence Chain Validation Reinjection Allowed", ATTR_EVIDENCE_CHAIN_VALIDATION_REINJECTION_ALLOWED),
     ("controlled_evidence_binding_trace_identity", "Evidence Binding Trace Identity", ATTR_EVIDENCE_BINDING_TRACE_IDENTITY),
     ("controlled_evidence_binding_transport_proof", "Evidence Binding Transport Proof", ATTR_EVIDENCE_BINDING_TRANSPORT_PROOF),
     ("controlled_evidence_binding_readback", "Evidence Binding Readback", ATTR_EVIDENCE_BINDING_READBACK),

@@ -64,6 +64,10 @@ from .controlled_evidence_binding import (
     ControlledEvidenceBindingInput,
     evaluate_controlled_evidence_binding,
 )
+from .controlled_evidence_chain_validation import (
+    ControlledEvidenceChainValidationInput,
+    evaluate_controlled_evidence_chain_validation,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1250,6 +1254,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Phase 3B-16: validate the complete 3B-14 -> 3B-15 evidence
+            # chain as a locked diagnostic boundary. No transport or write path.
+            evidence_chain_validation = evaluate_controlled_evidence_chain_validation(
+                ControlledEvidenceChainValidationInput(
+                    trace_identity_bound=command_trace.identity_bound,
+                    binding_state=evidence_binding.state,
+                    transport_proof_bound=evidence_binding.transport_proof_bound,
+                    readback_bound=evidence_binding.readback_bound,
+                    correlation_bound=evidence_binding.correlation_bound,
+                    evidence_chain_complete=evidence_binding.evidence_chain_complete,
+                    upstream_write_locked=evidence_binding.write_locked,
+                    upstream_reinjection_allowed=evidence_binding.reinjection_allowed,
+                )
+            )
+
             # Controlled feedback loop: map 3B-9 facts back toward 3B-7,
             # but keep reinjection disabled. This proves the feedback contract
             # without creating a cyclic execution path or enabling writes.
@@ -1354,6 +1373,19 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_EVIDENCE_BINDING_WRITE_LOCKED: evidence_binding.write_locked,
                 ATTR_EVIDENCE_BINDING_REINJECTION_ALLOWED: evidence_binding.reinjection_allowed,
                 ATTR_EVIDENCE_BINDING_EVALUATED_AT: evidence_binding.evaluated_at,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_STATE: evidence_chain_validation.state,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_BLOCKERS: ", ".join(evidence_chain_validation.blockers),
+                ATTR_EVIDENCE_CHAIN_VALIDATION_TRACE_IDENTITY: evidence_chain_validation.trace_identity_valid,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_BINDING_READY: evidence_chain_validation.binding_ready,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_TRANSPORT_PROOF: evidence_chain_validation.transport_proof_valid,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_READBACK: evidence_chain_validation.readback_valid,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_CORRELATION: evidence_chain_validation.correlation_valid,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_CHAIN_VALID: evidence_chain_validation.evidence_chain_valid,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_SAFETY_PRESERVED: evidence_chain_validation.safety_invariants_preserved,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_EXECUTION_ADMISSIBLE: evidence_chain_validation.execution_admissible,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_WRITE_LOCKED: evidence_chain_validation.write_locked,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_REINJECTION_ALLOWED: evidence_chain_validation.reinjection_allowed,
+                ATTR_EVIDENCE_CHAIN_VALIDATION_EVALUATED_AT: evidence_chain_validation.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

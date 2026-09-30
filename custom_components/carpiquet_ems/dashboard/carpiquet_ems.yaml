@@ -694,7 +694,7 @@ views:
 
       - type: grid
         column_span: 3
-        title: 3B-14 — identité & traçabilité commande 🔒
+        title: 3B-14 → 3B-16 — identité / preuves / validation 🔒
         cards:
           - type: entities
             title: 3B-14 — Trace immuable de commande 🔒
@@ -731,10 +731,6 @@ views:
               - entity: sensor.garage_carpiquet_ems_command_trace_evaluated_at
                 name: Dernière évaluation
 
-      - type: grid
-        column_span: 3
-        title: 3B-15 — liaison identité / preuve / readback 🔒
-        cards:
           - type: entities
             title: 3B-15 — Liaison de preuves contrôlée 🔒
             show_header_toggle: false
@@ -762,6 +758,37 @@ views:
               - entity: binary_sensor.carpiquet_ems_evidence_binding_reinjection_allowed
                 name: Réinjection autorisée
               - entity: sensor.garage_carpiquet_ems_evidence_binding_evaluated_at
+                name: Dernière évaluation
+
+          - type: entities
+            title: 3B-16 — Validation chaîne de preuves 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_evidence_chain_validation_state
+                name: État validation
+              - entity: sensor.garage_carpiquet_ems_evidence_chain_validation_blockers
+                name: Blockers
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_trace_identity
+                name: Identité 3B-14 valide
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_binding_ready
+                name: Liaison 3B-15 prête
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_transport_proof
+                name: Preuve transport valide
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_readback
+                name: Readback valide
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_correlation
+                name: Corrélation valide
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_chain_valid
+                name: Chaîne de preuves valide
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_safety_preserved
+                name: Invariants sécurité préservés
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_execution_admissible
+                name: Exécution admissible
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_evidence_chain_validation_reinjection_allowed
+                name: Réinjection autorisée
+              - entity: sensor.garage_carpiquet_ems_evidence_chain_validation_evaluated_at
                 name: Dernière évaluation
 
       - type: grid

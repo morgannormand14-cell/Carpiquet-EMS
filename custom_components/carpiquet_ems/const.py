@@ -551,6 +551,23 @@ ATTR_TRANSPORT_COMMAND_PROOF_WRITE_LOCKED = "controlled_transport_command_proof_
 ATTR_TRANSPORT_COMMAND_PROOF_REINJECTION_ALLOWED = "controlled_transport_command_proof_reinjection_allowed"
 ATTR_TRANSPORT_COMMAND_PROOF_EVALUATED_AT = "controlled_transport_command_proof_evaluated_at"
 
+# Phase 3B-14 — immutable command trace / identity diagnostics
+ATTR_COMMAND_TRACE_STATE = "controlled_command_trace_state"
+ATTR_COMMAND_TRACE_BLOCKERS = "controlled_command_trace_blockers"
+ATTR_COMMAND_TRACE_CONTEXT_AVAILABLE = "controlled_command_trace_context_available"
+ATTR_COMMAND_TRACE_ACTION = "controlled_command_trace_action"
+ATTR_COMMAND_TRACE_REQUEST_PREPARED = "controlled_command_trace_request_prepared"
+ATTR_COMMAND_TRACE_REQUEST_ID = "controlled_command_trace_request_id"
+ATTR_COMMAND_TRACE_FINGERPRINT = "controlled_command_trace_fingerprint"
+ATTR_COMMAND_TRACE_IDENTITY_BOUND = "controlled_command_trace_identity_bound"
+ATTR_COMMAND_TRACE_CALL_SENT = "controlled_command_trace_call_sent"
+ATTR_COMMAND_TRACE_RESULT_AVAILABLE = "controlled_command_trace_result_available"
+ATTR_COMMAND_TRACE_POST_PROOF = "controlled_command_trace_post_proof"
+ATTR_COMMAND_TRACE_AUTHENTICATED_PROOF = "controlled_command_trace_authenticated_proof"
+ATTR_COMMAND_TRACE_WRITE_LOCKED = "controlled_command_trace_write_locked"
+ATTR_COMMAND_TRACE_REINJECTION_ALLOWED = "controlled_command_trace_reinjection_allowed"
+ATTR_COMMAND_TRACE_EVALUATED_AT = "controlled_command_trace_evaluated_at"
+
 ATTR_LOOP_SIM_SUCCESS_PASSED = "controlled_loop_sim_success_passed"
 ATTR_LOOP_SIM_SUCCESS_FINAL_STATE = "controlled_loop_sim_success_final_state"
 ATTR_LOOP_SIM_SUCCESS_LOCK_PRESERVED = "controlled_loop_sim_success_lock_preserved"

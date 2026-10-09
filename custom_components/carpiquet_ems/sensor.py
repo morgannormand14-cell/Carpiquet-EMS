@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_evidence_identity_state", "Evidence Identity State", ATTR_EVIDENCE_IDENTITY_STATE, None, None),
+    ("controlled_evidence_identity_blockers", "Evidence Identity Blockers", ATTR_EVIDENCE_IDENTITY_BLOCKERS, None, None),
+    ("controlled_evidence_identity_evaluated_at", "Evidence Identity Evaluated At", ATTR_EVIDENCE_IDENTITY_EVALUATED_AT, None, None),
     ("controlled_pre_execution_coherence_state", "Pre Execution Coherence State", ATTR_PRE_EXEC_COHERENCE_STATE, None, None),
     ("controlled_pre_execution_coherence_blockers", "Pre Execution Coherence Blockers", ATTR_PRE_EXEC_COHERENCE_BLOCKERS, None, None),
     ("controlled_pre_execution_coherence_evaluated_at", "Pre Execution Coherence Evaluated At", ATTR_PRE_EXEC_COHERENCE_EVALUATED_AT, None, None),

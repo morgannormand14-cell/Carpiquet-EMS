@@ -829,6 +829,39 @@ views:
                 name: Dernière évaluation
 
       - type: grid
+        column_span: 3
+        title: 3B-18 — identité / reçu transport / readback 🔒
+        cards:
+          - type: entities
+            title: 3B-18 — Vérification indépendante des preuves 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_evidence_identity_state
+                name: État identité transport
+              - entity: sensor.garage_carpiquet_ems_evidence_identity_blockers
+                name: Blockers
+              - entity: binary_sensor.carpiquet_ems_evidence_identity_ready
+                name: Identité requête prête
+              - entity: binary_sensor.carpiquet_ems_evidence_identity_observation
+                name: Observation GET disponible
+              - entity: binary_sensor.carpiquet_ems_evidence_identity_receipt_present
+                name: Reçu transport indépendant présent
+              - entity: binary_sensor.carpiquet_ems_evidence_identity_receipt_matches
+                name: Identité du reçu concordante
+              - entity: binary_sensor.carpiquet_ems_evidence_identity_receipt_authenticated
+                name: Reçu authentifié
+              - entity: binary_sensor.carpiquet_ems_evidence_identity_proof_verified
+                name: Preuve POST indépendante vérifiée
+              - entity: binary_sensor.carpiquet_ems_evidence_identity_readback_causal
+                name: Lien causal readback prouvé
+              - entity: binary_sensor.carpiquet_ems_evidence_identity_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_evidence_identity_reinjection
+                name: Réinjection autorisée
+              - entity: sensor.garage_carpiquet_ems_evidence_identity_evaluated_at
+                name: Dernière évaluation
+
+      - type: grid
         title: Hyper 2000
         cards:
           - type: entities

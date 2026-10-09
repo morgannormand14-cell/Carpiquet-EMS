@@ -3,6 +3,17 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_pre_execution_coherence_identity", "Pre Execution Coherence Identity", ATTR_PRE_EXEC_COHERENCE_IDENTITY),
+    ("controlled_pre_execution_coherence_binding", "Pre Execution Coherence Binding", ATTR_PRE_EXEC_COHERENCE_BINDING),
+    ("controlled_pre_execution_coherence_readback", "Pre Execution Coherence Readback", ATTR_PRE_EXEC_COHERENCE_READBACK),
+    ("controlled_pre_execution_coherence_transport_proof", "Pre Execution Coherence Transport Proof", ATTR_PRE_EXEC_COHERENCE_TRANSPORT_PROOF),
+    ("controlled_pre_execution_coherence_correlation", "Pre Execution Coherence Correlation", ATTR_PRE_EXEC_COHERENCE_CORRELATION),
+    ("controlled_pre_execution_coherence_evidence_chain", "Pre Execution Coherence Evidence Chain", ATTR_PRE_EXEC_COHERENCE_EVIDENCE_CHAIN),
+    ("controlled_pre_execution_coherence_safety_boundary", "Pre Execution Coherence Safety Boundary", ATTR_PRE_EXEC_COHERENCE_SAFETY_BOUNDARY),
+    ("controlled_pre_execution_coherence_complete", "Pre Execution Coherence Complete", ATTR_PRE_EXEC_COHERENCE_COMPLETE),
+    ("controlled_pre_execution_coherence_execution_admissible", "Pre Execution Coherence Execution Admissible", ATTR_PRE_EXEC_COHERENCE_EXECUTION_ADMISSIBLE),
+    ("controlled_pre_execution_coherence_write_locked", "Pre Execution Coherence Write Locked", ATTR_PRE_EXEC_COHERENCE_WRITE_LOCKED),
+    ("controlled_pre_execution_coherence_reinjection_allowed", "Pre Execution Coherence Reinjection Allowed", ATTR_PRE_EXEC_COHERENCE_REINJECTION_ALLOWED),
     ("controlled_evidence_chain_validation_trace_identity", "Evidence Chain Validation Trace Identity", ATTR_EVIDENCE_CHAIN_VALIDATION_TRACE_IDENTITY),
     ("controlled_evidence_chain_validation_binding_ready", "Evidence Chain Validation Binding Ready", ATTR_EVIDENCE_CHAIN_VALIDATION_BINDING_READY),
     ("controlled_evidence_chain_validation_transport_proof", "Evidence Chain Validation Transport Proof", ATTR_EVIDENCE_CHAIN_VALIDATION_TRANSPORT_PROOF),

@@ -12,6 +12,8 @@ jobs:
           python-version: "3.12"
       - name: Compile Python
         run: python -m compileall custom_components/carpiquet_ems
+      - name: 3B-18 evidence identity tests
+        run: python -m unittest discover -s tests -p 'test_controlled_evidence_identity.py' -v
       - name: Validate JSON
         run: |
           python - <<'PY'

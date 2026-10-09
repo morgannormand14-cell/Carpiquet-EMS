@@ -76,6 +76,7 @@ from .controlled_evidence_identity import (
     ControlledEvidenceIdentityInput,
     evaluate_controlled_evidence_identity,
 )
+from .controlled_failure_recovery_bench import run_locked_failure_recovery_bench
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1306,6 +1307,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            failure_recovery_bench = run_locked_failure_recovery_bench()
+
             # Controlled feedback loop: map 3B-9 facts back toward 3B-7,
             # but keep reinjection disabled. This proves the feedback contract
             # without creating a cyclic execution path or enabling writes.
@@ -1449,6 +1452,17 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_EVIDENCE_IDENTITY_WRITE_LOCKED: evidence_identity.write_locked,
                 ATTR_EVIDENCE_IDENTITY_REINJECTION: evidence_identity.reinjection_allowed,
                 ATTR_EVIDENCE_IDENTITY_EVALUATED_AT: evidence_identity.evaluated_at,
+                ATTR_FAILURE_RECOVERY_STATE: failure_recovery_bench.state,
+                ATTR_FAILURE_RECOVERY_RESULTS: ", ".join(failure_recovery_bench.results),
+                ATTR_FAILURE_RECOVERY_PASSED_COUNT: failure_recovery_bench.passed_count,
+                ATTR_FAILURE_RECOVERY_TOTAL_COUNT: failure_recovery_bench.total_count,
+                ATTR_FAILURE_RECOVERY_ALL_PASSED: failure_recovery_bench.all_passed,
+                ATTR_FAILURE_RECOVERY_ZERO_REQUIRED: failure_recovery_bench.zero_return_required,
+                ATTR_FAILURE_RECOVERY_ZERO_CONFIRMED: failure_recovery_bench.zero_return_confirmed,
+                ATTR_FAILURE_RECOVERY_WRITE_LOCKED: failure_recovery_bench.write_locked,
+                ATTR_FAILURE_RECOVERY_REINJECTION_ALLOWED: failure_recovery_bench.reinjection_allowed,
+                ATTR_FAILURE_RECOVERY_REAL_TRANSPORT_USED: failure_recovery_bench.real_transport_used,
+                ATTR_FAILURE_RECOVERY_EVALUATED_AT: failure_recovery_bench.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

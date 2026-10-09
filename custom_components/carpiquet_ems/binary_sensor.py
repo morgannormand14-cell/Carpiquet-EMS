@@ -3,6 +3,15 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_evidence_identity_ready", "Evidence Identity Identity Ready", ATTR_EVIDENCE_IDENTITY_READY),
+    ("controlled_evidence_identity_observation", "Evidence Identity Observation", ATTR_EVIDENCE_IDENTITY_OBSERVATION),
+    ("controlled_evidence_identity_receipt_present", "Evidence Identity Receipt Present", ATTR_EVIDENCE_IDENTITY_RECEIPT_PRESENT),
+    ("controlled_evidence_identity_receipt_matches", "Evidence Identity Receipt Matches", ATTR_EVIDENCE_IDENTITY_RECEIPT_MATCHES),
+    ("controlled_evidence_identity_receipt_authenticated", "Evidence Identity Receipt Authenticated", ATTR_EVIDENCE_IDENTITY_RECEIPT_AUTHENTICATED),
+    ("controlled_evidence_identity_proof_verified", "Evidence Identity Proof Verified", ATTR_EVIDENCE_IDENTITY_PROOF_VERIFIED),
+    ("controlled_evidence_identity_readback_causal", "Evidence Identity Readback Causal", ATTR_EVIDENCE_IDENTITY_READBACK_CAUSAL),
+    ("controlled_evidence_identity_write_locked", "Evidence Identity Write Locked", ATTR_EVIDENCE_IDENTITY_WRITE_LOCKED),
+    ("controlled_evidence_identity_reinjection", "Evidence Identity Reinjection Allowed", ATTR_EVIDENCE_IDENTITY_REINJECTION),
     ("controlled_pre_execution_coherence_identity", "Pre Execution Coherence Identity", ATTR_PRE_EXEC_COHERENCE_IDENTITY),
     ("controlled_pre_execution_coherence_binding", "Pre Execution Coherence Binding", ATTR_PRE_EXEC_COHERENCE_BINDING),
     ("controlled_pre_execution_coherence_readback", "Pre Execution Coherence Readback", ATTR_PRE_EXEC_COHERENCE_READBACK),

@@ -72,6 +72,10 @@ from .controlled_pre_execution_coherence import (
     ControlledPreExecutionCoherenceInput,
     evaluate_controlled_pre_execution_coherence,
 )
+from .controlled_evidence_identity import (
+    ControlledEvidenceIdentityInput,
+    evaluate_controlled_evidence_identity,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1290,6 +1294,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # 3B-18: independent identity check; no transport receipt is
+            # available during the locked simulation and none is fabricated.
+            evidence_identity = evaluate_controlled_evidence_identity(
+                ControlledEvidenceIdentityInput(
+                    trace_identity_bound=command_trace.identity_bound,
+                    request_id=command_trace.request_id,
+                    request_fingerprint=command_trace.request_fingerprint,
+                    observation_available=command_readback_correlation.observation_available,
+                    transport_receipt=None,
+                )
+            )
+
             # Controlled feedback loop: map 3B-9 facts back toward 3B-7,
             # but keep reinjection disabled. This proves the feedback contract
             # without creating a cyclic execution path or enabling writes.
@@ -1421,6 +1437,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_PRE_EXEC_COHERENCE_WRITE_LOCKED: pre_execution_coherence.write_locked,
                 ATTR_PRE_EXEC_COHERENCE_REINJECTION_ALLOWED: pre_execution_coherence.reinjection_allowed,
                 ATTR_PRE_EXEC_COHERENCE_EVALUATED_AT: pre_execution_coherence.evaluated_at,
+                ATTR_EVIDENCE_IDENTITY_STATE: evidence_identity.state,
+                ATTR_EVIDENCE_IDENTITY_BLOCKERS: ", ".join(evidence_identity.blockers),
+                ATTR_EVIDENCE_IDENTITY_READY: evidence_identity.identity_ready,
+                ATTR_EVIDENCE_IDENTITY_OBSERVATION: evidence_identity.observation_available,
+                ATTR_EVIDENCE_IDENTITY_RECEIPT_PRESENT: evidence_identity.receipt_present,
+                ATTR_EVIDENCE_IDENTITY_RECEIPT_MATCHES: evidence_identity.receipt_identity_matches,
+                ATTR_EVIDENCE_IDENTITY_RECEIPT_AUTHENTICATED: evidence_identity.receipt_authenticated,
+                ATTR_EVIDENCE_IDENTITY_PROOF_VERIFIED: evidence_identity.independent_transport_proof_verified,
+                ATTR_EVIDENCE_IDENTITY_READBACK_CAUSAL: evidence_identity.readback_causally_bound,
+                ATTR_EVIDENCE_IDENTITY_WRITE_LOCKED: evidence_identity.write_locked,
+                ATTR_EVIDENCE_IDENTITY_REINJECTION: evidence_identity.reinjection_allowed,
+                ATTR_EVIDENCE_IDENTITY_EVALUATED_AT: evidence_identity.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

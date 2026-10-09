@@ -3,6 +3,12 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_failure_recovery_all_passed", "Failure Recovery All Passed", ATTR_FAILURE_RECOVERY_ALL_PASSED),
+    ("controlled_failure_recovery_zero_required", "Failure Recovery Zero Required", ATTR_FAILURE_RECOVERY_ZERO_REQUIRED),
+    ("controlled_failure_recovery_zero_confirmed", "Failure Recovery Zero Confirmed", ATTR_FAILURE_RECOVERY_ZERO_CONFIRMED),
+    ("controlled_failure_recovery_write_locked", "Failure Recovery Write Locked", ATTR_FAILURE_RECOVERY_WRITE_LOCKED),
+    ("controlled_failure_recovery_reinjection_allowed", "Failure Recovery Reinjection Allowed", ATTR_FAILURE_RECOVERY_REINJECTION_ALLOWED),
+    ("controlled_failure_recovery_real_transport_used", "Failure Recovery Real Transport Used", ATTR_FAILURE_RECOVERY_REAL_TRANSPORT_USED),
     ("controlled_evidence_identity_ready", "Evidence Identity Identity Ready", ATTR_EVIDENCE_IDENTITY_READY),
     ("controlled_evidence_identity_observation", "Evidence Identity Observation", ATTR_EVIDENCE_IDENTITY_OBSERVATION),
     ("controlled_evidence_identity_receipt_present", "Evidence Identity Receipt Present", ATTR_EVIDENCE_IDENTITY_RECEIPT_PRESENT),

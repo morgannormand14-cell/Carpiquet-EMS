@@ -793,7 +793,7 @@ views:
 
       - type: grid
         column_span: 3
-        title: 3B-17 — cohérence pré-exécution 🔒
+        title: 3B-17 / 3B-18 — cohérence et preuves 🔒
         cards:
           - type: entities
             title: 3B-17 — Cohérence pré-exécution 🔒
@@ -828,17 +828,13 @@ views:
               - entity: sensor.garage_carpiquet_ems_pre_execution_coherence_evaluated_at
                 name: Dernière évaluation
 
-      - type: grid
-        column_span: 3
-        title: 3B-18 — identité / reçu transport / readback 🔒
-        cards:
           - type: entities
             title: 3B-18 — Vérification indépendante des preuves 🔒
             show_header_toggle: false
             entities:
-              - entity: sensor.garage_carpiquet_ems_evidence_identity_state
+              - entity: sensor.carpiquet_ems_evidence_identity_state
                 name: État identité transport
-              - entity: sensor.garage_carpiquet_ems_evidence_identity_blockers
+              - entity: sensor.carpiquet_ems_evidence_identity_blockers
                 name: Blockers
               - entity: binary_sensor.carpiquet_ems_evidence_identity_ready
                 name: Identité requête prête
@@ -858,7 +854,7 @@ views:
                 name: Verrou écriture
               - entity: binary_sensor.carpiquet_ems_evidence_identity_reinjection
                 name: Réinjection autorisée
-              - entity: sensor.garage_carpiquet_ems_evidence_identity_evaluated_at
+              - entity: sensor.carpiquet_ems_evidence_identity_evaluated_at
                 name: Dernière évaluation
 
       - type: grid

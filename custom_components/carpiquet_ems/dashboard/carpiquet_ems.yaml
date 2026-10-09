@@ -792,6 +792,43 @@ views:
                 name: Dernière évaluation
 
       - type: grid
+        column_span: 3
+        title: 3B-17 — cohérence pré-exécution 🔒
+        cards:
+          - type: entities
+            title: 3B-17 — Cohérence pré-exécution 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_pre_execution_coherence_state
+                name: État cohérence
+              - entity: sensor.garage_carpiquet_ems_pre_execution_coherence_blockers
+                name: Blockers
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_identity
+                name: Identité cohérente
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_binding
+                name: Liaison cohérente
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_readback
+                name: Readback cohérent
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_transport_proof
+                name: Preuve transport cohérente
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_correlation
+                name: Corrélation cohérente
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_evidence_chain
+                name: Chaîne de preuves cohérente
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_safety_boundary
+                name: Frontière sécurité cohérente
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_complete
+                name: Pré-exécution cohérente
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_execution_admissible
+                name: Exécution admissible
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_pre_execution_coherence_reinjection_allowed
+                name: Réinjection autorisée
+              - entity: sensor.garage_carpiquet_ems_pre_execution_coherence_evaluated_at
+                name: Dernière évaluation
+
+      - type: grid
         title: Hyper 2000
         cards:
           - type: entities

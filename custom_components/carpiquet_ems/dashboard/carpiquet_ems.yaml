@@ -793,7 +793,7 @@ views:
 
       - type: grid
         column_span: 3
-        title: 3B-17 / 3B-18 — cohérence et preuves 🔒
+        title: 3B-17 → 3B-19 — cohérence, preuves et repli 🔒
         cards:
           - type: entities
             title: 3B-17 — Cohérence pré-exécution 🔒
@@ -855,6 +855,33 @@ views:
               - entity: binary_sensor.carpiquet_ems_evidence_identity_reinjection_allowed
                 name: Réinjection autorisée
               - entity: sensor.garage_carpiquet_ems_evidence_identity_evaluated_at
+                name: Dernière évaluation
+
+          - type: entities
+            title: 3B-19 — Banc des échecs et retour à zéro 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_failure_recovery_state
+                name: État banc
+              - entity: sensor.garage_carpiquet_ems_failure_recovery_results
+                name: Scénarios
+              - entity: sensor.garage_carpiquet_ems_failure_recovery_passed_count
+                name: Réussis
+              - entity: sensor.garage_carpiquet_ems_failure_recovery_total_count
+                name: Total
+              - entity: binary_sensor.carpiquet_ems_failure_recovery_all_passed
+                name: Tous les scénarios réussis
+              - entity: binary_sensor.carpiquet_ems_failure_recovery_zero_required
+                name: Retour zéro requis
+              - entity: binary_sensor.carpiquet_ems_failure_recovery_zero_confirmed
+                name: Retour zéro confirmé
+              - entity: binary_sensor.carpiquet_ems_failure_recovery_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_failure_recovery_reinjection_allowed
+                name: Réinjection autorisée
+              - entity: binary_sensor.carpiquet_ems_failure_recovery_real_transport_used
+                name: Transport réel utilisé
+              - entity: sensor.garage_carpiquet_ems_failure_recovery_evaluated_at
                 name: Dernière évaluation
 
       - type: grid

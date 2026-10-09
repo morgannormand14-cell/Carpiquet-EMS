@@ -68,6 +68,10 @@ from .controlled_evidence_chain_validation import (
     ControlledEvidenceChainValidationInput,
     evaluate_controlled_evidence_chain_validation,
 )
+from .controlled_pre_execution_coherence import (
+    ControlledPreExecutionCoherenceInput,
+    evaluate_controlled_pre_execution_coherence,
+)
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1269,6 +1273,23 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            # Phase 3B-17: check pre-execution coherence using only
+            # 3B-16 diagnostics. This remains locked and cannot authorize I/O.
+            pre_execution_coherence = evaluate_controlled_pre_execution_coherence(
+                ControlledPreExecutionCoherenceInput(
+                    trace_identity_valid=evidence_chain_validation.trace_identity_valid,
+                    binding_ready=evidence_chain_validation.binding_ready,
+                    transport_proof_valid=evidence_chain_validation.transport_proof_valid,
+                    readback_valid=evidence_chain_validation.readback_valid,
+                    correlation_valid=evidence_chain_validation.correlation_valid,
+                    evidence_chain_valid=evidence_chain_validation.evidence_chain_valid,
+                    safety_invariants_preserved=evidence_chain_validation.safety_invariants_preserved,
+                    upstream_execution_admissible=evidence_chain_validation.execution_admissible,
+                    upstream_write_locked=evidence_chain_validation.write_locked,
+                    upstream_reinjection_allowed=evidence_chain_validation.reinjection_allowed,
+                )
+            )
+
             # Controlled feedback loop: map 3B-9 facts back toward 3B-7,
             # but keep reinjection disabled. This proves the feedback contract
             # without creating a cyclic execution path or enabling writes.
@@ -1386,6 +1407,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_EVIDENCE_CHAIN_VALIDATION_WRITE_LOCKED: evidence_chain_validation.write_locked,
                 ATTR_EVIDENCE_CHAIN_VALIDATION_REINJECTION_ALLOWED: evidence_chain_validation.reinjection_allowed,
                 ATTR_EVIDENCE_CHAIN_VALIDATION_EVALUATED_AT: evidence_chain_validation.evaluated_at,
+                ATTR_PRE_EXEC_COHERENCE_STATE: pre_execution_coherence.state,
+                ATTR_PRE_EXEC_COHERENCE_BLOCKERS: ", ".join(pre_execution_coherence.blockers),
+                ATTR_PRE_EXEC_COHERENCE_IDENTITY: pre_execution_coherence.identity_coherent,
+                ATTR_PRE_EXEC_COHERENCE_BINDING: pre_execution_coherence.binding_coherent,
+                ATTR_PRE_EXEC_COHERENCE_READBACK: pre_execution_coherence.readback_coherent,
+                ATTR_PRE_EXEC_COHERENCE_TRANSPORT_PROOF: pre_execution_coherence.transport_proof_coherent,
+                ATTR_PRE_EXEC_COHERENCE_CORRELATION: pre_execution_coherence.correlation_coherent,
+                ATTR_PRE_EXEC_COHERENCE_EVIDENCE_CHAIN: pre_execution_coherence.evidence_chain_coherent,
+                ATTR_PRE_EXEC_COHERENCE_SAFETY_BOUNDARY: pre_execution_coherence.safety_boundary_coherent,
+                ATTR_PRE_EXEC_COHERENCE_COMPLETE: pre_execution_coherence.pre_execution_coherent,
+                ATTR_PRE_EXEC_COHERENCE_EXECUTION_ADMISSIBLE: pre_execution_coherence.execution_admissible,
+                ATTR_PRE_EXEC_COHERENCE_WRITE_LOCKED: pre_execution_coherence.write_locked,
+                ATTR_PRE_EXEC_COHERENCE_REINJECTION_ALLOWED: pre_execution_coherence.reinjection_allowed,
+                ATTR_PRE_EXEC_COHERENCE_EVALUATED_AT: pre_execution_coherence.evaluated_at,
                 ATTR_GRID_POWER: round(grid, 1),
                 ATTR_REQUESTED_DISCHARGE: round(requested, 1),
                 ATTR_EFFECTIVE_REQUEST: result.effective_request_w,

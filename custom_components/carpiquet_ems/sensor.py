@@ -3,6 +3,11 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_failure_recovery_state", "Failure Recovery State", ATTR_FAILURE_RECOVERY_STATE, None, None),
+    ("controlled_failure_recovery_results", "Failure Recovery Results", ATTR_FAILURE_RECOVERY_RESULTS, None, None),
+    ("controlled_failure_recovery_passed_count", "Failure Recovery Passed Count", ATTR_FAILURE_RECOVERY_PASSED_COUNT, None, None),
+    ("controlled_failure_recovery_total_count", "Failure Recovery Total Count", ATTR_FAILURE_RECOVERY_TOTAL_COUNT, None, None),
+    ("controlled_failure_recovery_evaluated_at", "Failure Recovery Evaluated At", ATTR_FAILURE_RECOVERY_EVALUATED_AT, None, None),
     ("controlled_evidence_identity_state", "Evidence Identity State", ATTR_EVIDENCE_IDENTITY_STATE, None, None),
     ("controlled_evidence_identity_blockers", "Evidence Identity Blockers", ATTR_EVIDENCE_IDENTITY_BLOCKERS, None, None),
     ("controlled_evidence_identity_evaluated_at", "Evidence Identity Evaluated At", ATTR_EVIDENCE_IDENTITY_EVALUATED_AT, None, None),

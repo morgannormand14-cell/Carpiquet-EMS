@@ -1429,7 +1429,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     final_reinjection_allowed=final_regression.reinjection_allowed,
                     real_write_used=final_regression.real_write_used,
                     test_power_w=float(self._test_gate_power_w),
-                    duration_seconds=float(self._test_gate_duration_s),
+                    duration_seconds=float(self._test_gate_duration_seconds),
                     single_device_only=execution_safety.single_device_only,
                     local_http_only=execution_safety.local_http_only,
                     watchdog_required=execution_safety.watchdog_required,

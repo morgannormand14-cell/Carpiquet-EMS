@@ -1458,6 +1458,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ATTR_HARDWARE_PREFLIGHT_RECOVERY_READY: hardware_preflight.recovery_contract_ready,
                 ATTR_HARDWARE_PREFLIGHT_EVIDENCE_READY: hardware_preflight.independent_evidence_ready,
                 ATTR_HARDWARE_PREFLIGHT_PROTOCOL_READY: hardware_preflight.protocol_ready,
+                ATTR_HARDWARE_PREFLIGHT_UNLOCK_ELIGIBLE: hardware_preflight.unlock_eligible,
                 ATTR_HARDWARE_PREFLIGHT_HARDWARE_ADMISSIBLE: hardware_preflight.hardware_test_admissible,
                 ATTR_HARDWARE_PREFLIGHT_HUMAN_AUTH_REQUIRED: hardware_preflight.explicit_human_authorization_required,
                 ATTR_HARDWARE_PREFLIGHT_WRITE_LOCKED: hardware_preflight.write_locked,

@@ -20,7 +20,8 @@ def baseline(**overrides):
         local_http_only=True, watchdog_required=True, verification_required=True,
         zero_return_required=True, zero_on_failure_required=True,
         relock_required=True, test_request_prepared=True, zero_request_prepared=True,
-        report_target_ready=True,
+        report_target_ready=True, test_armed=True, solarflow_selected=True,
+        local_http_qualified=True, explicit_write_authorized=False,
     )
     values.update(overrides)
     return module.ControlledHardwarePreflightInput(**values)
@@ -32,6 +33,7 @@ class TestHardwarePreflight(unittest.TestCase):
         self.assertTrue(r.audit_passed)
         self.assertTrue(r.protocol_ready)
         self.assertFalse(r.independent_evidence_ready)
+        self.assertTrue(r.unlock_eligible)
         self.assertFalse(r.hardware_test_admissible)
         self.assertTrue(r.explicit_human_authorization_required)
         self.assertTrue(r.write_locked)
@@ -51,9 +53,9 @@ class TestHardwarePreflight(unittest.TestCase):
         self.assertIn("ZERO_RETURN_PROTOCOL_NOT_READY", r.blockers)
 
     def test_even_complete_evidence_never_unlocks_3b21(self):
-        r = module.evaluate_controlled_hardware_preflight(baseline(independent_evidence_complete=True))
+        r = module.evaluate_controlled_hardware_preflight(baseline(independent_evidence_complete=True, explicit_write_authorized=True))
         self.assertTrue(r.independent_evidence_ready)
-        self.assertFalse(r.hardware_test_admissible)
+        self.assertTrue(r.hardware_test_admissible)
         self.assertTrue(r.write_locked)
         self.assertFalse(r.reinjection_allowed)
 

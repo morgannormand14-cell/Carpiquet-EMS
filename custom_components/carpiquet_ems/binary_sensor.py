@@ -9,6 +9,7 @@ BINARY_SENSORS = [
     ("controlled_hardware_preflight_recovery_ready", "Hardware Preflight Recovery Contract Ready", ATTR_HARDWARE_PREFLIGHT_RECOVERY_READY),
     ("controlled_hardware_preflight_evidence_ready", "Hardware Preflight Independent Evidence Ready", ATTR_HARDWARE_PREFLIGHT_EVIDENCE_READY),
     ("controlled_hardware_preflight_protocol_ready", "Hardware Preflight Protocol Ready", ATTR_HARDWARE_PREFLIGHT_PROTOCOL_READY),
+    ("controlled_hardware_preflight_unlock_eligible", "Hardware Preflight Unlock Eligible", ATTR_HARDWARE_PREFLIGHT_UNLOCK_ELIGIBLE),
     ("controlled_hardware_preflight_hardware_admissible", "Hardware Preflight Hardware Test Admissible", ATTR_HARDWARE_PREFLIGHT_HARDWARE_ADMISSIBLE),
     ("controlled_hardware_preflight_human_auth_required", "Hardware Preflight Human Authorization Required", ATTR_HARDWARE_PREFLIGHT_HUMAN_AUTH_REQUIRED),
     ("controlled_hardware_preflight_write_locked", "Hardware Preflight Write Locked", ATTR_HARDWARE_PREFLIGHT_WRITE_LOCKED),

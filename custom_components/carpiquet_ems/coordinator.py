@@ -1451,6 +1451,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._latest_hardware_preflight = hardware_preflight
 
             result_data = {
+                ATTR_REAL_TEST_STATE: self._last_real_test_result.state if self._last_real_test_result else "NOT_RUN",
+                ATTR_REAL_TEST_TEST_STATUS: self._last_real_test_result.test_post_status if self._last_real_test_result else None,
+                ATTR_REAL_TEST_TEST_VERIFIED: self._last_real_test_result.test_verified if self._last_real_test_result else False,
+                ATTR_REAL_TEST_ZERO_STATUS: self._last_real_test_result.zero_post_status if self._last_real_test_result else None,
+                ATTR_REAL_TEST_ZERO_VERIFIED: self._last_real_test_result.zero_verified if self._last_real_test_result else False,
+                ATTR_REAL_TEST_RELOCKED: self._last_real_test_result.relocked if self._last_real_test_result else True,
+                ATTR_REAL_TEST_ERROR: self._last_real_test_result.error if self._last_real_test_result else "",
+                ATTR_REAL_TEST_COMPLETED_AT: self._last_real_test_result.completed_at if self._last_real_test_result else "",
                 ATTR_HARDWARE_PREFLIGHT_STATE: hardware_preflight.state,
                 ATTR_HARDWARE_PREFLIGHT_BLOCKERS: ", ".join(hardware_preflight.blockers),
                 ATTR_HARDWARE_PREFLIGHT_AUDIT_PASSED: hardware_preflight.audit_passed,

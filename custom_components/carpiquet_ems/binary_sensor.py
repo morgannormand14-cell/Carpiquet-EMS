@@ -3,6 +3,17 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_hardware_preflight_audit_passed", "Hardware Preflight Audit Passed", ATTR_HARDWARE_PREFLIGHT_AUDIT_PASSED),
+    ("controlled_hardware_preflight_regression_ready", "Hardware Preflight Regression Ready", ATTR_HARDWARE_PREFLIGHT_REGRESSION_READY),
+    ("controlled_hardware_preflight_bounds_ready", "Hardware Preflight Bounds Ready", ATTR_HARDWARE_PREFLIGHT_BOUNDS_READY),
+    ("controlled_hardware_preflight_recovery_ready", "Hardware Preflight Recovery Contract Ready", ATTR_HARDWARE_PREFLIGHT_RECOVERY_READY),
+    ("controlled_hardware_preflight_evidence_ready", "Hardware Preflight Independent Evidence Ready", ATTR_HARDWARE_PREFLIGHT_EVIDENCE_READY),
+    ("controlled_hardware_preflight_protocol_ready", "Hardware Preflight Protocol Ready", ATTR_HARDWARE_PREFLIGHT_PROTOCOL_READY),
+    ("controlled_hardware_preflight_hardware_admissible", "Hardware Preflight Hardware Test Admissible", ATTR_HARDWARE_PREFLIGHT_HARDWARE_ADMISSIBLE),
+    ("controlled_hardware_preflight_human_auth_required", "Hardware Preflight Human Authorization Required", ATTR_HARDWARE_PREFLIGHT_HUMAN_AUTH_REQUIRED),
+    ("controlled_hardware_preflight_write_locked", "Hardware Preflight Write Locked", ATTR_HARDWARE_PREFLIGHT_WRITE_LOCKED),
+    ("controlled_hardware_preflight_reinjection", "Hardware Preflight Reinjection Allowed", ATTR_HARDWARE_PREFLIGHT_REINJECTION),
+    ("controlled_hardware_preflight_real_write", "Hardware Preflight Real Write Used", ATTR_HARDWARE_PREFLIGHT_REAL_WRITE),
     ("controlled_final_regression_passed", "Final Regression Passed", ATTR_FINAL_REGRESSION_PASSED),
     ("controlled_final_regression_chain", "Final Regression Locked Chain Consistent", ATTR_FINAL_REGRESSION_CHAIN),
     ("controlled_final_regression_safety", "Final Regression Safety Invariants Preserved", ATTR_FINAL_REGRESSION_SAFETY),

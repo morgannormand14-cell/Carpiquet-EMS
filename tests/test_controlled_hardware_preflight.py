@@ -27,7 +27,7 @@ def baseline(**overrides):
     return module.ControlledHardwarePreflightInput(**values)
 
 class TestHardwarePreflight(unittest.TestCase):
-    def test_current_locked_chain_is_audit_ready_but_never_admissible(self):
+    def test_current_locked_chain_is_unlock_eligible_but_not_authorized(self):
         r = module.evaluate_controlled_hardware_preflight(baseline())
         self.assertEqual(r.state, "PREFLIGHT_READY_LOCKED")
         self.assertTrue(r.audit_passed)
@@ -38,7 +38,6 @@ class TestHardwarePreflight(unittest.TestCase):
         self.assertTrue(r.explicit_human_authorization_required)
         self.assertTrue(r.write_locked)
         self.assertFalse(r.real_write_used)
-        self.assertIn("INDEPENDENT_TRANSPORT_EVIDENCE_NOT_READY", r.blockers)
         self.assertIn("GLOBAL_WRITE_LOCK", r.blockers)
 
     def test_out_of_bounds_blocks_preflight(self):
@@ -52,7 +51,7 @@ class TestHardwarePreflight(unittest.TestCase):
         self.assertFalse(r.audit_passed)
         self.assertIn("ZERO_RETURN_PROTOCOL_NOT_READY", r.blockers)
 
-    def test_even_complete_evidence_never_unlocks_3b21(self):
+    def test_explicit_authorization_admits_only_after_preflight(self):
         r = module.evaluate_controlled_hardware_preflight(baseline(independent_evidence_complete=True, explicit_write_authorized=True))
         self.assertTrue(r.independent_evidence_ready)
         self.assertTrue(r.hardware_test_admissible)

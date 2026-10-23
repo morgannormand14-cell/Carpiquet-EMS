@@ -26,6 +26,10 @@ class ControlledHardwarePreflightInput:
     test_request_prepared: bool
     zero_request_prepared: bool
     report_target_ready: bool
+    test_armed: bool
+    solarflow_selected: bool
+    local_http_qualified: bool
+    explicit_write_authorized: bool
 
 
 @dataclass(frozen=True)
@@ -38,6 +42,7 @@ class ControlledHardwarePreflight:
     recovery_contract_ready: bool
     independent_evidence_ready: bool
     protocol_ready: bool
+    unlock_eligible: bool
     hardware_test_admissible: bool
     explicit_human_authorization_required: bool
     write_locked: bool
@@ -84,15 +89,24 @@ def evaluate_controlled_hardware_preflight(context: ControlledHardwarePreflightI
         blockers.append("CONTROLLED_TEST_BOUNDS_NOT_READY")
     if not recovery_ready:
         blockers.append("ZERO_RETURN_PROTOCOL_NOT_READY")
-    if not evidence_ready:
-        blockers.append("INDEPENDENT_TRANSPORT_EVIDENCE_NOT_READY")
-    blockers.append("EXPLICIT_HUMAN_AUTHORIZATION_REQUIRED")
-    blockers.append("GLOBAL_WRITE_LOCK")
-
-    # 3B-21 is an audit, never an execution grant. A later separately-reviewed
-    # execution stage would be required even if every technical prerequisite
-    # becomes true.
-    hardware_test_admissible = False
+    # Independent POST evidence is necessarily produced after the first POST;
+    # it is a required result of the test, not a circular prerequisite to it.
+    exact_first_test = bool(float(context.test_power_w) == 50.0 and float(context.duration_seconds) == 5.0)
+    unlock_eligible = bool(protocol_ready and context.test_armed and context.solarflow_selected
+                           and context.local_http_qualified and exact_first_test)
+    if not context.test_armed:
+        blockers.append("CONTROLLED_TEST_NOT_ARMED")
+    if not context.solarflow_selected:
+        blockers.append("SOLARFLOW_NOT_SELECTED")
+    if not context.local_http_qualified:
+        blockers.append("LOCAL_HTTP_NOT_QUALIFIED")
+    if not exact_first_test:
+        blockers.append("FIRST_REAL_TEST_MUST_BE_50W_5S")
+    if not context.explicit_write_authorized:
+        blockers.append("EXPLICIT_HUMAN_AUTHORIZATION_REQUIRED")
+    hardware_test_admissible = bool(unlock_eligible and context.explicit_write_authorized)
+    if not hardware_test_admissible:
+        blockers.append("GLOBAL_WRITE_LOCK")
     audit_passed = bool(protocol_ready)
 
     return ControlledHardwarePreflight(
@@ -104,6 +118,7 @@ def evaluate_controlled_hardware_preflight(context: ControlledHardwarePreflightI
         recovery_contract_ready=recovery_ready,
         independent_evidence_ready=evidence_ready,
         protocol_ready=protocol_ready,
+        unlock_eligible=unlock_eligible,
         hardware_test_admissible=hardware_test_admissible,
         explicit_human_authorization_required=True,
         write_locked=True,

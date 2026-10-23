@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_real_test_test_verified", "Real Test Test Verified", ATTR_REAL_TEST_TEST_VERIFIED),
+    ("controlled_real_test_zero_verified", "Real Test Zero Verified", ATTR_REAL_TEST_ZERO_VERIFIED),
+    ("controlled_real_test_relocked", "Real Test Relocked", ATTR_REAL_TEST_RELOCKED),
     ("controlled_hardware_preflight_audit_passed", "Hardware Preflight Audit Passed", ATTR_HARDWARE_PREFLIGHT_AUDIT_PASSED),
     ("controlled_hardware_preflight_regression_ready", "Hardware Preflight Regression Ready", ATTR_HARDWARE_PREFLIGHT_REGRESSION_READY),
     ("controlled_hardware_preflight_bounds_ready", "Hardware Preflight Bounds Ready", ATTR_HARDWARE_PREFLIGHT_BOUNDS_READY),

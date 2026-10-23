@@ -16,6 +16,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_controlled_evidence_identity.py' -v
       - name: 3B-19 locked recovery tests
         run: python -m unittest discover -s tests -p 'test_controlled_failure_recovery_bench.py' -v
+      - name: 3B-20 final non-regression tests
+        run: python -m unittest discover -s tests -p 'test_controlled_final_regression.py' -v
       - name: Validate JSON
         run: |
           python - <<'PY'

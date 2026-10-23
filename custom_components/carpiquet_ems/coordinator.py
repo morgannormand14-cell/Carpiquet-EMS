@@ -77,6 +77,7 @@ from .controlled_evidence_identity import (
     evaluate_controlled_evidence_identity,
 )
 from .controlled_failure_recovery_bench import run_locked_failure_recovery_bench
+from .controlled_final_regression import ControlledFinalRegressionInput, evaluate_controlled_final_regression
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1339,7 +1340,46 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 for item in loop_sim_degraded
             )
 
+            final_regression = evaluate_controlled_final_regression(
+                ControlledFinalRegressionInput(
+                    coherence_state=pre_execution_coherence.state,
+                    safety_boundary_coherent=pre_execution_coherence.safety_boundary_coherent,
+                    execution_admissible=pre_execution_coherence.execution_admissible,
+                    coherence_write_locked=pre_execution_coherence.write_locked,
+                    coherence_reinjection_allowed=pre_execution_coherence.reinjection_allowed,
+                    identity_state=evidence_identity.state,
+                    identity_ready=evidence_identity.identity_ready,
+                    independent_transport_proof_verified=evidence_identity.independent_transport_proof_verified,
+                    readback_causally_bound=evidence_identity.readback_causally_bound,
+                    identity_write_locked=evidence_identity.write_locked,
+                    identity_reinjection_allowed=evidence_identity.reinjection_allowed,
+                    recovery_state=failure_recovery_bench.state,
+                    recovery_all_passed=failure_recovery_bench.all_passed,
+                    recovery_zero_required=failure_recovery_bench.zero_return_required,
+                    recovery_zero_confirmed=failure_recovery_bench.zero_return_confirmed,
+                    recovery_write_locked=failure_recovery_bench.write_locked,
+                    recovery_reinjection_allowed=failure_recovery_bench.reinjection_allowed,
+                    recovery_real_transport_used=failure_recovery_bench.real_transport_used,
+                    loop_success_passed=loop_sim_success.passed,
+                    loop_failure_passed=loop_sim_failure.passed,
+                    loop_degraded_all_passed=all(item.passed for item in loop_sim_degraded),
+                    loop_edge_cases_passed=loop_sim_edge_cases_passed,
+                )
+            )
+
             result_data = {
+                ATTR_FINAL_REGRESSION_STATE: final_regression.state,
+                ATTR_FINAL_REGRESSION_BLOCKERS: ", ".join(final_regression.blockers),
+                ATTR_FINAL_REGRESSION_PASSED: final_regression.regression_passed,
+                ATTR_FINAL_REGRESSION_CHAIN: final_regression.locked_chain_consistent,
+                ATTR_FINAL_REGRESSION_SAFETY: final_regression.safety_invariants_preserved,
+                ATTR_FINAL_REGRESSION_SIMULATION: final_regression.simulation_bench_passed,
+                ATTR_FINAL_REGRESSION_EVIDENCE: final_regression.evidence_complete,
+                ATTR_FINAL_REGRESSION_HARDWARE_ADMISSIBLE: final_regression.hardware_test_admissible,
+                ATTR_FINAL_REGRESSION_WRITE_LOCKED: final_regression.write_locked,
+                ATTR_FINAL_REGRESSION_REINJECTION: final_regression.reinjection_allowed,
+                ATTR_FINAL_REGRESSION_REAL_WRITE: final_regression.real_write_used,
+                ATTR_FINAL_REGRESSION_EVALUATED_AT: final_regression.evaluated_at,
                 ATTR_REAL_READBACK_STATE: real_readback.state,
                 ATTR_REAL_READBACK_BLOCKERS: ", ".join(real_readback.blockers),
                 ATTR_REAL_READBACK_TARGET: real_readback.target,

@@ -20,6 +20,8 @@ jobs:
         run: python -m unittest discover -s tests -p 'test_controlled_final_regression.py' -v
       - name: 3B-21 final hardware preflight tests
         run: python -m unittest discover -s tests -p 'test_controlled_hardware_preflight.py' -v
+      - name: 3B-21 real executor safety tests
+        run: python -m unittest discover -s tests -p 'test_controlled_real_test_executor.py' -v
       - name: Validate JSON
         run: |
           python - <<'PY'

@@ -13,6 +13,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         [
             PrepareReportButton(coordinator, entry),
             SynchronizeCarpiquetButton(coordinator, entry),
+            ExecuteControlledRealTestButton(coordinator, entry),
         ]
     )
 
@@ -97,4 +98,36 @@ class SynchronizeCarpiquetButton(CoordinatorEntity, ButtonEntity):
             self.hass, message,
             title="Carpiquet EMS — Synchronisation terminée",
             notification_id="carpiquet_ems_synchronization",
+        )
+
+class ExecuteControlledRealTestButton(CoordinatorEntity, ButtonEntity):
+    """Explicit final action for the one-shot SolarFlow 50 W / 5 s test."""
+
+    def __init__(self, coordinator, entry):
+        super().__init__(coordinator)
+        self._attr_name = "Carpiquet EMS Execute Controlled Real Test"
+        self._attr_unique_id = f"{entry.entry_id}_execute_controlled_real_test"
+        self._attr_icon = "mdi:flash-alert"
+
+    async def async_press(self):
+        try:
+            result = await self.coordinator.async_execute_real_controlled_test()
+        except Exception as err:
+            persistent_notification.async_create(
+                self.hass, f"Essai réel refusé/échoué avant exécution : `{err}`",
+                title="Carpiquet EMS — Essai réel 3B-21",
+                notification_id="carpiquet_ems_real_test",
+            )
+            raise HomeAssistantError(str(err)) from err
+        persistent_notification.async_create(
+            self.hass,
+            (
+                f"État : **{result.state}**\n"
+                f"POST test : **{result.test_post_status}** — vérifié: **{result.test_verified}**\n"
+                f"POST zéro : **{result.zero_post_status}** — zéro vérifié: **{result.zero_verified}**\n"
+                f"Reverrouillé : **{result.relocked}**\n"
+                f"Erreur : `{result.error or 'aucune'}`"
+            ),
+            title="Carpiquet EMS — Résultat essai réel 3B-21",
+            notification_id="carpiquet_ems_real_test",
         )

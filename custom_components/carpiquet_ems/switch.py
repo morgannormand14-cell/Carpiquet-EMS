@@ -4,7 +4,7 @@ from .const import DOMAIN
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([SimulationSwitch(coordinator, entry), AutomationEngineSwitch(coordinator, entry), ControlledTestArmSwitch(coordinator, entry), ControlledTestAuthorizationSimulationSwitch(coordinator, entry)])
+    async_add_entities([SimulationSwitch(coordinator, entry), AutomationEngineSwitch(coordinator, entry), ControlledTestArmSwitch(coordinator, entry), ControlledTestAuthorizationSimulationSwitch(coordinator, entry), ControlledRealTestAuthorizationSwitch(coordinator, entry)])
 
 class SimulationSwitch(CoordinatorEntity, SwitchEntity):
     def __init__(self, coordinator, entry):
@@ -87,3 +87,26 @@ class ControlledTestAuthorizationSimulationSwitch(CoordinatorEntity, SwitchEntit
             "global_write_lock": True,
             "note": "Phase 3B Step 4 authorization simulation only; no hardware I/O path",
         }
+
+class ControlledRealTestAuthorizationSwitch(CoordinatorEntity, SwitchEntity):
+    """Volatile second key for the one-shot 3B-21 real SolarFlow test."""
+
+    def __init__(self, coordinator, entry):
+        super().__init__(coordinator)
+        self._attr_name = "Carpiquet EMS Real Test Authorization"
+        self._attr_unique_id = f"{entry.entry_id}_controlled_real_test_authorization"
+        self._attr_icon = "mdi:shield-key"
+
+    @property
+    def is_on(self):
+        return self.coordinator.real_test_authorized
+
+    async def async_turn_on(self, **kwargs):
+        await self.coordinator.async_set_real_test_authorized(True)
+
+    async def async_turn_off(self, **kwargs):
+        await self.coordinator.async_set_real_test_authorized(False)
+
+    @property
+    def extra_state_attributes(self):
+        return {"volatile": True, "one_shot": True, "scope": "SolarFlow 50 W / 5 s only"}

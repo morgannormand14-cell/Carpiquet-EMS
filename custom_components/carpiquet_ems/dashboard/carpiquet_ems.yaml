@@ -918,6 +918,43 @@ views:
                 name: Dernière évaluation
 
       - type: grid
+        title: 3B-21 — audit final pré-essai 🔒
+        column_span: 3
+        cards:
+          - type: entities
+            title: 3B-21 — Préflight matériel contrôlé 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_hardware_preflight_state
+                name: État audit
+              - entity: sensor.garage_carpiquet_ems_hardware_preflight_blockers
+                name: Blockers
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_audit_passed
+                name: Audit protocole validé
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_regression_ready
+                name: Non-régression prête
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_bounds_ready
+                name: Bornes test conformes
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_recovery_contract_ready
+                name: Contrat retour zéro prêt
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_independent_evidence_ready
+                name: Preuves indépendantes prêtes
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_protocol_ready
+                name: Protocole pré-essai prêt
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_hardware_test_admissible
+                name: Test matériel admissible
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_human_authorization_required
+                name: Autorisation humaine requise
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_reinjection_allowed
+                name: Réinjection autorisée
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_real_write_used
+                name: Écriture réelle utilisée
+              - entity: sensor.garage_carpiquet_ems_hardware_preflight_evaluated_at
+                name: Dernière évaluation
+
+      - type: grid
         title: Hyper 2000
         cards:
           - type: entities

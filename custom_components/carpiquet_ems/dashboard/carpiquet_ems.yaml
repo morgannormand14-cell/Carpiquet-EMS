@@ -941,6 +941,8 @@ views:
                 name: Preuves indépendantes prêtes
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_protocol_ready
                 name: Protocole pré-essai prêt
+              - entity: binary_sensor.carpiquet_ems_hardware_preflight_unlock_eligible
+                name: Déverrouillage éligible
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_hardware_test_admissible
                 name: Test matériel admissible
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_human_authorization_required
@@ -951,6 +953,10 @@ views:
                 name: Réinjection autorisée
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_real_write_used
                 name: Écriture réelle utilisée
+              - entity: switch.carpiquet_ems_real_test_authorization
+                name: Autorisation réelle ponctuelle
+              - entity: button.carpiquet_ems_execute_controlled_real_test
+                name: EXÉCUTER essai réel 50 W / 5 s
               - entity: sensor.garage_carpiquet_ems_hardware_preflight_evaluated_at
                 name: Dernière évaluation
 

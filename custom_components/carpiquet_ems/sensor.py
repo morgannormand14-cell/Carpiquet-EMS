@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_hardware_preflight_state", "Hardware Preflight State", ATTR_HARDWARE_PREFLIGHT_STATE, None, None),
+    ("controlled_hardware_preflight_blockers", "Hardware Preflight Blockers", ATTR_HARDWARE_PREFLIGHT_BLOCKERS, None, None),
+    ("controlled_hardware_preflight_evaluated_at", "Hardware Preflight Evaluated At", ATTR_HARDWARE_PREFLIGHT_EVALUATED_AT, None, None),
     ("controlled_final_regression_state", "Final Regression State", ATTR_FINAL_REGRESSION_STATE, None, None),
     ("controlled_final_regression_blockers", "Final Regression Blockers", ATTR_FINAL_REGRESSION_BLOCKERS, None, None),
     ("controlled_final_regression_evaluated_at", "Final Regression Evaluated At", ATTR_FINAL_REGRESSION_EVALUATED_AT, None, None),

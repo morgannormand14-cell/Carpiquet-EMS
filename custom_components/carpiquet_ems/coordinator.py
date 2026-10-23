@@ -1134,13 +1134,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 executor_prepared=bool(
                     selected_test_execution and selected_test_execution.prepared
                 ),
+                explicit_write_authorized=self._real_test_authorized,
             ))
 
             # alpha.3.15 Phase 3B Step 3: observe the future SolarFlow test lifecycle.
             # Explicit write authorization and all confirmation inputs remain false;
             # this is diagnostics-only and cannot request or send hardware I/O.
             test_sequence = evaluate_controlled_test_sequence(ControlledTestSequenceInput(
-                explicit_write_authorized=self._test_sequence_authorized,
+                explicit_write_authorized=(self._test_sequence_authorized or self._real_test_authorized),
                 device=self._test_gate_device,
                 selected_transport=str(transport_policy[ATTR_TRANSPORT_SOLARFLOW_SELECTED]),
                 gate_ready=(test_gate.state == "READY_LOCKED"),

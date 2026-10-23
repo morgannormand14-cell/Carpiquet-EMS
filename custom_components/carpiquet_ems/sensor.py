@@ -3,6 +3,9 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_final_regression_state", "Final Regression State", ATTR_FINAL_REGRESSION_STATE, None, None),
+    ("controlled_final_regression_blockers", "Final Regression Blockers", ATTR_FINAL_REGRESSION_BLOCKERS, None, None),
+    ("controlled_final_regression_evaluated_at", "Final Regression Evaluated At", ATTR_FINAL_REGRESSION_EVALUATED_AT, None, None),
     ("controlled_failure_recovery_state", "Failure Recovery State", ATTR_FAILURE_RECOVERY_STATE, None, None),
     ("controlled_failure_recovery_results", "Failure Recovery Results", ATTR_FAILURE_RECOVERY_RESULTS, None, None),
     ("controlled_failure_recovery_passed_count", "Failure Recovery Passed Count", ATTR_FAILURE_RECOVERY_PASSED_COUNT, None, None),

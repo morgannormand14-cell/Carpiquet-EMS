@@ -3,6 +3,15 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 BINARY_SENSORS = [
+    ("controlled_final_regression_passed", "Final Regression Passed", ATTR_FINAL_REGRESSION_PASSED),
+    ("controlled_final_regression_chain", "Final Regression Locked Chain Consistent", ATTR_FINAL_REGRESSION_CHAIN),
+    ("controlled_final_regression_safety", "Final Regression Safety Invariants Preserved", ATTR_FINAL_REGRESSION_SAFETY),
+    ("controlled_final_regression_simulation", "Final Regression Simulation Bench Passed", ATTR_FINAL_REGRESSION_SIMULATION),
+    ("controlled_final_regression_evidence", "Final Regression Evidence Complete", ATTR_FINAL_REGRESSION_EVIDENCE),
+    ("controlled_final_regression_hardware_admissible", "Final Regression Hardware Test Admissible", ATTR_FINAL_REGRESSION_HARDWARE_ADMISSIBLE),
+    ("controlled_final_regression_write_locked", "Final Regression Write Locked", ATTR_FINAL_REGRESSION_WRITE_LOCKED),
+    ("controlled_final_regression_reinjection", "Final Regression Reinjection Allowed", ATTR_FINAL_REGRESSION_REINJECTION),
+    ("controlled_final_regression_real_write", "Final Regression Real Write Used", ATTR_FINAL_REGRESSION_REAL_WRITE),
     ("controlled_failure_recovery_all_passed", "Failure Recovery All Passed", ATTR_FAILURE_RECOVERY_ALL_PASSED),
     ("controlled_failure_recovery_zero_required", "Failure Recovery Zero Required", ATTR_FAILURE_RECOVERY_ZERO_REQUIRED),
     ("controlled_failure_recovery_zero_confirmed", "Failure Recovery Zero Confirmed", ATTR_FAILURE_RECOVERY_ZERO_CONFIRMED),

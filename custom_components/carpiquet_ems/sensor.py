@@ -3,6 +3,11 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_real_test_state", "Real Test State", ATTR_REAL_TEST_STATE, None, None),
+    ("controlled_real_test_test_status", "Real Test Test POST Status", ATTR_REAL_TEST_TEST_STATUS, None, None),
+    ("controlled_real_test_zero_status", "Real Test Zero POST Status", ATTR_REAL_TEST_ZERO_STATUS, None, None),
+    ("controlled_real_test_error", "Real Test Error", ATTR_REAL_TEST_ERROR, None, None),
+    ("controlled_real_test_completed_at", "Real Test Completed At", ATTR_REAL_TEST_COMPLETED_AT, None, None),
     ("controlled_hardware_preflight_state", "Hardware Preflight State", ATTR_HARDWARE_PREFLIGHT_STATE, None, None),
     ("controlled_hardware_preflight_blockers", "Hardware Preflight Blockers", ATTR_HARDWARE_PREFLIGHT_BLOCKERS, None, None),
     ("controlled_hardware_preflight_evaluated_at", "Hardware Preflight Evaluated At", ATTR_HARDWARE_PREFLIGHT_EVALUATED_AT, None, None),

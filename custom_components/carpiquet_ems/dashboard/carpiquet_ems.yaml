@@ -885,6 +885,39 @@ views:
                 name: Dernière évaluation
 
       - type: grid
+        title: 3B-20 — non-régression finale 🔒
+        column_span: 3
+        cards:
+          - type: entities
+            title: 3B-20 — Verdict final de non-régression 🔒
+            show_header_toggle: false
+            entities:
+              - entity: sensor.garage_carpiquet_ems_final_regression_state
+                name: État
+              - entity: sensor.garage_carpiquet_ems_final_regression_blockers
+                name: Blockers
+              - entity: binary_sensor.carpiquet_ems_final_regression_passed
+                name: Non-régression validée
+              - entity: binary_sensor.carpiquet_ems_final_regression_locked_chain_consistent
+                name: Chaîne verrouillée cohérente
+              - entity: binary_sensor.carpiquet_ems_final_regression_safety_invariants_preserved
+                name: Invariants sécurité préservés
+              - entity: binary_sensor.carpiquet_ems_final_regression_simulation_bench_passed
+                name: Banc simulation validé
+              - entity: binary_sensor.carpiquet_ems_final_regression_evidence_complete
+                name: Preuves indépendantes complètes
+              - entity: binary_sensor.carpiquet_ems_final_regression_hardware_test_admissible
+                name: Test matériel admissible
+              - entity: binary_sensor.carpiquet_ems_final_regression_write_locked
+                name: Verrou écriture
+              - entity: binary_sensor.carpiquet_ems_final_regression_reinjection_allowed
+                name: Réinjection autorisée
+              - entity: binary_sensor.carpiquet_ems_final_regression_real_write_used
+                name: Écriture réelle utilisée
+              - entity: sensor.garage_carpiquet_ems_final_regression_evaluated_at
+                name: Dernière évaluation
+
+      - type: grid
         title: Hyper 2000
         cards:
           - type: entities

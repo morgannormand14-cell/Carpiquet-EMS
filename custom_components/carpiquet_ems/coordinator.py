@@ -78,6 +78,7 @@ from .controlled_evidence_identity import (
 )
 from .controlled_failure_recovery_bench import run_locked_failure_recovery_bench
 from .controlled_final_regression import ControlledFinalRegressionInput, evaluate_controlled_final_regression
+from .controlled_hardware_preflight import ControlledHardwarePreflightInput, evaluate_controlled_hardware_preflight
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -1367,7 +1368,46 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            hardware_preflight = evaluate_controlled_hardware_preflight(
+                ControlledHardwarePreflightInput(
+                    final_regression_passed=final_regression.regression_passed,
+                    locked_chain_consistent=final_regression.locked_chain_consistent,
+                    safety_invariants_preserved=final_regression.safety_invariants_preserved,
+                    simulation_bench_passed=final_regression.simulation_bench_passed,
+                    independent_evidence_complete=final_regression.evidence_complete,
+                    final_write_locked=final_regression.write_locked,
+                    final_reinjection_allowed=final_regression.reinjection_allowed,
+                    real_write_used=final_regression.real_write_used,
+                    test_power_w=float(self._test_gate_power_w),
+                    duration_seconds=float(self._test_gate_duration_s),
+                    single_device_only=execution_safety.single_device_only,
+                    local_http_only=execution_safety.local_http_only,
+                    watchdog_required=execution_safety.watchdog_required,
+                    verification_required=execution_safety.verification_required,
+                    zero_return_required=execution_safety.zero_return_required,
+                    zero_on_failure_required=execution_safety.zero_on_failure_required,
+                    relock_required=execution_safety.relock_required,
+                    test_request_prepared=local_http_preparation.test_request.prepared,
+                    zero_request_prepared=local_http_preparation.zero_request.prepared,
+                    report_target_ready=bool(local_http_preparation.report_target),
+                )
+            )
+
             result_data = {
+                ATTR_HARDWARE_PREFLIGHT_STATE: hardware_preflight.state,
+                ATTR_HARDWARE_PREFLIGHT_BLOCKERS: ", ".join(hardware_preflight.blockers),
+                ATTR_HARDWARE_PREFLIGHT_AUDIT_PASSED: hardware_preflight.audit_passed,
+                ATTR_HARDWARE_PREFLIGHT_REGRESSION_READY: hardware_preflight.regression_ready,
+                ATTR_HARDWARE_PREFLIGHT_BOUNDS_READY: hardware_preflight.bounds_ready,
+                ATTR_HARDWARE_PREFLIGHT_RECOVERY_READY: hardware_preflight.recovery_contract_ready,
+                ATTR_HARDWARE_PREFLIGHT_EVIDENCE_READY: hardware_preflight.independent_evidence_ready,
+                ATTR_HARDWARE_PREFLIGHT_PROTOCOL_READY: hardware_preflight.protocol_ready,
+                ATTR_HARDWARE_PREFLIGHT_HARDWARE_ADMISSIBLE: hardware_preflight.hardware_test_admissible,
+                ATTR_HARDWARE_PREFLIGHT_HUMAN_AUTH_REQUIRED: hardware_preflight.explicit_human_authorization_required,
+                ATTR_HARDWARE_PREFLIGHT_WRITE_LOCKED: hardware_preflight.write_locked,
+                ATTR_HARDWARE_PREFLIGHT_REINJECTION: hardware_preflight.reinjection_allowed,
+                ATTR_HARDWARE_PREFLIGHT_REAL_WRITE: hardware_preflight.real_write_used,
+                ATTR_HARDWARE_PREFLIGHT_EVALUATED_AT: hardware_preflight.evaluated_at,
                 ATTR_FINAL_REGRESSION_STATE: final_regression.state,
                 ATTR_FINAL_REGRESSION_BLOCKERS: ", ".join(final_regression.blockers),
                 ATTR_FINAL_REGRESSION_PASSED: final_regression.regression_passed,

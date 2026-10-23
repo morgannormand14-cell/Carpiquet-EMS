@@ -955,8 +955,10 @@ views:
                 name: Écriture réelle utilisée
               - entity: switch.carpiquet_ems_real_test_authorization
                 name: Autorisation réelle ponctuelle
-              - entity: button.carpiquet_ems_execute_controlled_real_test
+              - type: button
+                entity: button.carpiquet_ems_execute_controlled_real_test
                 name: EXÉCUTER essai réel 50 W / 5 s
+                action_name: EXÉCUTER
               - entity: sensor.garage_carpiquet_ems_real_test_state
                 name: Résultat essai réel
               - entity: sensor.garage_carpiquet_ems_real_test_test_post_status

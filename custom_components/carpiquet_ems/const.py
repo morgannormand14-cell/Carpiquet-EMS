@@ -687,3 +687,13 @@ ATTR_HARDWARE_PREFLIGHT_WRITE_LOCKED = "controlled_hardware_preflight_write_lock
 ATTR_HARDWARE_PREFLIGHT_REINJECTION = "controlled_hardware_preflight_reinjection_allowed"
 ATTR_HARDWARE_PREFLIGHT_REAL_WRITE = "controlled_hardware_preflight_real_write_used"
 ATTR_HARDWARE_PREFLIGHT_EVALUATED_AT = "controlled_hardware_preflight_evaluated_at"
+
+# Phase 3B-21 — one-shot real test result
+ATTR_REAL_TEST_STATE = "controlled_real_test_state"
+ATTR_REAL_TEST_TEST_STATUS = "controlled_real_test_test_post_status"
+ATTR_REAL_TEST_TEST_VERIFIED = "controlled_real_test_test_verified"
+ATTR_REAL_TEST_ZERO_STATUS = "controlled_real_test_zero_post_status"
+ATTR_REAL_TEST_ZERO_VERIFIED = "controlled_real_test_zero_verified"
+ATTR_REAL_TEST_RELOCKED = "controlled_real_test_relocked"
+ATTR_REAL_TEST_ERROR = "controlled_real_test_error"
+ATTR_REAL_TEST_COMPLETED_AT = "controlled_real_test_completed_at"

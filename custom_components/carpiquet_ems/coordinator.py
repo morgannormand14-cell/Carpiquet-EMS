@@ -79,6 +79,7 @@ from .controlled_evidence_identity import (
 from .controlled_failure_recovery_bench import run_locked_failure_recovery_bench
 from .controlled_final_regression import ControlledFinalRegressionInput, evaluate_controlled_final_regression
 from .controlled_hardware_preflight import ControlledHardwarePreflightInput, evaluate_controlled_hardware_preflight
+from .controlled_real_test_executor import execute_single_solarflow_test
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -188,6 +189,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._test_gate_duration_seconds = 0.0
         # Phase 3B Step 4: volatile authorization simulation; never enables hardware I/O.
         self._test_sequence_authorized = False
+        self._real_test_authorized = False
+        self._real_test_running = False
+        self._latest_local_http_preparation = None
+        self._latest_hardware_preflight = None
+        self._last_real_test_result = None
         self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
@@ -263,6 +269,46 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         await self.async_request_refresh()
 
     @property
+    def real_test_authorized(self):
+        return bool(self._real_test_authorized)
+
+    async def async_set_real_test_authorized(self, authorized):
+        # Volatile, one-shot authorization. It never survives reload or parameter changes.
+        self._real_test_authorized = bool(authorized)
+        await self.async_request_refresh()
+
+    async def async_execute_real_controlled_test(self):
+        if self._real_test_running:
+            raise RuntimeError("A controlled real test is already running")
+        await self.async_request_refresh()
+        preflight = self._latest_hardware_preflight
+        prep = self._latest_local_http_preparation
+        if not preflight or not prep or not preflight.hardware_test_admissible:
+            raise RuntimeError("3B-21 preflight does not admit the real test")
+        if self._test_gate_device != "solarflow" or float(self._test_gate_power_w) != 50.0 or float(self._test_gate_duration_seconds) != 5.0:
+            raise RuntimeError("First real test is strictly SolarFlow 50 W / 5 s")
+        self._real_test_running = True
+        try:
+            result = await execute_single_solarflow_test(
+                self.hass,
+                test_target=prep.test_request.target,
+                report_target=prep.report_target,
+                test_body=prep.test_request.json_body,
+                zero_body=prep.zero_request.json_body,
+                power_w=self._test_gate_power_w,
+                duration_seconds=self._test_gate_duration_seconds,
+            )
+            self._last_real_test_result = result
+            return result
+        finally:
+            # One-shot boundary: always revoke authorization and disarm after any attempt.
+            self._real_test_authorized = False
+            self._test_sequence_authorized = False
+            self._test_gate_armed = False
+            self._real_test_running = False
+            await self.async_request_refresh()
+
+    @property
     def test_sequence_authorized(self):
         return bool(self._test_sequence_authorized)
 
@@ -296,18 +342,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._test_gate_device = device
         self._test_gate_armed = False
         self._test_sequence_authorized = False
+        self._real_test_authorized = False
         await self.async_request_refresh()
 
     async def async_set_test_gate_power(self, value):
         self._test_gate_power_w = max(0.0, min(100.0, float(value)))
         self._test_gate_armed = False
         self._test_sequence_authorized = False
+        self._real_test_authorized = False
         await self.async_request_refresh()
 
     async def async_set_test_gate_duration(self, value):
         self._test_gate_duration_seconds = max(0.0, min(10.0, float(value)))
         self._test_gate_armed = False
         self._test_sequence_authorized = False
+        self._real_test_authorized = False
         await self.async_request_refresh()
 
     def _transport_policy_diagnostics(self):
@@ -1390,8 +1439,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     test_request_prepared=local_http_preparation.test_request.prepared,
                     zero_request_prepared=local_http_preparation.zero_request.prepared,
                     report_target_ready=bool(local_http_preparation.report_target),
+                    test_armed=self._test_gate_armed,
+                    solarflow_selected=self._test_gate_device == "solarflow",
+                    local_http_qualified=bool(self._solarflow_local_probe and self._solarflow_local_probe.qualified),
+                    explicit_write_authorized=self._real_test_authorized,
                 )
             )
+
+            self._latest_local_http_preparation = local_http_preparation
+            self._latest_hardware_preflight = hardware_preflight
 
             result_data = {
                 ATTR_HARDWARE_PREFLIGHT_STATE: hardware_preflight.state,

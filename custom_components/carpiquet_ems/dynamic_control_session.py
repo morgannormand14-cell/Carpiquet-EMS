@@ -23,6 +23,7 @@ class DynamicControlSession:
             confirmation_timeout_s=confirmation_timeout_s,
         )
         self._closed = False
+        self._closing_lock = asyncio.Lock()
 
     @property
     def status(self):
@@ -66,6 +67,8 @@ class DynamicControlSession:
             return result
 
     async def close(self):
-        async with self._lock:
+        # Do not hold the session apply lock while the watchdog waits for
+        # the executor lock: an in-flight HTTP call must be able to finish.
+        async with self._closing_lock:
             self._closed = True
             await self._watchdog.close()

@@ -338,7 +338,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         return float(self._test_gate_duration_seconds)
 
     async def async_set_test_gate_armed(self, armed):
-        self._test_gate_armed = bool(armed)
+        armed = bool(armed)
+        if armed:
+            await self.async_request_refresh()
+            if self._test_gate_device == "solarflow":
+                self._test_gate_frozen_ems_power_w = float(self.data.get(ATTR_VALIDATED_SOLARFLOW_OUTPUT, 0.0) or 0.0)
+            elif self._test_gate_device == "hyper":
+                self._test_gate_frozen_ems_power_w = float(self.data.get(ATTR_VALIDATED_HYPER_OUTPUT, 0.0) or 0.0)
+            else:
+                self._test_gate_frozen_ems_power_w = 0.0
+        else:
+            self._test_gate_frozen_ems_power_w = 0.0
+        self._test_gate_armed = armed
         await self.async_request_refresh()
 
     async def async_set_test_gate_device(self, device):

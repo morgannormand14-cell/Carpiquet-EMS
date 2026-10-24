@@ -64,6 +64,15 @@ class TestHardwarePreflight(unittest.TestCase):
         self.assertTrue(r.audit_passed)
         self.assertTrue(r.unlock_eligible)
 
+    def test_duration_accepts_zero_and_six_hundred_seconds(self):
+        self.assertTrue(module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=0)).audit_passed)
+        self.assertTrue(module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=600)).audit_passed)
+
+    def test_duration_above_six_hundred_seconds_fails_closed(self):
+        r = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=601))
+        self.assertFalse(r.audit_passed)
+        self.assertIn("CONTROLLED_TEST_BOUNDS_NOT_READY", r.blockers)
+
     def test_duration_accepts_ten_minutes_and_rejects_above(self):
         ok = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=600))
         too_long = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=601))

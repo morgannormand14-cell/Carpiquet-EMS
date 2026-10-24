@@ -98,3 +98,23 @@ async def test_interlock_loss_stops_without_deadlock():
         )
     assert session.status.stop_confirmed is True
     await session.close()
+
+
+@pytest.mark.asyncio
+async def test_late_confirmation_does_not_rearm_after_close():
+    executor = FakeExecutor()
+    session = Session(executor)
+    session.start(authorized=True)
+    pending = asyncio.create_task(
+        session.apply(450, authorized=True, conditions_valid=True)
+    )
+    await executor.entered.wait()
+    stopping = asyncio.create_task(session.close())
+    await asyncio.sleep(0)
+    executor.release.set()
+    await asyncio.wait_for(asyncio.gather(pending, stopping), 2)
+    assert session.status.state == "TRIPPED"
+    assert session.status.stop_confirmed is True
+    with pytest.raises(RuntimeError, match="not monitoring"):
+        await session.apply(450, authorized=True, conditions_valid=True)
+    assert sum(1 for name, _ in executor.calls if name == "stop") == 1

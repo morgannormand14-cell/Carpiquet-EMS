@@ -49,7 +49,8 @@ class DynamicControlSession:
             if self._closed or self.status.state != "MONITORING":
                 raise RuntimeError("Session is not monitoring")
             if not authorized or not conditions_valid:
-                await self.close()
+                self._closed = True
+                await self._watchdog._trip("DYNAMIC_INTERLOCK_LOST")
                 raise RuntimeError("Dynamic safety interlock lost")
             self._watchdog.feed_decision()
             result = await self.executor.apply(
@@ -57,7 +58,10 @@ class DynamicControlSession:
             )
             if result.state == "APPLIED_VERIFIED":
                 self._watchdog.feed_confirmation(verified=True)
-            elif result.state != "STOP_ZERO_VERIFIED":
+            elif result.state == "STOP_ZERO_VERIFIED":
+                self._closed = True
+                await self._watchdog.close()
+            else:
                 self._watchdog.feed_confirmation(verified=False)
             return result
 

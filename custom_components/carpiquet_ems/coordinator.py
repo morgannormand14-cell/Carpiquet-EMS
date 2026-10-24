@@ -1252,10 +1252,16 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 )
             )
 
+            prepared_test_properties = (
+                local_http_preparation.test_request.json_body.get("properties", {})
+                if isinstance(local_http_preparation.test_request.json_body, dict)
+                else {}
+            )
+            prepared_test_output = float(prepared_test_properties.get("outputLimit", 0.0) or 0.0)
             expected_feedback_output = (
                 0.0
                 if transport_bridge.zero_return_selected
-                else float(self._test_gate_power_w)
+                else prepared_test_output
             )
             transport_feedback = evaluate_controlled_transport_feedback(
                 ControlledTransportFeedbackInput(

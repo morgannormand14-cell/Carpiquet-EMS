@@ -118,3 +118,35 @@ async def test_late_confirmation_does_not_rearm_after_close():
     with pytest.raises(RuntimeError, match="not monitoring"):
         await session.apply(450, authorized=True, conditions_valid=True)
     assert sum(1 for name, _ in executor.calls if name == "stop") == 1
+
+
+@pytest.mark.asyncio
+async def test_watchdog_trip_during_inflight_command_requests_zero():
+    executor = FakeExecutor()
+    session = Session(executor)
+    session.start(authorized=True)
+    pending = asyncio.create_task(session.apply(250, authorized=True, conditions_valid=True))
+    await executor.entered.wait()
+    tripping = asyncio.create_task(session._watchdog._trip("EMS_DECISION_STALE"))
+    await asyncio.sleep(0)
+    executor.release.set()
+    await asyncio.wait_for(asyncio.gather(pending, tripping), 2)
+    assert session.status.state == "TRIPPED"
+    assert session.status.stop_confirmed is True
+    assert executor.calls[-1][0] == "stop"
+    await session.close()
+
+
+@pytest.mark.asyncio
+async def test_repeated_close_during_pending_command_is_serialized():
+    executor = FakeExecutor()
+    session = Session(executor)
+    session.start(authorized=True)
+    pending = asyncio.create_task(session.apply(200, authorized=True, conditions_valid=True))
+    await executor.entered.wait()
+    closing = [asyncio.create_task(session.close()) for _ in range(3)]
+    await asyncio.sleep(0)
+    executor.release.set()
+    await asyncio.wait_for(asyncio.gather(pending, *closing), 2)
+    assert sum(1 for name, _ in executor.calls if name == "stop") == 1
+    assert session.status.stop_confirmed is True

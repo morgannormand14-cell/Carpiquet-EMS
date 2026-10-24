@@ -101,7 +101,7 @@ class SynchronizeCarpiquetButton(CoordinatorEntity, ButtonEntity):
         )
 
 class ExecuteControlledRealTestButton(CoordinatorEntity, ButtonEntity):
-    """Explicit final action for the one-shot SolarFlow 50 W / 5 s test."""
+    """Explicit final action for the one-shot bounded SolarFlow EMS test."""
 
     def __init__(self, coordinator, entry):
         super().__init__(coordinator)

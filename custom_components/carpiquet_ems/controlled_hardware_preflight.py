@@ -15,6 +15,7 @@ class ControlledHardwarePreflightInput:
     final_reinjection_allowed: bool
     real_write_used: bool
     test_power_w: float
+    power_limit_w: float
     duration_seconds: float
     single_device_only: bool
     local_http_only: bool
@@ -63,8 +64,11 @@ def evaluate_controlled_hardware_preflight(context: ControlledHardwarePreflightI
         and not context.final_reinjection_allowed
         and not context.real_write_used
     )
+    power_setpoint_ready = bool(0.0 < float(context.test_power_w) <= 2400.0)
+    power_limit_ready = bool(0.0 <= float(context.power_limit_w) <= 2400.0)
+    power_within_limit = bool(power_setpoint_ready and power_limit_ready and float(context.test_power_w) <= float(context.power_limit_w))
     bounds_ready = bool(
-        1.0 <= float(context.test_power_w) <= 100.0
+        power_within_limit
         and 1.0 <= float(context.duration_seconds) <= 10.0
         and context.single_device_only
         and context.local_http_only
@@ -85,23 +89,26 @@ def evaluate_controlled_hardware_preflight(context: ControlledHardwarePreflightI
     blockers: list[str] = []
     if not regression_ready:
         blockers.append("FINAL_REGRESSION_NOT_READY")
+    if not power_setpoint_ready:
+        blockers.append("EMS_SETPOINT_NOT_FROZEN")
+    if not power_limit_ready:
+        blockers.append("TEST_POWER_LIMIT_OUT_OF_RANGE")
+    if power_setpoint_ready and power_limit_ready and not power_within_limit:
+        blockers.append("POWER_ABOVE_TEST_LIMIT")
     if not bounds_ready:
         blockers.append("CONTROLLED_TEST_BOUNDS_NOT_READY")
     if not recovery_ready:
         blockers.append("ZERO_RETURN_PROTOCOL_NOT_READY")
     # Independent POST evidence is necessarily produced after the first POST;
     # it is a required result of the test, not a circular prerequisite to it.
-    exact_first_test = bool(float(context.test_power_w) == 50.0 and float(context.duration_seconds) == 5.0)
     unlock_eligible = bool(protocol_ready and context.test_armed and context.solarflow_selected
-                           and context.local_http_qualified and exact_first_test)
+                           and context.local_http_qualified)
     if not context.test_armed:
         blockers.append("CONTROLLED_TEST_NOT_ARMED")
     if not context.solarflow_selected:
         blockers.append("SOLARFLOW_NOT_SELECTED")
     if not context.local_http_qualified:
         blockers.append("LOCAL_HTTP_NOT_QUALIFIED")
-    if not exact_first_test:
-        blockers.append("FIRST_REAL_TEST_MUST_BE_50W_5S")
     if not context.explicit_write_authorized:
         blockers.append("EXPLICIT_HUMAN_AUTHORIZATION_REQUIRED")
     hardware_test_admissible = bool(unlock_eligible and context.explicit_write_authorized)

@@ -64,7 +64,15 @@ class TestHardwarePreflight(unittest.TestCase):
         self.assertTrue(r.audit_passed)
         self.assertTrue(r.unlock_eligible)
 
-    def test_duration_accepts_ten_minutes_and_rejects_above(self):\n        ok = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=600))\n        too_long = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=601))\n        zero = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=0))\n        self.assertTrue(ok.audit_passed)\n        self.assertFalse(too_long.audit_passed)\n        self.assertFalse(zero.audit_passed)\n\n    def test_missing_zero_request_blocks_preflight(self):
+    def test_duration_accepts_ten_minutes_and_rejects_above(self):
+        ok = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=600))
+        too_long = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=601))
+        zero = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=0))
+        self.assertTrue(ok.audit_passed)
+        self.assertFalse(too_long.audit_passed)
+        self.assertFalse(zero.audit_passed)
+
+    def test_missing_zero_request_blocks_preflight(self):
         r = module.evaluate_controlled_hardware_preflight(baseline(zero_request_prepared=False))
         self.assertFalse(r.audit_passed)
         self.assertIn("ZERO_RETURN_PROTOCOL_NOT_READY", r.blockers)

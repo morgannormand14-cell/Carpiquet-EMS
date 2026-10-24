@@ -1,9 +1,13 @@
 from __future__ import annotations
 
 import asyncio
+import math
 from dataclasses import dataclass
 from datetime import datetime, timezone
 from typing import Any
+
+ZERO_ATTEMPTS = 3
+SETTLING_SECONDS = 5.0
 
 
 @dataclass(frozen=True)
@@ -23,7 +27,7 @@ def _output(payload: Any) -> float | None:
         return None
     for key in ("outputLimit", "outputPower", "outPower"):
         value = payload["properties"].get(key)
-        if isinstance(value, (int, float)) and not isinstance(value, bool):
+        if isinstance(value, (int, float)) and not isinstance(value, bool) and math.isfinite(value):
             return float(value)
     return None
 
@@ -37,23 +41,48 @@ async def _get_output(session, target: str) -> tuple[int, float | None]:
 
 async def _post(session, target: str, body: dict) -> int:
     async with session.post(target, json=body, timeout=5) as response:
-        # Consume the response so the connection is cleanly reusable.
         await response.read()
         return int(response.status)
+
+
+async def _restore_zero(session, test_target: str, report_target: str, zero_body: dict):
+    """Bounded zero recovery; verify readback even if POST response is lost."""
+    last_status = None
+    errors = []
+    for attempt in range(1, ZERO_ATTEMPTS + 1):
+        try:
+            last_status = await _post(session, test_target, zero_body)
+            if not 200 <= last_status < 300:
+                errors.append(f"ZERO_POST_HTTP_{last_status}_ATTEMPT_{attempt}")
+        except Exception as err:
+            errors.append(f"ZERO_POST_{type(err).__name__}_ATTEMPT_{attempt}: {err}")
+        # A timed-out POST can still have been applied: always attempt readback.
+        await asyncio.sleep(SETTLING_SECONDS)
+        try:
+            status, observed = await _get_output(session, report_target)
+            if status == 200 and observed is not None and abs(observed) <= 1.0:
+                return last_status, True, ""
+            errors.append(f"ZERO_READBACK_UNCONFIRMED_ATTEMPT_{attempt}")
+        except Exception as err:
+            errors.append(f"ZERO_GET_{type(err).__name__}_ATTEMPT_{attempt}: {err}")
+    return last_status, False, "; ".join(errors)
 
 
 async def execute_single_solarflow_test(
     hass, *, test_target: str, report_target: str, test_body: dict,
     zero_body: dict, power_w: float, duration_seconds: float,
 ) -> RealTestResult:
-    """Execute exactly one bounded SolarFlow Local HTTP test.
+    """One authorized SolarFlow test; always attempt zero after initiating POST.
 
-    Caller must enforce the 3B-21 authorization boundary. Once the test POST
-    succeeds, a zero POST is attempted in finally on every path.
+    Software authorization is revoked by the coordinator independently of
+    physical zero confirmation. Unconfirmed zero must remain visible as failure.
     """
     if not test_target.endswith("/properties/write") or not report_target.endswith("/properties/report"):
         raise ValueError("Invalid SolarFlow Local HTTP targets")
-    if not (0.0 < float(power_w) <= 2400.0 and 0.0 <= float(duration_seconds) <= 600.0):
+    if not (
+        math.isfinite(float(power_w)) and 0.0 < float(power_w) <= 2400.0
+        and math.isfinite(float(duration_seconds)) and 0.0 <= float(duration_seconds) <= 600.0
+    ):
         raise ValueError("Controlled test outside safety bounds")
     if float(test_body.get("properties", {}).get("outputLimit", -1)) != float(power_w):
         raise ValueError("Prepared test body does not match requested power")
@@ -67,36 +96,44 @@ async def execute_single_solarflow_test(
     test_verified = False
     zero_verified = False
     error = ""
-    test_sent = False
+    post_attempted = False
     try:
+        # Mark before I/O: a timeout or cancellation does not prove no write occurred.
+        post_attempted = True
         test_status = await _post(session, test_target, test_body)
-        test_sent = 200 <= test_status < 300
-        if not test_sent:
+        if not 200 <= test_status < 300:
             raise RuntimeError(f"TEST_POST_HTTP_{test_status}")
-        # Fixed settling delay before validating the physical readback.
-        await asyncio.sleep(5.0)
+        await asyncio.sleep(SETTLING_SECONDS)
         get_status, observed = await _get_output(session, report_target)
-        test_verified = bool(get_status == 200 and observed is not None and abs(observed - float(power_w)) <= 1.0)
+        test_verified = bool(
+            get_status == 200 and observed is not None
+            and abs(observed - float(power_w)) <= 1.0
+        )
         if not test_verified:
             raise RuntimeError("TEST_READBACK_NOT_CONFIRMED")
-        # Operator-selected hold after successful validation: 0..600 seconds.
         await asyncio.sleep(float(duration_seconds))
     except Exception as err:
         error = f"{type(err).__name__}: {err}"
     finally:
-        if test_sent:
+        if post_attempted:
+            # Shield cleanup from caller cancellation, and wait for it to finish
+            # before returning/re-raising; never abandon the zero operation.
+            recovery = asyncio.create_task(
+                _restore_zero(session, test_target, report_target, zero_body)
+            )
             try:
-                zero_status = await _post(session, test_target, zero_body)
-                if 200 <= zero_status < 300:
-                    # Give SolarFlow the same fixed settling window before zero readback.
-                    await asyncio.sleep(5.0)
-                    get_status, observed = await _get_output(session, report_target)
-                    zero_verified = bool(get_status == 200 and observed is not None and abs(observed) <= 1.0)
-            except Exception as err:
-                if not error:
-                    error = f"ZERO_{type(err).__name__}: {err}"
+                zero_status, zero_verified, zero_error = await asyncio.shield(recovery)
+            except asyncio.CancelledError:
+                # Python task cancellation must not orphan the physical stop.
+                zero_status, zero_verified, zero_error = await recovery
+                raise
+            if zero_error:
+                error = f"{error}; {zero_error}".strip("; ")
 
-    state = "REAL_TEST_COMPLETE_RELOCKED" if test_verified and zero_verified else "REAL_TEST_FAILED_RELOCKED"
+    if zero_verified:
+        state = "REAL_TEST_COMPLETE_RELOCKED" if test_verified else "REAL_TEST_FAILED_RELOCKED"
+    else:
+        state = "ZERO_UNCONFIRMED_RELOCKED"
     return RealTestResult(
         state=state, test_post_status=test_status, test_verified=test_verified,
         zero_post_status=zero_status, zero_verified=zero_verified, relocked=True,

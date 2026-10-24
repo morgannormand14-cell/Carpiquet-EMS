@@ -357,6 +357,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             raise ValueError("Unsupported Controlled Test Gate device")
         self._test_gate_device = device
         self._test_gate_armed = False
+        self._test_gate_frozen_ems_power_w = 0.0
         self._test_sequence_authorized = False
         self._real_test_authorized = False
         await self.async_request_refresh()
@@ -1466,7 +1467,16 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._latest_local_http_preparation = local_http_preparation
             self._latest_hardware_preflight = hardware_preflight
 
+            live_test_ems_power = (
+                float(command_decision.validated.solarflow_output_w) if self._test_gate_device == "solarflow"
+                else float(command_decision.validated.hyper_output_w) if self._test_gate_device == "hyper"
+                else 0.0
+            )
             result_data = {
+                ATTR_TEST_GATE_POWER_LIMIT: float(self._test_gate_power_w),
+                ATTR_TEST_GATE_LIVE_EMS_POWER: live_test_ems_power,
+                ATTR_TEST_GATE_FROZEN_EMS_POWER: float(self._test_gate_frozen_ems_power_w),
+                ATTR_TEST_GATE_POWER_WITHIN_LIMIT: bool(self._test_gate_armed and 0.0 < self._test_gate_frozen_ems_power_w <= self._test_gate_power_w),
                 ATTR_REAL_TEST_STATE: self._last_real_test_result.state if self._last_real_test_result else "NOT_RUN",
                 ATTR_REAL_TEST_TEST_STATUS: self._last_real_test_result.test_post_status if self._last_real_test_result else None,
                 ATTR_REAL_TEST_TEST_VERIFIED: self._last_real_test_result.test_verified if self._last_real_test_result else False,

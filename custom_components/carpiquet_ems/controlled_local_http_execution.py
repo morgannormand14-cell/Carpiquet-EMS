@@ -11,6 +11,7 @@ STATE_PREPARED_LOCKED = "PREPARED_LOCKED"
 REASON_SEQUENCE_NOT_PREPARED = "CONTROLLED_SEQUENCE_NOT_PREPARED"
 REASON_EXECUTOR_NOT_PREPARED = "LOCAL_HTTP_EXECUTOR_NOT_PREPARED"
 REASON_INVALID_ENVELOPE = "INVALID_LOCAL_HTTP_ENVELOPE"
+REASON_INVALID_FROZEN_SETPOINT = "INVALID_FROZEN_EMS_SETPOINT"
 REASON_GLOBAL_LOCK = "GLOBAL_WRITE_LOCK"
 
 
@@ -70,6 +71,7 @@ def prepare_controlled_local_http_execution(
     target: str,
     report_target: str,
     envelope: dict[str, Any],
+    frozen_power_w: float,
 ) -> ControlledLocalHttpPreparation:
     """Prepare test and mandatory-zero HTTP descriptions without executing them."""
 
@@ -90,6 +92,12 @@ def prepare_controlled_local_http_execution(
     )
     if not valid:
         blockers.append(REASON_INVALID_ENVELOPE)
+
+    frozen_setpoint_valid = bool(0.0 < float(frozen_power_w) <= 2400.0)
+    if not frozen_setpoint_valid:
+        blockers.append(REASON_INVALID_FROZEN_SETPOINT)
+    if valid and frozen_setpoint_valid:
+        body["properties"]["outputLimit"] = float(frozen_power_w)
 
     prepared = not blockers
     zero_body = deepcopy(body)

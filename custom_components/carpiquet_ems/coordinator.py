@@ -185,7 +185,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         # alpha.3.15 phase 2: volatile test settings; reset on every HA reload.
         self._test_gate_armed = False
         self._test_gate_device = ""
-        self._test_gate_power_w = 0.0
+        self._test_gate_power_w = 0.0  # operator-selected authorization ceiling
+        self._test_gate_frozen_ems_power_w = 0.0
         self._test_gate_duration_seconds = 0.0
         # Phase 3B Step 4: volatile authorization simulation; never enables hardware I/O.
         self._test_sequence_authorized = False
@@ -329,6 +330,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         return float(self._test_gate_power_w)
 
     @property
+    def test_gate_frozen_ems_power_w(self):
+        return float(self._test_gate_frozen_ems_power_w)
+
+    @property
     def test_gate_duration_seconds(self):
         return float(self._test_gate_duration_seconds)
 
@@ -346,7 +351,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         await self.async_request_refresh()
 
     async def async_set_test_gate_power(self, value):
-        self._test_gate_power_w = max(0.0, min(100.0, float(value)))
+        self._test_gate_power_w = max(0.0, min(2400.0, float(value)))
         self._test_gate_armed = False
         self._test_sequence_authorized = False
         self._real_test_authorized = False

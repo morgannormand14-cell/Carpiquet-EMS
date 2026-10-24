@@ -109,4 +109,4 @@ class ControlledRealTestAuthorizationSwitch(CoordinatorEntity, SwitchEntity):
 
     @property
     def extra_state_attributes(self):
-        return {"volatile": True, "one_shot": True, "scope": "SolarFlow 50 W / 5 s only"}
+        return {"volatile": True, "one_shot": True, "scope": "SolarFlow frozen EMS setpoint within operator ceiling"}

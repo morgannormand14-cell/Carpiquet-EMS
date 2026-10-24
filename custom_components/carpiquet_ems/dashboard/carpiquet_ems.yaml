@@ -958,9 +958,9 @@ views:
             entities:
               - entity: select.carpiquet_ems_controlled_test_device
                 name: Onduleur de test
-              - entity: sensor.carpiquet_ems_controlled_test_gate_live_ems_power
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_live_ems_power
                 name: Consigne moteur EMS sélectionnée
-              - entity: sensor.carpiquet_ems_controlled_test_gate_frozen_ems_power
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_frozen_ems_power
                 name: Consigne EMS figée à l’armement
               - entity: number.carpiquet_ems_controlled_test_power
                 name: Limite de puissance autorisée
@@ -978,7 +978,7 @@ views:
                 action_name: EXÉCUTER
               - entity: sensor.garage_carpiquet_ems_controlled_test_gate_state
                 name: État Test Gate
-              - entity: sensor.carpiquet_ems_controlled_test_gate_power_limit
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_power_limit
                 name: Limite autorisée (diagnostic)
               - entity: binary_sensor.carpiquet_ems_controlled_test_gate_power_within_limit
                 name: Consigne sous limite

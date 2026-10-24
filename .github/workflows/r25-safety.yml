@@ -1,0 +1,27 @@
+name: R25 dynamic-control safety tests
+on:
+  push:
+    branches:
+      - dev-alpha-3.15-phase3b-r25-dynamic-control
+  pull_request:
+  workflow_dispatch:
+jobs:
+  safety:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install pytest pytest-asyncio
+      - name: Compile R25 source
+        run: python -m compileall -q custom_components/carpiquet_ems
+      - name: R25 mocked safety regression tests
+        run: |
+          python -m pytest -q \
+            tests/test_dynamic_watchdog.py \
+            tests/test_r25_session_concurrency.py \
+            tests/test_dynamic_http_executor_contract.py \
+            tests/test_r25_mode_switch_contract.py

@@ -49,6 +49,7 @@ class DynamicWatchdog:
         self._reason = ""
         self._stop_confirmed: bool | None = None
         self._trip_lock = asyncio.Lock()
+        self._trip_task: asyncio.Task | None = None
 
     @property
     def status(self) -> WatchdogStatus:
@@ -88,7 +89,7 @@ class DynamicWatchdog:
         if self._state == "MONITORING":
             self._state = "STOPPING"
             self._reason = reason
-            asyncio.create_task(self._trip(reason))
+            self._trip_task = asyncio.create_task(self._trip(reason))
 
     async def _trip(self, reason: str) -> None:
         async with self._trip_lock:
@@ -122,7 +123,9 @@ class DynamicWatchdog:
 
     async def close(self) -> None:
         """Stop monitoring and request a verified zero before returning."""
-        if self._state in ("MONITORING", "STOPPING"):
+        if self._trip_task is not None:
+            await asyncio.shield(self._trip_task)
+        elif self._state in ("MONITORING", "STOPPING"):
             await self._trip("SESSION_CLOSED")
         task = self._task
         if task is not None and task is not asyncio.current_task():

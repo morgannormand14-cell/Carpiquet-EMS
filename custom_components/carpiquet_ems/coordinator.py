@@ -1140,7 +1140,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             test_gate = evaluate_controlled_test_gate(ControlledTestGateInput(
                 armed=self._test_gate_armed,
                 device=self._test_gate_device,
-                requested_power_w=self._test_gate_power_w,
+                requested_power_w=self._test_gate_frozen_ems_power_w,
+                max_authorized_power_w=self._test_gate_power_w,
                 duration_seconds=self._test_gate_duration_seconds,
                 watchdog_ok=(command_decision.watchdog_state == "OK"),
                 safety_ok=bool(command_decision.safety_ok),
@@ -1177,6 +1178,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     if executor.solarflow_verification else ""
                 ),
                 envelope=executor.solarflow.envelope,
+                frozen_power_w=self._test_gate_frozen_ems_power_w,
             )
 
             # Phase 3B-6: evaluate the complete safety contract for the future
@@ -1189,7 +1191,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     test_request_prepared=local_http_preparation.test_request.prepared,
                     zero_request_prepared=local_http_preparation.zero_request.prepared,
                     report_target=local_http_preparation.report_target,
-                    requested_power_w=self._test_gate_power_w,
+                    requested_power_w=self._test_gate_frozen_ems_power_w,
+                    max_authorized_power_w=self._test_gate_power_w,
                     duration_seconds=self._test_gate_duration_seconds,
                     watchdog_ok=(command_decision.watchdog_state == "OK"),
                     safety_ok=bool(command_decision.safety_ok),

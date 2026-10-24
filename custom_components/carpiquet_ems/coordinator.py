@@ -772,7 +772,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
     async def async_set_control_mode(self, mode: str):
         if mode not in CONTROL_MODE_OPTIONS:
             raise ValueError(f"Unsupported control mode: {mode}")
-        # No Live mode and no real-write path exist in v0.6.4.
+        # A change to the legacy control mode revokes R25 authority first.
+        # Do not allow a second control path to coexist with a live HTTP session.
+        if self._r25_session is not None:
+            await self.async_set_r25_cycle_mode(False)
         self._control_mode = mode
         await self.async_request_refresh()
 

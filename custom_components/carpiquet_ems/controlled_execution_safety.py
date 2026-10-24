@@ -88,7 +88,7 @@ def evaluate_controlled_execution_safety(
         and float(context.requested_power_w) > float(context.max_authorized_power_w)
     ):
         blockers.append(REASON_POWER_ABOVE_LIMIT)
-    if not (1.0 <= float(context.duration_seconds) <= 10.0):
+    if not (0.0 < float(context.duration_seconds) <= 600.0):
         blockers.append(REASON_INVALID_DURATION)
     if not context.watchdog_ok:
         blockers.append(REASON_WATCHDOG)
@@ -108,7 +108,7 @@ def evaluate_controlled_execution_safety(
         single_device_only=True,
         local_http_only=True,
         max_test_power_w=float(context.max_authorized_power_w),
-        max_duration_seconds=10.0,
+        max_duration_seconds=600.0,
         watchdog_required=True,
         verification_required=True,
         zero_return_required=True,

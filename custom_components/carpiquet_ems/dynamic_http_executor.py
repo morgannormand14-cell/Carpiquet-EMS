@@ -117,6 +117,8 @@ class DynamicHttpExecutor:
                 except asyncio.CancelledError:
                     await recovery
                     raise
+                if isinstance(exc, asyncio.CancelledError):
+                    raise
                 return DynamicHttpResult(
                     "FAULT_ZERO_VERIFIED" if zero_ok else "FAULT_ZERO_UNCONFIRMED",
                     float(watts), observed, status, False, zero_ok,

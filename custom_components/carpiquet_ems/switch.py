@@ -4,7 +4,7 @@ from .const import DOMAIN
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([SimulationSwitch(coordinator, entry), AutomationEngineSwitch(coordinator, entry), ControlledTestArmSwitch(coordinator, entry), ControlledTestAuthorizationSimulationSwitch(coordinator, entry), ControlledRealTestAuthorizationSwitch(coordinator, entry)])
+    async_add_entities([SimulationSwitch(coordinator, entry), AutomationEngineSwitch(coordinator, entry), ControlledTestArmSwitch(coordinator, entry), ControlledTestAuthorizationSimulationSwitch(coordinator, entry), ControlledRealTestAuthorizationSwitch(coordinator, entry), R25RealCycleSwitch(coordinator, entry)])
 
 class SimulationSwitch(CoordinatorEntity, SwitchEntity):
     def __init__(self, coordinator, entry):
@@ -110,3 +110,37 @@ class ControlledRealTestAuthorizationSwitch(CoordinatorEntity, SwitchEntity):
     @property
     def extra_state_attributes(self):
         return {"volatile": True, "one_shot": True, "scope": "SolarFlow frozen EMS setpoint within operator ceiling"}
+
+
+class R25RealCycleSwitch(CoordinatorEntity, SwitchEntity):
+    """Operator-facing mode switch; real output stays locked until commissioning."""
+
+    def __init__(self, coordinator, entry):
+        super().__init__(coordinator)
+        self._attr_name = "Carpiquet EMS R25 Cycle Reel"
+        self._attr_unique_id = f"{entry.entry_id}_r25_real_cycle"
+        self._attr_icon = "mdi:shield-lock-outline"
+
+    @property
+    def is_on(self):
+        return self.coordinator.r25_cycle_mode == "Cycle réel"
+
+    async def async_turn_on(self, **kwargs):
+        from homeassistant.exceptions import HomeAssistantError
+        try:
+            await self.coordinator.async_set_r25_cycle_mode(True)
+        except RuntimeError as err:
+            raise HomeAssistantError(str(err)) from err
+
+    async def async_turn_off(self, **kwargs):
+        await self.coordinator.async_set_r25_cycle_mode(False)
+
+    @property
+    def extra_state_attributes(self):
+        return {
+            "mode_off": "Simulation",
+            "mode_on": "Cycle réel",
+            "real_cycle_available": False,
+            "reason": "R25 commissioning and watchdog integration tests pending",
+            "hardware_writes_enabled": False,
+        }

@@ -73,7 +73,7 @@ def evaluate_controlled_test_gate(context: ControlledTestGateInput) -> Controlle
         and context.requested_power_w > context.max_authorized_power_w
     ):
         blockers.append(REASON_POWER_ABOVE_LIMIT)
-    if not (1.0 <= context.duration_seconds <= 10.0):
+    if not (0.0 < context.duration_seconds <= 600.0):
         blockers.append(REASON_DURATION)
     if not context.watchdog_ok:
         blockers.append(REASON_WATCHDOG)

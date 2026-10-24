@@ -80,6 +80,7 @@ from .controlled_failure_recovery_bench import run_locked_failure_recovery_bench
 from .controlled_final_regression import ControlledFinalRegressionInput, evaluate_controlled_final_regression
 from .controlled_hardware_preflight import ControlledHardwarePreflightInput, evaluate_controlled_hardware_preflight
 from .controlled_real_test_executor import execute_single_solarflow_test
+from .dynamic_control_gate import evaluate_dynamic_gate
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -195,6 +196,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._latest_local_http_preparation = None
         self._latest_hardware_preflight = None
         self._last_real_test_result = None
+        # R25: read-only cycle diagnostics; never grants hardware authority.
+        self._r25_dynamic_gate = None
         self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
@@ -1497,7 +1500,36 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 else float(command_decision.validated.hyper_output_w) if self._test_gate_device == "hyper"
                 else 0.0
             )
+            # R25 shadow integration: inspect the validated EMS setpoint on each
+            # coordinator refresh, without touching the R24 hardware executor.
+            solarflow_soc = self._state_float(
+                self.config[CONF_SOLARFLOW_SOC_ENTITY], default=float("nan")
+            )
+            r25_transport = self._transport_policy_diagnostics()
+            r25_decision = evaluate_dynamic_gate(
+                requested_w=float(command_decision.validated.solarflow_output_w),
+                limit_w=min(2400.0, float(dynamic["solarflow_max_power"])),
+                local_mode=(
+                    self._control_mode != CONTROL_MODE_SIMULATION
+                    and r25_transport[ATTR_TRANSPORT_SOLARFLOW_SELECTED] == "LOCAL_HTTP"
+                ),
+                transport_qualified=bool(
+                    self._solarflow_local_probe and self._solarflow_local_probe.qualified
+                ),
+                soc_valid=(
+                    solarflow_soc == solarflow_soc
+                    and float(dynamic["solarflow_min_soc"]) < solarflow_soc <= 100.0
+                ),
+                authorized=False,  # R25 continuous authorization not implemented.
+                previously_active=False,  # R25 has never written hardware.
+            )
+            self._r25_dynamic_gate = r25_decision
             result_data = {
+                "r25_dynamic_gate_state": r25_decision.state,
+                "r25_dynamic_gate_reason": r25_decision.reason,
+                "r25_dynamic_gate_target_w": r25_decision.target_w,
+                "r25_dynamic_gate_write_allowed": r25_decision.should_write,
+                "r25_dynamic_gate_stop_required": r25_decision.must_stop,
                 ATTR_TEST_GATE_POWER_LIMIT: float(self._test_gate_power_w),
                 ATTR_TEST_GATE_LIVE_EMS_POWER: live_test_ems_power,
                 ATTR_TEST_GATE_FROZEN_EMS_POWER: float(self._test_gate_frozen_ems_power_w),

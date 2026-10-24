@@ -318,6 +318,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._real_test_authorized = False
             self._test_sequence_authorized = False
             self._test_gate_armed = False
+            self._test_gate_frozen_ems_power_w = 0.0
             self._real_test_running = False
             await self.async_request_refresh()
 

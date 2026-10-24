@@ -81,6 +81,8 @@ from .controlled_final_regression import ControlledFinalRegressionInput, evaluat
 from .controlled_hardware_preflight import ControlledHardwarePreflightInput, evaluate_controlled_hardware_preflight
 from .controlled_real_test_executor import execute_single_solarflow_test
 from .dynamic_control_gate import evaluate_dynamic_gate
+from .dynamic_control_session import DynamicControlSession
+from .dynamic_http_executor import DynamicHttpExecutor
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
@@ -199,6 +201,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         # R25: read-only cycle diagnostics; never grants hardware authority.
         self._r25_dynamic_gate = None
         self._r25_cycle_mode = "Simulation"
+        self._r25_session = None
+        self._r25_transition_lock = asyncio.Lock()
+        self._r25_last_result = None
+        self._r25_ready_for_real = False
+        self._r25_transport_info = None
         self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
@@ -278,14 +285,33 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         return self._r25_cycle_mode
 
     async def async_set_r25_cycle_mode(self, real: bool):
-        """R25 operator mode selection; hardware remains locked pending validation."""
-        if real:
-            raise RuntimeError(
-                "R25 real cycle is not yet commissioned: integration tests, "
-                "watchdog lifecycle and hardware safety validation are required"
+        """Explicit operator transition; never persist real mode across reloads."""
+        async with self._r25_transition_lock:
+            if not real:
+                self._r25_cycle_mode = "Simulation"
+                session, self._r25_session = self._r25_session, None
+                if session is not None:
+                    await session.close()
+                    if session.status.stop_confirmed is not True:
+                        raise RuntimeError("R25 physical zero not confirmed; inspect SolarFlow")
+                await self.async_request_refresh()
+                return
+            if self._r25_session is not None or self._real_test_running:
+                raise RuntimeError("A real control session is already active")
+            await self.async_request_refresh()
+            if not self._r25_ready_for_real:
+                raise RuntimeError("R25 real mode refused: fresh EMS inputs and qualified local transport required")
+            info = self._r25_transport_info
+            controller = DynamicHttpExecutor(
+                self.hass, write_target=info["target"],
+                report_target=info["report_target"],
+                envelope=info["envelope"], limit_w=info["limit_w"],
             )
-        self._r25_cycle_mode = "Simulation"
-        await self.async_request_refresh()
+            session = DynamicControlSession(controller)
+            session.start(authorized=True)
+            self._r25_session = session
+            self._r25_cycle_mode = "Cycle réel"
+            await self.async_request_refresh()
 
     @property
     def real_test_authorized(self):
@@ -724,6 +750,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 self._session_stopping = False
 
     async def async_shutdown(self):
+        if self._r25_session is not None:
+            await self.async_set_r25_cycle_mode(False)
         self._control_mode = CONTROL_MODE_SIMULATION
         self._safety_state_machine.reset(datetime.now(timezone.utc))
         self._automation_enabled_runtime = False
@@ -1539,7 +1567,47 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 previously_active=False,  # R25 has never written hardware.
             )
             self._r25_dynamic_gate = r25_decision
+            self._r25_transport_info = {
+                "target": executor.solarflow.target,
+                "report_target": (
+                    executor.solarflow_verification.report_target
+                    if executor.solarflow_verification else ""
+                ),
+                "envelope": executor.solarflow.envelope,
+                "limit_w": min(2400.0, float(dynamic["solarflow_max_power"])),
+            }
+            self._r25_ready_for_real = bool(
+                grid_source_fresh and solar_command_sources_ok
+                and self._initialization_ready
+                and executor.solarflow.prepared
+                and self._r25_transport_info["target"]
+                and self._r25_transport_info["report_target"]
+                and self._solarflow_local_probe
+                and self._solarflow_local_probe.qualified
+                and r25_transport[ATTR_TRANSPORT_SOLARFLOW_SELECTED] == "LOCAL_HTTP"
+                and solarflow_soc > float(dynamic["solarflow_min_soc"])
+                and not self._real_test_running
+            )
+            if self._r25_session is not None:
+                if not self._r25_ready_for_real or self._r25_session.status.state != "MONITORING":
+                    self._r25_cycle_mode = "Simulation"
+                    previous, self._r25_session = self._r25_session, None
+                    await previous.close()
+                    if previous.status.stop_confirmed is not True:
+                        _LOGGER.error("R25 zero unconfirmed following safety interlock")
+                else:
+                    self._r25_last_result = await self._r25_session.apply(
+                        float(command_decision.validated.solarflow_output_w),
+                        authorized=True, conditions_valid=True,
+                    )
+                    if self._r25_session.status.state != "MONITORING":
+                        self._r25_cycle_mode = "Simulation"
+                        self._r25_session = None
             result_data = {
+                "r25_cycle_mode": self._r25_cycle_mode,
+                "r25_cycle_ready": self._r25_ready_for_real,
+                "r25_http_result": self._r25_last_result.state if self._r25_last_result else "NOT_RUN",
+                "r25_watchdog_state": self._r25_session.status.state if self._r25_session else "LOCKED",
                 "r25_dynamic_gate_state": r25_decision.state,
                 "r25_dynamic_gate_reason": r25_decision.reason,
                 "r25_dynamic_gate_target_w": r25_decision.target_w,

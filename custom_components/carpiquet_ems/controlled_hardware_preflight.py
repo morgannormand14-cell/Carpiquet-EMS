@@ -69,7 +69,7 @@ def evaluate_controlled_hardware_preflight(context: ControlledHardwarePreflightI
     power_within_limit = bool(power_setpoint_ready and power_limit_ready and float(context.test_power_w) <= float(context.power_limit_w))
     bounds_ready = bool(
         power_within_limit
-        and 0.0 < float(context.duration_seconds) <= 600.0
+        and 0.0 <= float(context.duration_seconds) <= 600.0
         and context.single_device_only
         and context.local_http_only
     )

@@ -365,6 +365,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
     async def async_set_test_gate_power(self, value):
         self._test_gate_power_w = max(0.0, min(2400.0, float(value)))
         self._test_gate_armed = False
+        self._test_gate_frozen_ems_power_w = 0.0
         self._test_sequence_authorized = False
         self._real_test_authorized = False
         await self.async_request_refresh()
@@ -372,6 +373,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
     async def async_set_test_gate_duration(self, value):
         self._test_gate_duration_seconds = max(0.0, min(10.0, float(value)))
         self._test_gate_armed = False
+        self._test_gate_frozen_ems_power_w = 0.0
         self._test_sequence_authorized = False
         self._real_test_authorized = False
         await self.async_request_refresh()

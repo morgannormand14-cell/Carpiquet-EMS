@@ -28,7 +28,6 @@ class ControlledExecutionSafetyInput:
     zero_request_prepared: bool
     report_target: str
     requested_power_w: float
-    max_authorized_power_w: float
     duration_seconds: float
     watchdog_ok: bool
     safety_ok: bool
@@ -76,9 +75,7 @@ def evaluate_controlled_execution_safety(
         blockers.append(REASON_ZERO_REQUEST_NOT_READY)
     if not context.report_target:
         blockers.append(REASON_REPORT_TARGET_NOT_READY)
-    if not (0.0 < float(context.requested_power_w) <= 2400.0):
-        blockers.append(REASON_INVALID_POWER)
-    if not (0.0 <= float(context.max_authorized_power_w) <= 2400.0) or float(context.requested_power_w) > float(context.max_authorized_power_w):
+    if not (1.0 <= float(context.requested_power_w) <= 100.0):
         blockers.append(REASON_INVALID_POWER)
     if not (1.0 <= float(context.duration_seconds) <= 10.0):
         blockers.append(REASON_INVALID_DURATION)
@@ -99,7 +96,7 @@ def evaluate_controlled_execution_safety(
         command_sent=False,
         single_device_only=True,
         local_http_only=True,
-        max_test_power_w=float(context.max_authorized_power_w),
+        max_test_power_w=100.0,
         max_duration_seconds=10.0,
         watchdog_required=True,
         verification_required=True,

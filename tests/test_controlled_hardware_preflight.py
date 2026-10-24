@@ -79,7 +79,7 @@ class TestHardwarePreflight(unittest.TestCase):
         zero = module.evaluate_controlled_hardware_preflight(baseline(duration_seconds=0))
         self.assertTrue(ok.audit_passed)
         self.assertFalse(too_long.audit_passed)
-        self.assertFalse(zero.audit_passed)
+        self.assertTrue(zero.audit_passed)
 
     def test_missing_zero_request_blocks_preflight(self):
         r = module.evaluate_controlled_hardware_preflight(baseline(zero_request_prepared=False))

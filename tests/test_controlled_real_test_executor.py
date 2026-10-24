@@ -28,7 +28,7 @@ class TestRealExecutorBoundary(unittest.TestCase):
                 test_body={"properties":{"outputLimit":2401}}, zero_body={"properties":{"outputLimit":0}},
                 power_w=2401, duration_seconds=5))
 
-    def test_rejects_invalid_zero_body_before_io(self):
+    def test_rejects_duration_above_ten_minutes_before_io(self):\n        with self.assertRaises(ValueError):\n            asyncio.run(module.execute_single_solarflow_test(\n                None, test_target="http://device/properties/write",\n                report_target="http://device/properties/report",\n                test_body={"properties":{"outputLimit":50}}, zero_body={"properties":{"outputLimit":0}},\n                power_w=50, duration_seconds=601))\n\n    def test_rejects_zero_duration_before_io(self):\n        with self.assertRaises(ValueError):\n            asyncio.run(module.execute_single_solarflow_test(\n                None, test_target="http://device/properties/write",\n                report_target="http://device/properties/report",\n                test_body={"properties":{"outputLimit":50}}, zero_body={"properties":{"outputLimit":0}},\n                power_w=50, duration_seconds=0))\n\n    def test_rejects_invalid_zero_body_before_io(self):
         with self.assertRaises(ValueError):
             asyncio.run(module.execute_single_solarflow_test(
                 None, test_target="http://device/properties/write",

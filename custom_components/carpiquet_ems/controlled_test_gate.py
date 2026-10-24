@@ -9,7 +9,9 @@ TEST_GATE_ARMED_LOCKED = "ARMED_LOCKED"
 
 REASON_NOT_ARMED = "TEST_NOT_ARMED"
 REASON_NO_DEVICE = "NO_SINGLE_TEST_DEVICE"
-REASON_POWER = "TEST_POWER_OUT_OF_RANGE"
+REASON_POWER = "EMS_SETPOINT_OUT_OF_RANGE"
+REASON_POWER_LIMIT = "TEST_POWER_LIMIT_OUT_OF_RANGE"
+REASON_POWER_ABOVE_LIMIT = "POWER_ABOVE_TEST_LIMIT"
 REASON_DURATION = "TEST_DURATION_OUT_OF_RANGE"
 REASON_WATCHDOG = "WATCHDOG_NOT_OK"
 REASON_SAFETY = "SAFETY_NOT_OK"
@@ -24,6 +26,7 @@ class ControlledTestGateInput:
     armed: bool
     device: str
     requested_power_w: float
+    max_authorized_power_w: float
     duration_seconds: float
     watchdog_ok: bool
     safety_ok: bool
@@ -41,6 +44,7 @@ class ControlledTestGateDecision:
     return_to_zero_required: bool
     device: str
     requested_power_w: float
+    max_authorized_power_w: float
     duration_seconds: float
     blockers: tuple[str, ...]
     evaluated_at: str
@@ -59,8 +63,16 @@ def evaluate_controlled_test_gate(context: ControlledTestGateInput) -> Controlle
         blockers.append(REASON_NOT_ARMED)
     if context.device not in ("hyper", "solarflow"):
         blockers.append(REASON_NO_DEVICE)
-    if not (1.0 <= context.requested_power_w <= 100.0):
+    if not (0.0 < context.requested_power_w <= 2400.0):
         blockers.append(REASON_POWER)
+    if not (0.0 <= context.max_authorized_power_w <= 2400.0):
+        blockers.append(REASON_POWER_LIMIT)
+    if (
+        0.0 < context.requested_power_w <= 2400.0
+        and 0.0 <= context.max_authorized_power_w <= 2400.0
+        and context.requested_power_w > context.max_authorized_power_w
+    ):
+        blockers.append(REASON_POWER_ABOVE_LIMIT)
     if not (1.0 <= context.duration_seconds <= 10.0):
         blockers.append(REASON_DURATION)
     if not context.watchdog_ok:
@@ -85,6 +97,7 @@ def evaluate_controlled_test_gate(context: ControlledTestGateInput) -> Controlle
         return_to_zero_required=True,
         device=context.device,
         requested_power_w=float(context.requested_power_w),
+        max_authorized_power_w=float(context.max_authorized_power_w),
         duration_seconds=float(context.duration_seconds),
         blockers=tuple(blockers),
         evaluated_at=datetime.now(timezone.utc).isoformat(),

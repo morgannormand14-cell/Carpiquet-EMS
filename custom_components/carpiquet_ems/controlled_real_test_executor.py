@@ -53,7 +53,7 @@ async def execute_single_solarflow_test(
     """
     if not test_target.endswith("/properties/write") or not report_target.endswith("/properties/report"):
         raise ValueError("Invalid SolarFlow Local HTTP targets")
-    if not (0.0 < float(power_w) <= 2400.0 and 1.0 <= float(duration_seconds) <= 10.0):
+    if not (1.0 <= float(power_w) <= 100.0 and 1.0 <= float(duration_seconds) <= 10.0):
         raise ValueError("Controlled test outside safety bounds")
     if float(test_body.get("properties", {}).get("outputLimit", -1)) != float(power_w):
         raise ValueError("Prepared test body does not match requested power")

@@ -296,7 +296,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             raise RuntimeError("Real controlled test is currently SolarFlow-only")
         if not (0.0 < frozen_power_w <= power_limit_w <= 2400.0):
             raise RuntimeError("Frozen EMS setpoint is outside the authorized power ceiling")
-        if not (1.0 <= duration_seconds <= 10.0):
+        if not (0.0 <= duration_seconds <= 600.0):
             raise RuntimeError("Controlled test duration is outside safety bounds")
         if prepared_power_w != frozen_power_w:
             raise RuntimeError("Prepared request does not match frozen EMS setpoint")
@@ -384,7 +384,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         await self.async_request_refresh()
 
     async def async_set_test_gate_duration(self, value):
-        self._test_gate_duration_seconds = max(1.0, min(10.0, float(value)))
+        self._test_gate_duration_seconds = max(0.0, min(600.0, float(value)))
         self._test_gate_armed = False
         self._test_gate_frozen_ems_power_w = 0.0
         self._test_sequence_authorized = False

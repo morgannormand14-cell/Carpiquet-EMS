@@ -374,8 +374,6 @@ views:
             title: Séquence contrôlée 3B — simulation 🔒
             show_header_toggle: false
             entities:
-              - entity: switch.carpiquet_ems_controlled_test_authorization_simulation
-                name: Autorisation 3B simulée
               - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_state
                 name: État séquence
               - entity: sensor.garage_carpiquet_ems_controlled_test_sequence_blockers
@@ -885,7 +883,7 @@ views:
                 name: Dernière évaluation
 
       - type: grid
-        title: 3B-20 — non-régression finale 🔒
+        title: 3B-20 → 3B-21 — validation & essai réel 🔒
         column_span: 3
         cards:
           - type: entities
@@ -917,12 +915,8 @@ views:
               - entity: sensor.garage_carpiquet_ems_final_regression_evaluated_at
                 name: Dernière évaluation
 
-      - type: grid
-        title: 3B-21 — audit final pré-essai 🔒
-        column_span: 3
-        cards:
           - type: entities
-            title: 3B-21 — Préflight matériel contrôlé 🔒
+            title: 3B-21A — Capteurs de pré-autorisation 🔒
             show_header_toggle: false
             entities:
               - entity: sensor.garage_carpiquet_ems_hardware_preflight_state
@@ -934,7 +928,7 @@ views:
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_regression_ready
                 name: Non-régression prête
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_bounds_ready
-                name: Bornes test conformes
+                name: Consigne sous limite
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_recovery_contract_ready
                 name: Contrat retour zéro prêt
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_independent_evidence_ready
@@ -953,12 +947,39 @@ views:
                 name: Réinjection autorisée
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_real_write_used
                 name: Écriture réelle utilisée
+              - entity: sensor.garage_carpiquet_ems_hardware_preflight_evaluated_at
+                name: Dernière évaluation
+
+          - type: entities
+            title: 3B-21B — Commande & test réel
+            show_header_toggle: false
+            entities:
+              - entity: select.carpiquet_ems_controlled_test_device
+                name: Onduleur de test
+              - entity: sensor.carpiquet_ems_validated_solarflow_output
+                name: Consigne moteur EMS — SolarFlow
+              - entity: sensor.carpiquet_ems_validated_hyper_output
+                name: Consigne moteur EMS — Hyper
+              - entity: number.carpiquet_ems_controlled_test_power
+                name: Limite de puissance autorisée
+              - entity: number.carpiquet_ems_controlled_test_duration
+                name: Temps de test
+              - entity: switch.carpiquet_ems_controlled_test_arm
+                name: Armer le Test Gate
+              - entity: switch.carpiquet_ems_controlled_test_authorization_simulation
+                name: Autorisation 3B simulée
               - entity: switch.carpiquet_ems_real_test_authorization
                 name: Autorisation réelle ponctuelle
               - type: button
                 entity: button.carpiquet_ems_execute_controlled_real_test
-                name: EXÉCUTER essai réel 50 W / 5 s
+                name: EXÉCUTER essai réel
                 action_name: EXÉCUTER
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_state
+                name: État Test Gate
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_requested_power
+                name: Consigne EMS figée
+              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_duration
+                name: Durée test
               - entity: sensor.garage_carpiquet_ems_real_test_state
                 name: Résultat essai réel
               - entity: sensor.garage_carpiquet_ems_real_test_test_post_status
@@ -973,8 +994,6 @@ views:
                 name: Reverrouillage confirmé
               - entity: sensor.garage_carpiquet_ems_real_test_error
                 name: Erreur essai réel
-              - entity: sensor.garage_carpiquet_ems_hardware_preflight_evaluated_at
-                name: Dernière évaluation
 
       - type: grid
         title: Hyper 2000

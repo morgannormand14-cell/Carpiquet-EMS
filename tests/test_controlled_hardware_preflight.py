@@ -16,7 +16,7 @@ def baseline(**overrides):
         safety_invariants_preserved=True, simulation_bench_passed=True,
         independent_evidence_complete=False, final_write_locked=True,
         final_reinjection_allowed=False, real_write_used=False,
-        test_power_w=50.0, duration_seconds=5.0, single_device_only=True,
+        test_power_w=177.0, power_limit_w=200.0, duration_seconds=5.0, single_device_only=True,
         local_http_only=True, watchdog_required=True, verification_required=True,
         zero_return_required=True, zero_on_failure_required=True,
         relock_required=True, test_request_prepared=True, zero_request_prepared=True,
@@ -40,11 +40,29 @@ class TestHardwarePreflight(unittest.TestCase):
         self.assertFalse(r.real_write_used)
         self.assertIn("GLOBAL_WRITE_LOCK", r.blockers)
 
-    def test_out_of_bounds_blocks_preflight(self):
-        r = module.evaluate_controlled_hardware_preflight(baseline(test_power_w=101))
+    def test_frozen_ems_setpoint_below_limit_is_eligible(self):
+        r = module.evaluate_controlled_hardware_preflight(baseline(test_power_w=177, power_limit_w=200))
+        self.assertTrue(r.audit_passed)
+        self.assertTrue(r.unlock_eligible)
+        self.assertNotIn("POWER_ABOVE_TEST_LIMIT", r.blockers)
+
+    def test_frozen_ems_setpoint_above_limit_is_refused(self):
+        r = module.evaluate_controlled_hardware_preflight(baseline(test_power_w=177, power_limit_w=100))
         self.assertEqual(r.state, "PREFLIGHT_BLOCKED_LOCKED")
         self.assertFalse(r.audit_passed)
-        self.assertIn("CONTROLLED_TEST_BOUNDS_NOT_READY", r.blockers)
+        self.assertFalse(r.unlock_eligible)
+        self.assertIn("POWER_ABOVE_TEST_LIMIT", r.blockers)
+        self.assertIn("GLOBAL_WRITE_LOCK", r.blockers)
+
+    def test_missing_frozen_ems_setpoint_blocks_preflight(self):
+        r = module.evaluate_controlled_hardware_preflight(baseline(test_power_w=0, power_limit_w=200))
+        self.assertFalse(r.audit_passed)
+        self.assertIn("EMS_SETPOINT_NOT_FROZEN", r.blockers)
+
+    def test_power_limit_accepts_full_configured_range(self):
+        r = module.evaluate_controlled_hardware_preflight(baseline(test_power_w=2400, power_limit_w=2400))
+        self.assertTrue(r.audit_passed)
+        self.assertTrue(r.unlock_eligible)
 
     def test_missing_zero_request_blocks_preflight(self):
         r = module.evaluate_controlled_hardware_preflight(baseline(zero_request_prepared=False))

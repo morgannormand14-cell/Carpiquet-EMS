@@ -57,6 +57,11 @@ class DynamicControlSession:
             result = await self.executor.apply(
                 watts, authorized=authorized, conditions_valid=conditions_valid,
             )
+            # A concurrent close/watchdog trip may already have revoked the
+            # session while the serialized HTTP request was in flight.
+            # Never acknowledge it as a fresh live confirmation or restart.
+            if self._closed or self.status.state != "MONITORING":
+                return result
             if result.state == "APPLIED_VERIFIED":
                 self._watchdog.feed_confirmation(verified=True)
             elif result.state == "STOP_ZERO_VERIFIED":

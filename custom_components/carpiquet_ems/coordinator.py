@@ -286,8 +286,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         prep = self._latest_local_http_preparation
         if not preflight or not prep or not preflight.hardware_test_admissible:
             raise RuntimeError("3B-21 preflight does not admit the real test")
-        if self._test_gate_device != "solarflow" or float(self._test_gate_power_w) != 50.0 or float(self._test_gate_duration_seconds) != 5.0:
-            raise RuntimeError("First real test is strictly SolarFlow 50 W / 5 s")
+        frozen_power_w = float(self._test_gate_frozen_ems_power_w)
+        power_limit_w = float(self._test_gate_power_w)
+        duration_seconds = float(self._test_gate_duration_seconds)
+        prepared_power_w = float(
+            prep.test_request.json_body.get("properties", {}).get("outputLimit", -1)
+        )
+        if self._test_gate_device != "solarflow":
+            raise RuntimeError("Real controlled test is currently SolarFlow-only")
+        if not (0.0 < frozen_power_w <= power_limit_w <= 2400.0):
+            raise RuntimeError("Frozen EMS setpoint is outside the authorized power ceiling")
+        if not (1.0 <= duration_seconds <= 10.0):
+            raise RuntimeError("Controlled test duration is outside safety bounds")
+        if prepared_power_w != frozen_power_w:
+            raise RuntimeError("Prepared request does not match frozen EMS setpoint")
         self._real_test_running = True
         try:
             result = await execute_single_solarflow_test(
@@ -296,8 +308,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 report_target=prep.report_target,
                 test_body=prep.test_request.json_body,
                 zero_body=prep.zero_request.json_body,
-                power_w=self._test_gate_power_w,
-                duration_seconds=self._test_gate_duration_seconds,
+                power_w=frozen_power_w,
+                duration_seconds=duration_seconds,
             )
             self._last_real_test_result = result
             return result

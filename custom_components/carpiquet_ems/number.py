@@ -9,7 +9,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         EMSNumber(coordinator, entry, CONF_GRID_DEADBAND, "Grid Deadband", 0, 1000, 1),
         EMSNumber(coordinator, entry, CONF_RAMP_LIMIT_W, "Ramp Limit", 0, 5000, 10),
         EMSNumber(coordinator, entry, CONF_AUTOMATION_MIN_HOLD_SECONDS, "Automation Minimum Hold", 0, 300, 1),
-        ControlledTestNumber(coordinator, entry, "power", "Controlled Test Power", 1, 100, 1, "W"),
+        ControlledTestNumber(coordinator, entry, "power", "Controlled Test Power Limit", 0, 2400, 10, "W"),
         ControlledTestNumber(coordinator, entry, "duration", "Controlled Test Duration", 1, 10, 1, "s"),
     ])
 
@@ -52,7 +52,7 @@ class ControlledTestNumber(CoordinatorEntity, NumberEntity):
     @property
     def native_value(self):
         if self._test_key == "power":
-            return self.coordinator.test_gate_power_w or 1.0
+            return self.coordinator.test_gate_power_w
         return self.coordinator.test_gate_duration_seconds or 1.0
 
     async def async_set_native_value(self, value):

@@ -140,7 +140,8 @@ class R25RealCycleSwitch(CoordinatorEntity, SwitchEntity):
         return {
             "mode_off": "Simulation",
             "mode_on": "Cycle réel",
-            "real_cycle_available": False,
-            "reason": "R25 commissioning and watchdog integration tests pending",
-            "hardware_writes_enabled": False,
+            "real_cycle_available": bool(self.coordinator.data and self.coordinator.data.get("r25_cycle_ready")),
+            "cycle_mode": self.coordinator.r25_cycle_mode,
+            "reason": "Requires fresh EMS inputs, qualified SolarFlow local HTTP and verified SOC",
+            "hardware_writes_enabled": self.is_on,
         }

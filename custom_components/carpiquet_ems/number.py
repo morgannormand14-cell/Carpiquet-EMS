@@ -10,7 +10,7 @@ async def async_setup_entry(hass, entry, async_add_entities):
         EMSNumber(coordinator, entry, CONF_RAMP_LIMIT_W, "Ramp Limit", 0, 5000, 10),
         EMSNumber(coordinator, entry, CONF_AUTOMATION_MIN_HOLD_SECONDS, "Automation Minimum Hold", 0, 300, 1),
         ControlledTestNumber(coordinator, entry, "power", "Controlled Test Power Limit", 0, 2400, 10, "W"),
-        ControlledTestNumber(coordinator, entry, "duration", "Controlled Test Duration", 1, 10, 1, "s"),
+        ControlledTestNumber(coordinator, entry, "duration", "Controlled Test Duration", 0, 10, 1, "min"),
     ])
 
 class EMSNumber(CoordinatorEntity, NumberEntity):
@@ -53,10 +53,10 @@ class ControlledTestNumber(CoordinatorEntity, NumberEntity):
     def native_value(self):
         if self._test_key == "power":
             return self.coordinator.test_gate_power_w
-        return self.coordinator.test_gate_duration_seconds or 1.0
+        return self.coordinator.test_gate_duration_seconds / 60.0
 
     async def async_set_native_value(self, value):
         if self._test_key == "power":
             await self.coordinator.async_set_test_gate_power(value)
         else:
-            await self.coordinator.async_set_test_gate_duration(value)
+            await self.coordinator.async_set_test_gate_duration(float(value) * 60.0)

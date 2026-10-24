@@ -1585,7 +1585,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "limit_w": min(2400.0, float(dynamic["solarflow_max_power"])),
             }
             self._r25_ready_for_real = bool(
-                grid_source_fresh and solar_command_sources_ok
+                self._control_mode == CONTROL_MODE_SIMULATION
+                and command_decision.safety_ok
+                and grid_source_fresh and solar_command_sources_ok
                 and self._initialization_ready
                 and executor.solarflow.prepared
                 and self._r25_transport_info["target"]

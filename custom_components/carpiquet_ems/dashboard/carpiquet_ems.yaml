@@ -930,7 +930,7 @@ views:
               - entity: binary_sensor.carpiquet_ems_controlled_test_gate_power_within_limit
                 name: Consigne EMS figée sous limite
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_bounds_ready
-                name: Bornes r22 préflight
+                name: Bornes dynamiques préflight
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_recovery_contract_ready
                 name: Contrat retour zéro prêt
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_independent_evidence_ready

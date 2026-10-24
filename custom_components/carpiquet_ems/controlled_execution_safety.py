@@ -11,7 +11,9 @@ REASON_WRITE_NOT_LOCKED = "PREPARATION_WRITE_LOCK_MISSING"
 REASON_TEST_REQUEST_NOT_READY = "TEST_REQUEST_NOT_READY"
 REASON_ZERO_REQUEST_NOT_READY = "ZERO_REQUEST_NOT_READY"
 REASON_REPORT_TARGET_NOT_READY = "REPORT_TARGET_NOT_READY"
-REASON_INVALID_POWER = "TEST_POWER_OUT_OF_RANGE"
+REASON_INVALID_POWER = "EMS_SETPOINT_OUT_OF_RANGE"
+REASON_INVALID_POWER_LIMIT = "TEST_POWER_LIMIT_OUT_OF_RANGE"
+REASON_POWER_ABOVE_LIMIT = "POWER_ABOVE_TEST_LIMIT"
 REASON_INVALID_DURATION = "TEST_DURATION_OUT_OF_RANGE"
 REASON_WATCHDOG = "WATCHDOG_NOT_OK"
 REASON_SAFETY = "SAFETY_NOT_OK"
@@ -28,6 +30,7 @@ class ControlledExecutionSafetyInput:
     zero_request_prepared: bool
     report_target: str
     requested_power_w: float
+    max_authorized_power_w: float
     duration_seconds: float
     watchdog_ok: bool
     safety_ok: bool
@@ -75,8 +78,16 @@ def evaluate_controlled_execution_safety(
         blockers.append(REASON_ZERO_REQUEST_NOT_READY)
     if not context.report_target:
         blockers.append(REASON_REPORT_TARGET_NOT_READY)
-    if not (1.0 <= float(context.requested_power_w) <= 100.0):
+    if not (0.0 < float(context.requested_power_w) <= 2400.0):
         blockers.append(REASON_INVALID_POWER)
+    if not (0.0 <= float(context.max_authorized_power_w) <= 2400.0):
+        blockers.append(REASON_INVALID_POWER_LIMIT)
+    if (
+        0.0 < float(context.requested_power_w) <= 2400.0
+        and 0.0 <= float(context.max_authorized_power_w) <= 2400.0
+        and float(context.requested_power_w) > float(context.max_authorized_power_w)
+    ):
+        blockers.append(REASON_POWER_ABOVE_LIMIT)
     if not (1.0 <= float(context.duration_seconds) <= 10.0):
         blockers.append(REASON_INVALID_DURATION)
     if not context.watchdog_ok:
@@ -96,7 +107,7 @@ def evaluate_controlled_execution_safety(
         command_sent=False,
         single_device_only=True,
         local_http_only=True,
-        max_test_power_w=100.0,
+        max_test_power_w=float(context.max_authorized_power_w),
         max_duration_seconds=10.0,
         watchdog_required=True,
         verification_required=True,

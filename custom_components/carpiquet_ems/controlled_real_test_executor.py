@@ -53,7 +53,7 @@ async def execute_single_solarflow_test(
     """
     if not test_target.endswith("/properties/write") or not report_target.endswith("/properties/report"):
         raise ValueError("Invalid SolarFlow Local HTTP targets")
-    if not (0.0 < float(power_w) <= 2400.0 and 1.0 <= float(duration_seconds) <= 10.0):
+    if not (0.0 < float(power_w) <= 2400.0 and 0.0 <= float(duration_seconds) <= 600.0):
         raise ValueError("Controlled test outside safety bounds")
     if float(test_body.get("properties", {}).get("outputLimit", -1)) != float(power_w):
         raise ValueError("Prepared test body does not match requested power")
@@ -73,10 +73,13 @@ async def execute_single_solarflow_test(
         test_sent = 200 <= test_status < 300
         if not test_sent:
             raise RuntimeError(f"TEST_POST_HTTP_{test_status}")
+        # Fixed settling delay before validating the physical readback.
+        await asyncio.sleep(5.0)
         get_status, observed = await _get_output(session, report_target)
         test_verified = bool(get_status == 200 and observed is not None and abs(observed - float(power_w)) <= 1.0)
         if not test_verified:
             raise RuntimeError("TEST_READBACK_NOT_CONFIRMED")
+        # Operator-selected hold after successful validation: 0..600 seconds.
         await asyncio.sleep(float(duration_seconds))
     except Exception as err:
         error = f"{type(err).__name__}: {err}"
@@ -85,6 +88,8 @@ async def execute_single_solarflow_test(
             try:
                 zero_status = await _post(session, test_target, zero_body)
                 if 200 <= zero_status < 300:
+                    # Give SolarFlow the same fixed settling window before zero readback.
+                    await asyncio.sleep(5.0)
                     get_status, observed = await _get_output(session, report_target)
                     zero_verified = bool(get_status == 200 and observed is not None and abs(observed) <= 1.0)
             except Exception as err:

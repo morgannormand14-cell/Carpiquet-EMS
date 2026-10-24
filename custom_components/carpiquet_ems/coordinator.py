@@ -1600,9 +1600,18 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                         float(command_decision.validated.solarflow_output_w),
                         authorized=True, conditions_valid=True,
                     )
-                    if self._r25_session.status.state != "MONITORING":
+                    if self._r25_last_result.state != "APPLIED_VERIFIED":
+                        previous = self._r25_session
                         self._r25_cycle_mode = "Simulation"
                         self._r25_session = None
+                        await previous.close()
+                        if previous.status.stop_confirmed is not True:
+                            _LOGGER.error("R25 physical zero unconfirmed after HTTP command failure")
+                    elif self._r25_session.status.state != "MONITORING":
+                        previous = self._r25_session
+                        self._r25_cycle_mode = "Simulation"
+                        self._r25_session = None
+                        await previous.close()
             result_data = {
                 "r25_cycle_mode": self._r25_cycle_mode,
                 "r25_cycle_ready": self._r25_ready_for_real,

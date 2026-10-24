@@ -198,6 +198,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._last_real_test_result = None
         # R25: read-only cycle diagnostics; never grants hardware authority.
         self._r25_dynamic_gate = None
+        self._r25_cycle_mode = "Simulation"
         self._zendure_reconciliation = None
         self._store = Store(hass, 1, f"{DOMAIN}.{config_entry.entry_id}.fallbacks")
         super().__init__(
@@ -270,6 +271,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         if option not in TRANSPORT_SOLARFLOW_OPTIONS:
             raise ValueError(f"Unsupported SolarFlow transport selection: {option}")
         self._solarflow_transport_selection = option
+        await self.async_request_refresh()
+
+    @property
+    def r25_cycle_mode(self):
+        return self._r25_cycle_mode
+
+    async def async_set_r25_cycle_mode(self, real: bool):
+        """R25 operator mode selection; hardware remains locked pending validation."""
+        if real:
+            raise RuntimeError(
+                "R25 real cycle is not yet commissioned: integration tests, "
+                "watchdog lifecycle and hardware safety validation are required"
+            )
+        self._r25_cycle_mode = "Simulation"
         await self.async_request_refresh()
 
     @property

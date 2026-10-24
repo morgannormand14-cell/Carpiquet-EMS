@@ -927,8 +927,10 @@ views:
                 name: Audit protocole validé
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_regression_ready
                 name: Non-régression prête
+              - entity: binary_sensor.carpiquet_ems_controlled_test_gate_power_within_limit
+                name: Consigne EMS figée sous limite
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_bounds_ready
-                name: Consigne sous limite
+                name: Bornes r22 préflight
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_recovery_contract_ready
                 name: Contrat retour zéro prêt
               - entity: binary_sensor.carpiquet_ems_hardware_preflight_independent_evidence_ready
@@ -956,10 +958,10 @@ views:
             entities:
               - entity: select.carpiquet_ems_controlled_test_device
                 name: Onduleur de test
-              - entity: sensor.carpiquet_ems_validated_solarflow_output
-                name: Consigne moteur EMS — SolarFlow
-              - entity: sensor.carpiquet_ems_validated_hyper_output
-                name: Consigne moteur EMS — Hyper
+              - entity: sensor.carpiquet_ems_controlled_test_gate_live_ems_power
+                name: Consigne moteur EMS sélectionnée
+              - entity: sensor.carpiquet_ems_controlled_test_gate_frozen_ems_power
+                name: Consigne EMS figée à l’armement
               - entity: number.carpiquet_ems_controlled_test_power
                 name: Limite de puissance autorisée
               - entity: number.carpiquet_ems_controlled_test_duration
@@ -976,8 +978,10 @@ views:
                 action_name: EXÉCUTER
               - entity: sensor.garage_carpiquet_ems_controlled_test_gate_state
                 name: État Test Gate
-              - entity: sensor.garage_carpiquet_ems_controlled_test_gate_requested_power
-                name: Consigne EMS figée
+              - entity: sensor.carpiquet_ems_controlled_test_gate_power_limit
+                name: Limite autorisée (diagnostic)
+              - entity: binary_sensor.carpiquet_ems_controlled_test_gate_power_within_limit
+                name: Consigne sous limite
               - entity: sensor.garage_carpiquet_ems_controlled_test_gate_duration
                 name: Durée test
               - entity: sensor.garage_carpiquet_ems_real_test_state

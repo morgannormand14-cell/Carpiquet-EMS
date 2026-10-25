@@ -1635,8 +1635,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                         if previous.status.stop_confirmed is not True:
                             _LOGGER.error("R25 zero unconfirmed following safety interlock")
                     else:
+                        # Do not issue discharge setpoints while the pack is not
+                        # confirmed discharging; state transitions remain locked.
+                        solarflow_command_w = (
+                            float(command_decision.validated.solarflow_output_w)
+                            if solar_pack.eligible else 0.0
+                        )
                         self._r25_last_result = await self._r25_session.apply(
-                            float(command_decision.validated.solarflow_output_w),
+                            solarflow_command_w,
                             authorized=True, conditions_valid=True,
                         )
                         if self._r25_last_result.state != "APPLIED_VERIFIED":
@@ -1653,6 +1659,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                             await previous.close()
             result_data = {
                 "r25_cycle_mode": self._r25_cycle_mode,
+                "r25_pack_transition_intents": self._r25_pack_transition_intents,
+                "r25_pack_transition_execution": "LOCKED_SIMULATION_ONLY",
                 "r25_cycle_ready": self._r25_ready_for_real,
                 "r25_http_result": self._r25_last_result.state if self._r25_last_result else "NOT_RUN",
                 "r25_watchdog_state": self._r25_session.status.state if self._r25_session else "LOCKED",

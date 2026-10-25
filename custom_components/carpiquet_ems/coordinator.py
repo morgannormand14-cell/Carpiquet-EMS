@@ -203,6 +203,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._r25_cycle_mode = "Simulation"
         self._r25_session = None
         self._r25_transition_lock = asyncio.Lock()
+        self._r25_update_lock = asyncio.Lock()
         self._r25_last_result = None
         self._r25_ready_for_real = False
         self._r25_transport_info = None
@@ -289,9 +290,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         async with self._r25_transition_lock:
             if not real:
                 self._r25_cycle_mode = "Simulation"
-                session, self._r25_session = self._r25_session, None
-                if session is not None:
-                    await session.close()
+                async with self._r25_update_lock:
+                    session, self._r25_session = self._r25_session, None
+                    if session is not None:
+                        await session.close()
                     if session.status.stop_confirmed is not True:
                         raise RuntimeError("R25 physical zero not confirmed; inspect SolarFlow")
                 await self.async_request_refresh()
@@ -1601,30 +1603,31 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 and solarflow_soc > float(dynamic["solarflow_min_soc"])
                 and not self._real_test_running
             )
-            if self._r25_session is not None:
-                if not self._r25_ready_for_real or self._r25_session.status.state != "MONITORING":
-                    self._r25_cycle_mode = "Simulation"
-                    previous, self._r25_session = self._r25_session, None
-                    await previous.close()
-                    if previous.status.stop_confirmed is not True:
-                        _LOGGER.error("R25 zero unconfirmed following safety interlock")
-                else:
-                    self._r25_last_result = await self._r25_session.apply(
-                        float(command_decision.validated.solarflow_output_w),
-                        authorized=True, conditions_valid=True,
-                    )
-                    if self._r25_last_result.state != "APPLIED_VERIFIED":
-                        previous = self._r25_session
+            async with self._r25_update_lock:
+                if self._r25_session is not None:
+                    if not self._r25_ready_for_real or self._r25_session.status.state != "MONITORING":
                         self._r25_cycle_mode = "Simulation"
-                        self._r25_session = None
+                        previous, self._r25_session = self._r25_session, None
                         await previous.close()
                         if previous.status.stop_confirmed is not True:
-                            _LOGGER.error("R25 physical zero unconfirmed after HTTP command failure")
-                    elif self._r25_session.status.state != "MONITORING":
-                        previous = self._r25_session
-                        self._r25_cycle_mode = "Simulation"
-                        self._r25_session = None
-                        await previous.close()
+                            _LOGGER.error("R25 zero unconfirmed following safety interlock")
+                    else:
+                        self._r25_last_result = await self._r25_session.apply(
+                            float(command_decision.validated.solarflow_output_w),
+                            authorized=True, conditions_valid=True,
+                        )
+                        if self._r25_last_result.state != "APPLIED_VERIFIED":
+                            previous = self._r25_session
+                            self._r25_cycle_mode = "Simulation"
+                            self._r25_session = None
+                            await previous.close()
+                            if previous.status.stop_confirmed is not True:
+                                _LOGGER.error("R25 physical zero unconfirmed after HTTP command failure")
+                        elif self._r25_session.status.state != "MONITORING":
+                            previous = self._r25_session
+                            self._r25_cycle_mode = "Simulation"
+                            self._r25_session = None
+                            await previous.close()
             result_data = {
                 "r25_cycle_mode": self._r25_cycle_mode,
                 "r25_cycle_ready": self._r25_ready_for_real,

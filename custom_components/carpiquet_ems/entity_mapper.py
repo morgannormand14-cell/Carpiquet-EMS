@@ -52,13 +52,13 @@ def _number(hass, entity_id: str | None) -> float | None:
         return None
 
 
-# Zendure-HA pack_state: 0=standby, 1=charging, 2=discharging.
+# Zendure pack-state mapping: 0=standby, 1=charging, 2=discharging, 3=off.
 # This is read-only mapping. It does not grant control authority.
 PACK_STATE_ENTITIES = {
     "hyper_2000": "sensor.hyper_2000_pack_state",
     "solarflow_2400_pro": "sensor.solarflow_2400_pro_pack_state",
 }
-PACK_STATES = {0: "standby", 1: "charging", 2: "discharging"}
+PACK_STATES = {0: "standby", 1: "charging", 2: "discharging", 3: "off"}
 
 
 def _pack_state(hass, system_id: str) -> dict[str, Any]:

@@ -86,6 +86,7 @@ from .dynamic_http_executor import DynamicHttpExecutor
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .pack_state_supervisor import evaluate_pack
+from .pack_transition_controller import plan_transitions
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
 from .zendure_discovery import (
     discover_zendure_inventory,
@@ -899,6 +900,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
 
             error = grid - target
             requested = error if grid_ok and error > deadband else 0.0
+            # Simulation-only transition requests; never dispatch to Zendure.
+            self._r25_pack_transition_intents = plan_transitions(
+                {"hyper_2000": hyper_pack, "solarflow_2400_pro": solar_pack},
+                discharge_needed=bool(self.automation_enabled and requested > 0),
+            )
 
             result = allocate_discharge_power(
                 requested,

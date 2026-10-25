@@ -39,6 +39,7 @@ class Coordinator:
     async_shutdown = ns["async_shutdown"]
     def __init__(self):
         self._r25_transition_lock = asyncio.Lock()
+        self._r25_update_lock = asyncio.Lock()
         self._r25_cycle_mode = "Simulation"
         self._r25_session = None
         self._real_test_running = False
@@ -117,4 +118,39 @@ async def test_shutdown_and_mode_off_race_serialized():
         c.async_shutdown(), c.async_set_r25_cycle_mode(False)
     ), 2)
     assert active.closes == 1
+    assert c._r25_session is None
+
+
+@pytest.mark.asyncio
+async def test_simulation_off_when_no_session_is_idempotent():
+    c = Coordinator()
+    await asyncio.wait_for(c.async_set_r25_cycle_mode(False), 2)
+    assert c._r25_session is None
+    assert c._r25_cycle_mode == "Simulation"
+
+
+@pytest.mark.asyncio
+async def test_operator_stop_waits_for_inflight_ems_update():
+    c = Coordinator()
+    active = Session()
+    c._r25_session = active
+    c._r25_cycle_mode = "Cycle réel"
+    entered = asyncio.Event()
+    release = asyncio.Event()
+
+    async def ems_cycle():
+        async with c._r25_update_lock:
+            entered.set()
+            await release.wait()
+
+    update = asyncio.create_task(ems_cycle())
+    await entered.wait()
+    stopping = asyncio.create_task(c.async_set_r25_cycle_mode(False))
+    await asyncio.sleep(0)
+    assert not stopping.done()
+    assert active.closes == 0
+    release.set()
+    await asyncio.wait_for(asyncio.gather(update, stopping), 2)
+    assert active.closes == 1
+    assert active.status.stop_confirmed is True
     assert c._r25_session is None

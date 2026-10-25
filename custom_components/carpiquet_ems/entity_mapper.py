@@ -52,6 +52,22 @@ def _number(hass, entity_id: str | None) -> float | None:
         return None
 
 
+# Zendure-HA pack_state: 0=standby, 1=charging, 2=discharging.
+# This is read-only mapping. It does not grant control authority.
+PACK_STATE_ENTITIES = {
+    "hyper_2000": "sensor.hyper_2000_pack_state",
+    "solarflow_2400_pro": "sensor.solarflow_2400_pro_pack_state",
+}
+PACK_STATES = {0: "standby", 1: "charging", 2: "discharging"}
+
+
+def _pack_state(hass, system_id: str) -> dict[str, Any]:
+    entity_id = PACK_STATE_ENTITIES[system_id]
+    raw = _number(hass, entity_id)
+    state = PACK_STATES.get(int(raw), "unknown") if raw is not None and raw in PACK_STATES else "unknown"
+    return {"entity_id": entity_id, "raw": int(raw) if state != "unknown" else None, "state": state}
+
+
 def _system(hass, system_id: str, name: str, control_profile: str, capabilities: dict[str, Any], entities: dict[str, str]) -> MappedSystem:
     values = {key: _number(hass, entity_id) for key, entity_id in entities.items()}
     # These are the minimum fields needed to describe a controllable Zendure
@@ -102,8 +118,12 @@ def build_shadow_systems(hass, config: dict[str, Any]) -> list[dict[str, Any]]:
             "max_soc": config.get(CONF_SOLARFLOW_MAX_SOC_ENTITY),
         }),
     )
-    return [_system(hass, sid, name, profile, capabilities, entities).as_dict()
-            for sid, name, profile, capabilities, entities in definitions]
+    systems = []
+    for sid, name, profile, capabilities, entities in definitions:
+        mapped = _system(hass, sid, name, profile, capabilities, entities).as_dict()
+        mapped["pack_state"] = _pack_state(hass, sid)
+        systems.append(mapped)
+    return systems
 
 
 def mapper_diagnostics(systems: list[dict[str, Any]]) -> dict[str, Any]:
@@ -135,5 +155,6 @@ def mapper_diagnostics(systems: list[dict[str, Any]]) -> dict[str, Any]:
             "command_limit_w": "generation-dependent Zendure command/limit; never treated as measured home power",
             "home_output_w": "measured power delivered by the system to the home; may include PV and battery contribution",
         },
+        "pack_state_mapping_mode": "read_only_no_engine_authority",
         "systems": systems,
     }

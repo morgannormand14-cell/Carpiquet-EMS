@@ -26,4 +26,5 @@ jobs:
             tests/test_dynamic_http_executor_contract.py \
             tests/test_r25_mode_switch_contract.py \
             tests/test_r25_http_failure_scenarios.py \
-            tests/test_r25_mode_lifecycle.py
+            tests/test_r25_mode_lifecycle.py \
+            tests/test_r25_integration_invariants.py

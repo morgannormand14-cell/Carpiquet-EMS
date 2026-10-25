@@ -294,7 +294,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     session, self._r25_session = self._r25_session, None
                     if session is not None:
                         await session.close()
-                    if session.status.stop_confirmed is not True:
+                    if session is not None and session.status.stop_confirmed is not True:
                         raise RuntimeError("R25 physical zero not confirmed; inspect SolarFlow")
                 await self.async_request_refresh()
                 return
@@ -756,12 +756,13 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         # already be tearing down the update loop and its dependencies.
         async with self._r25_transition_lock:
             self._r25_cycle_mode = "Simulation"
-            session, self._r25_session = self._r25_session, None
-            if session is not None:
-                await session.close()
-                if session.status.stop_confirmed is not True:
-                    _LOGGER.error("R25 shutdown: physical zero NOT confirmed")
-                    raise RuntimeError("R25 shutdown failed to verify physical zero")
+            async with self._r25_update_lock:
+                session, self._r25_session = self._r25_session, None
+                if session is not None:
+                    await session.close()
+                    if session.status.stop_confirmed is not True:
+                        _LOGGER.error("R25 shutdown: physical zero NOT confirmed")
+                        raise RuntimeError("R25 shutdown failed to verify physical zero")
         self._control_mode = CONTROL_MODE_SIMULATION
         self._safety_state_machine.reset(datetime.now(timezone.utc))
         self._automation_enabled_runtime = False

@@ -28,4 +28,5 @@ jobs:
             tests/test_r25_http_failure_scenarios.py \
             tests/test_r25_mode_lifecycle.py \
             tests/test_r25_integration_invariants.py \
-            tests/test_r25_pack_state_supervisor.py
+            tests/test_r25_pack_state_supervisor.py \
+            tests/test_r25_pack_transition_controller.py

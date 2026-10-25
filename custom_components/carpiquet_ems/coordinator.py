@@ -85,6 +85,7 @@ from .dynamic_control_session import DynamicControlSession
 from .dynamic_http_executor import DynamicHttpExecutor
 from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
+from .pack_state_supervisor import evaluate_pack
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
 from .zendure_discovery import (
     discover_zendure_inventory,
@@ -861,6 +862,17 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             solar_soc = self._state_float(solar_soc_entity)
             hyper_pv = self._state_float(hyper_pv_entity)
             solar_pv = self._state_float(solar_pv_entity)
+            # R25 pack supervision: fail closed on missing/unknown pack state.
+            hyper_pack = evaluate_pack(
+                getattr(self._state("sensor.hyper_2000_pack_state"), "state", None),
+                hyper_soc, dynamic["hyper_min_soc"],
+            )
+            solar_pack = evaluate_pack(
+                getattr(self._state("sensor.solarflow_2400_pro_pack_state"), "state", None),
+                solar_soc, dynamic["solarflow_min_soc"],
+            )
+            hyper_ok = hyper_ok and hyper_pack.eligible
+            solar_ok = solar_ok and solar_pack.eligible
             hyper_real_output = self._state_float(self.config[CONF_HYPER_REAL_OUTPUT_ENTITY])
             solar_real_output = self._state_float(self.config[CONF_SOLARFLOW_REAL_OUTPUT_ENTITY])
             real_zendure_total = max(0.0, hyper_real_output) + max(0.0, solar_real_output)
@@ -916,6 +928,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._previous_simulated_power = total
 
             total_batteries, active_batteries, physical_socs = self._battery_status()
+            # The legacy battery list can be empty while both physical systems
+            # are configured. Use the pack-state-filtered physical availability.
+            active_batteries = int(hyper_ok) + int(solar_ok)
 
             # Session watchdog: runtime engine ON <=> active recorder.
             if self.automation_enabled and not self._session.active:
@@ -1602,6 +1617,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 and self._solarflow_local_probe.qualified
                 and r25_transport[ATTR_TRANSPORT_SOLARFLOW_SELECTED] == "LOCAL_HTTP"
                 and solarflow_soc > float(dynamic["solarflow_min_soc"])
+                and solar_pack.eligible
                 and not self._real_test_running
             )
             async with self._r25_update_lock:

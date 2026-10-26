@@ -87,6 +87,7 @@ from .session_recorder import SimulationSessionRecorder
 from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .pack_state_supervisor import evaluate_pack
 from .pack_transition_controller import plan_transitions
+from .hyper_mqtt_transition import prepare_hyper_transition
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
 from .zendure_discovery import (
     discover_zendure_inventory,
@@ -905,6 +906,16 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 {"hyper_2000": hyper_pack, "solarflow_2400_pro": solar_pack},
                 discharge_needed=bool(self.automation_enabled and requested > 0),
             )
+            hyper_intent = self._r25_pack_transition_intents["hyper_2000"]
+            hyper_transport = self._hyper_transport_selection
+            self._r25_hyper_mqtt_prepared = prepare_hyper_transition(
+                hyper_intent["action"],
+                transport=hyper_transport,
+                power_w=max(1, min(1200, int(requested))) if requested > 0 else 0,
+                pack_state=hyper_pack.state,
+                soc=hyper_soc,
+                minimum_soc=dynamic["hyper_min_soc"],
+            )
 
             result = allocate_discharge_power(
                 requested,
@@ -1661,6 +1672,13 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "r25_cycle_mode": self._r25_cycle_mode,
                 "r25_pack_transition_intents": self._r25_pack_transition_intents,
                 "r25_pack_transition_execution": "LOCKED_SIMULATION_ONLY",
+                "r25_hyper_mqtt_preparation": {
+                    "transport": self._r25_hyper_mqtt_prepared.transport,
+                    "action": self._r25_hyper_mqtt_prepared.action,
+                    "prepared": self._r25_hyper_mqtt_prepared.allowed,
+                    "reason": self._r25_hyper_mqtt_prepared.reason,
+                    "write_enabled": False,
+                },
                 "r25_cycle_ready": self._r25_ready_for_real,
                 "r25_http_result": self._r25_last_result.state if self._r25_last_result else "NOT_RUN",
                 "r25_watchdog_state": self._r25_session.status.state if self._r25_session else "LOCKED",

@@ -867,12 +867,15 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             hyper_pv = self._state_float(hyper_pv_entity)
             solar_pv = self._state_float(solar_pv_entity)
             # R25 pack supervision: fail closed on missing/unknown pack state.
+            # Keep the HA state objects and timestamps for read-only transition diagnostics.
+            hyper_pack_entity = self._state("sensor.hyper_2000_pack_state")
+            solar_pack_entity = self._state("sensor.solarflow_2400_pro_pack_state")
             hyper_pack = evaluate_pack(
-                getattr(self._state("sensor.hyper_2000_pack_state"), "state", None),
+                getattr(hyper_pack_entity, "state", None),
                 hyper_soc, dynamic["hyper_min_soc"],
             )
             solar_pack = evaluate_pack(
-                getattr(self._state("sensor.solarflow_2400_pro_pack_state"), "state", None),
+                getattr(solar_pack_entity, "state", None),
                 solar_soc, dynamic["solarflow_min_soc"],
             )
             hyper_ok = hyper_ok and hyper_pack.eligible
@@ -926,6 +929,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 self._r25_pack_transition_feedback[system_id] = {
                     "state": feedback.state, "confirmed": feedback.confirmed,
                     "reason": feedback.reason,
+                }
+            # Telemetry is observational: no actual transition dispatch ID/time exists yet.
+            # A recent HA update must never be misreported as post-command confirmation.
+            self._r25_transition_telemetry = {}
+            for system_id, entity in (
+                ("hyper_2000", hyper_pack_entity),
+                ("solarflow_2400_pro", solar_pack_entity),
+            ):
+                changed = getattr(entity, "last_updated", None)
+                self._r25_transition_telemetry[system_id] = {
+                    "entity_available": entity is not None,
+                    "last_updated": changed.isoformat() if changed is not None else None,
+                    "dispatch_registered": False,
+                    "confirmation_state": "NOT_TRACKED",
+                    "reason": "no_physical_transition_dispatch",
                 }
             hyper_intent = self._r25_pack_transition_intents["hyper_2000"]
             # Explicit MQTT route; broker qualification remains required.
@@ -1698,6 +1716,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 "r25_cycle_mode": self._r25_cycle_mode,
                 "r25_pack_transition_intents": self._r25_pack_transition_intents,
                 "r25_pack_transition_feedback": self._r25_pack_transition_feedback,
+                "r25_transition_telemetry": self._r25_transition_telemetry,
                 "r25_pack_transition_execution": "LOCKED_SIMULATION_ONLY",
                 "r25_hyper_mqtt_preparation": {
                     "transport": self._r25_hyper_mqtt_prepared.transport,

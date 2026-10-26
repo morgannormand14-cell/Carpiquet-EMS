@@ -51,7 +51,10 @@ def test_invalid_route_or_timestamp_rejected():
 def test_coordinator_diagnostic_is_read_only():
     source = (ROOT / "coordinator.py").read_text()
     ast.parse(source)
-    assert "self._r25_hyper_mqtt_event = unproven_hyper_mqtt_event(" in source
+    assert "unproven_hyper_mqtt_event(" in source
+    assert "self._r25_hyper_mqtt_observer.on_published(" in source
+    assert "self._r25_hyper_mqtt_observer.on_broker_ack(" in source
+    assert "self._r25_hyper_mqtt_observer.on_device_reply(" in source
     assert '"r25_hyper_mqtt_event": {' in source
     assert '"pack_transition_confirmed": False' in source
 

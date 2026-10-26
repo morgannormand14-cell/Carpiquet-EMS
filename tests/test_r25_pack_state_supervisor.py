@@ -45,3 +45,15 @@ def test_recovery_without_restart():
     states = [("2", 10), ("0", 15), ("2", 15), ("1", 16), ("0", 18), ("2", 18)]
     actual = [evaluate_pack(state, soc, 10).eligible for state, soc in states]
     assert actual == [False, False, True, False, False, True]
+
+
+def test_localized_home_assistant_pack_labels():
+    for raw in ("0", "standby", "En veille"):
+        assert evaluate_pack(raw, 40, 10).needs_discharge_transition
+    for raw in ("1", "charging", "En charge"):
+        assert not evaluate_pack(raw, 40, 10).eligible
+    for raw in ("2", "discharging", "En décharge"):
+        assert evaluate_pack(raw, 40, 10).eligible
+    for raw in ("3", "off", "Arrêt"):
+        assert not evaluate_pack(raw, 40, 10).eligible
+    assert not evaluate_pack("unavailable", 40, 10).eligible

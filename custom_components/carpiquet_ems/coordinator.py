@@ -211,6 +211,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._r25_transition_lock = asyncio.Lock()
         self._r25_update_lock = asyncio.Lock()
         self._r25_last_result = None
+        self._r25_last_http_post_event = None
         self._r25_ready_for_real = False
         self._r25_transport_info = None
         self._zendure_reconciliation = None
@@ -299,6 +300,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 async with self._r25_update_lock:
                     session, self._r25_session = self._r25_session, None
                     if session is not None:
+                        self._remember_r25_http_post_event(session)
                         await session.close()
                     if session is not None and session.status.stop_confirmed is not True:
                         raise RuntimeError("R25 physical zero not confirmed; inspect SolarFlow")
@@ -320,6 +322,12 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             self._r25_session = session
             self._r25_cycle_mode = "Cycle réel"
             await self.async_request_refresh()
+
+    def _remember_r25_http_post_event(self, session):
+        """Retain the last POST attempt after session teardown; diagnostic only."""
+        event = session.last_setpoint_event
+        if event is not None:
+            self._r25_last_http_post_event = event
 
     @property
     def real_test_authorized(self):
@@ -1713,6 +1721,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     if not self._r25_ready_for_real or self._r25_session.status.state != "MONITORING":
                         self._r25_cycle_mode = "Simulation"
                         previous, self._r25_session = self._r25_session, None
+                        self._remember_r25_http_post_event(previous)
                         await previous.close()
                         if previous.status.stop_confirmed is not True:
                             _LOGGER.error("R25 zero unconfirmed following safety interlock")
@@ -1731,18 +1740,20 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                             previous = self._r25_session
                             self._r25_cycle_mode = "Simulation"
                             self._r25_session = None
-                            await previous.close()
+                            self._remember_r25_http_post_event(previous)
+                        await previous.close()
                             if previous.status.stop_confirmed is not True:
                                 _LOGGER.error("R25 physical zero unconfirmed after HTTP command failure")
                         elif self._r25_session.status.state != "MONITORING":
                             previous = self._r25_session
                             self._r25_cycle_mode = "Simulation"
                             self._r25_session = None
-                            await previous.close()
+                            self._remember_r25_http_post_event(previous)
+                        await previous.close()
             # Diagnostic only: HTTP setpoint POST is not a pack transition.
             http_setpoint_event = (
                 self._r25_session.last_setpoint_event
-                if self._r25_session is not None else None
+                if self._r25_session is not None else self._r25_last_http_post_event
             )
             result_data = {
                 "r25_http_post_event": {

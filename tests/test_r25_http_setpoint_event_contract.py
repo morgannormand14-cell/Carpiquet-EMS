@@ -28,3 +28,12 @@ def test_coordinator_surfaces_http_event_without_pack_confirmation():
     assert '"r25_http_post_event": {' in coordinator
     assert '"transport_accepted": bool(http_setpoint_event and http_setpoint_event.transport_accepted)' in coordinator
     assert '"pack_transition_confirmed": False' in coordinator
+
+
+def test_http_event_retained_after_session_teardown():
+    coordinator = (Path(__file__).resolve().parents[1] /
+                   "custom_components/carpiquet_ems/coordinator.py").read_text()
+    assert "def _remember_r25_http_post_event(self, session):" in coordinator
+    assert "self._r25_last_http_post_event = event" in coordinator
+    assert "else self._r25_last_http_post_event" in coordinator
+    assert "self._remember_r25_http_post_event(previous)" in coordinator

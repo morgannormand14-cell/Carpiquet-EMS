@@ -73,3 +73,14 @@ def test_mqtt_candidate_missing_metadata_is_fail_closed():
     assert contract["state"] == "METADATA_MISSING"
     assert contract["topic"] is None
     assert not contract["write_enabled"]
+
+
+@pytest.mark.parametrize("route", ["LOCAL_MQTT", "CLOUD_MQTT"])
+def test_upstream_publish_seam_does_not_imply_broker_ack(route):
+    status = module.zendure_ha_publish_integration_status(transport=route)
+    assert status["command_entrypoint"] == "Hyper2000.discharge -> mqttInvoke -> mqttPublish"
+    assert status["publish_surface"] == "paho.Client.publish"
+    assert not status["publish_result_exposed"]
+    assert not status["broker_ack_callback_exposed"]
+    assert not status["device_reply_correlated"]
+    assert not status["write_enabled"]

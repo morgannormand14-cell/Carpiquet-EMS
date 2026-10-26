@@ -4,8 +4,8 @@ from pathlib import Path
 
 def test_ha_telemetry_wiring_does_not_claim_dispatch_or_confirmation():
     source = (Path(__file__).resolve().parents[1] / "custom_components/carpiquet_ems/coordinator.py").read_text()
-    assert 'hyper_pack_entity = self._state("sensor.hyper_2000_pack_state")' in source
-    assert 'solar_pack_entity = self._state("sensor.solarflow_2400_pro_pack_state")' in source
+    assert 'hyper_pack_entity = self._state(self.config.get(CONF_HYPER_PACK_STATE_ENTITY, DEFAULT_HYPER_PACK_STATE_ENTITY))' in source
+    assert 'solar_pack_entity = self._state(self.config.get(CONF_SOLARFLOW_PACK_STATE_ENTITY, DEFAULT_SOLARFLOW_PACK_STATE_ENTITY))' in source
     assert '"last_updated": changed.isoformat() if changed is not None else None' in source
     assert '"dispatch_registered": False' in source
     assert '"confirmation_state": "NOT_TRACKED"' in source

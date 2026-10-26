@@ -44,3 +44,23 @@ def observed_hyper_mqtt_publish(*, transport: str, action: str,
         published=True, published_at=float(published_at),
         broker_accepted=bool(broker_accepted),
     )
+
+
+def hyper_mqtt_transport_contract(*, transport: str, product_key: str | None,
+                                  protocol_device_id: str | None) -> dict[str, object]:
+    """Describe a candidate HA MQTT surface without subscribing or publishing.
+
+    A topic inferred from inventory is not proof that Zendure-HA uses
+    Home Assistant's mqtt.publish service or exposes broker acknowledgements.
+    """
+    if transport not in ROUTES:
+        return {"transport": transport, "state": "UNSUPPORTED_ROUTE",
+                "topic": None, "publisher_verified": False,
+                "feedback_verified": False, "write_enabled": False}
+    key = str(product_key or "").strip()
+    device = str(protocol_device_id or "").strip()
+    topic = f"iot/{key}/{device}/function/invoke" if key and device else None
+    return {"transport": transport,
+            "state": "CANDIDATE_UNVERIFIED" if topic else "METADATA_MISSING",
+            "topic": topic, "publisher_verified": False,
+            "feedback_verified": False, "write_enabled": False}

@@ -17,3 +17,14 @@ def test_setpoint_evidence_does_not_claim_pack_transition():
     assert "NOT a physical pack transition" in SOURCE
     assert "self._last_setpoint_event" in SOURCE
     assert "pack_transition_confirmed" not in SOURCE
+
+
+def test_coordinator_surfaces_http_event_without_pack_confirmation():
+    root = Path(__file__).resolve().parents[1] / "custom_components/carpiquet_ems"
+    session = (root / "dynamic_control_session.py").read_text()
+    coordinator = (root / "coordinator.py").read_text()
+    assert "def last_setpoint_event(self):" in session
+    assert "return self.executor.last_setpoint_event" in session
+    assert '"r25_http_post_event": {' in coordinator
+    assert '"transport_accepted": bool(http_setpoint_event and http_setpoint_event.transport_accepted)' in coordinator
+    assert '"pack_transition_confirmed": False' in coordinator

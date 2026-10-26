@@ -137,7 +137,20 @@ class CarpiquetEMSOptionsFlow(config_entries.OptionsFlow):
         current = self._config_entry.options.get(
             CONF_GRID_POWER_ENTITY, self._config_entry.data.get(CONF_GRID_POWER_ENTITY)
         )
-        schema = vol.Schema({vol.Required(CONF_GRID_POWER_ENTITY, default=current): _entity("sensor")})
+        # Optional R25 pack-state sensors. Existing installs keep legacy defaults.
+        hyper_pack = self._config_entry.options.get(
+            CONF_HYPER_PACK_STATE_ENTITY,
+            self._config_entry.data.get(CONF_HYPER_PACK_STATE_ENTITY, DEFAULT_HYPER_PACK_STATE_ENTITY),
+        )
+        solar_pack = self._config_entry.options.get(
+            CONF_SOLARFLOW_PACK_STATE_ENTITY,
+            self._config_entry.data.get(CONF_SOLARFLOW_PACK_STATE_ENTITY, DEFAULT_SOLARFLOW_PACK_STATE_ENTITY),
+        )
+        schema = vol.Schema({
+            vol.Required(CONF_GRID_POWER_ENTITY, default=current): _entity("sensor"),
+            vol.Required(CONF_HYPER_PACK_STATE_ENTITY, default=hyper_pack): _entity("sensor"),
+            vol.Required(CONF_SOLARFLOW_PACK_STATE_ENTITY, default=solar_pack): _entity("sensor"),
+        })
         if user_input is not None:
             return self.async_create_entry(title="", data=user_input)
         return self.async_show_form(step_id="init", data_schema=schema)

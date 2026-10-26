@@ -13,8 +13,8 @@ TREE = ast.parse(SOURCE)
 CLASS = next(n for n in TREE.body if isinstance(n, ast.ClassDef) and
              any(isinstance(x, ast.AsyncFunctionDef) and x.name == "async_set_r25_cycle_mode"
                  for x in n.body))
-METHODS = ("async_set_r25_cycle_mode", "async_shutdown")
-methods = [n for n in CLASS.body if isinstance(n, ast.AsyncFunctionDef) and n.name in METHODS]
+METHODS = ("async_set_r25_cycle_mode", "async_shutdown", "_remember_r25_http_post_event")
+methods = [n for n in CLASS.body if isinstance(n, (ast.AsyncFunctionDef, ast.FunctionDef)) and n.name in METHODS]
 ns = {
     "asyncio": asyncio,
     "CONTROL_MODE_SIMULATION": "Simulation",
@@ -25,6 +25,8 @@ ns = {
 exec(compile(ast.Module(body=methods, type_ignores=[]), "<r25-coordinator-methods>", "exec"), ns)
 
 class Session:
+    last_setpoint_event = None
+
     def __init__(self, zero=True):
         self.zero = zero
         self.closes = 0
@@ -37,11 +39,13 @@ class Session:
 class Coordinator:
     async_set_r25_cycle_mode = ns["async_set_r25_cycle_mode"]
     async_shutdown = ns["async_shutdown"]
+    _remember_r25_http_post_event = ns["_remember_r25_http_post_event"]
     def __init__(self):
         self._r25_transition_lock = asyncio.Lock()
         self._r25_update_lock = asyncio.Lock()
         self._r25_cycle_mode = "Simulation"
         self._r25_session = None
+        self._r25_last_http_post_event = None
         self._real_test_running = False
         self._r25_ready_for_real = True
         self._r25_transport_info = {

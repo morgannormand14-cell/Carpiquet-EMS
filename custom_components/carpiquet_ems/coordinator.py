@@ -88,6 +88,7 @@ from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .pack_state_supervisor import evaluate_pack
 from .pack_transition_controller import plan_transitions
 from .hyper_mqtt_transition import prepare_hyper_transition
+from .const import TRANSPORT_MODE_MQTT_LOCAL, TRANSPORT_MODE_MQTT_CLOUD, TRANSPORT_MODE_CLOUD, TRANSPORT_MODE_ZENSDK
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
 from .zendure_discovery import (
     discover_zendure_inventory,
@@ -186,8 +187,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             }
         self._pending_zendure_discovery = None
         self._solarflow_local_probe = None
-        self._hyper_transport_selection = TRANSPORT_MODE_AUTO
-        self._solarflow_transport_selection = TRANSPORT_MODE_AUTO
+        self._hyper_transport_selection = TRANSPORT_MODE_MQTT_CLOUD
+        self._solarflow_transport_selection = TRANSPORT_MODE_ZENSDK
         # alpha.3.15 phase 2: volatile test settings; reset on every HA reload.
         self._test_gate_armed = False
         self._test_gate_device = ""
@@ -441,29 +442,29 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         await self.async_request_refresh()
 
     def _transport_policy_diagnostics(self):
-        hyper_selected = "MQTT"
-        hyper_reason = "AUTO: only MQTT candidate is available" if self._hyper_transport_selection == TRANSPORT_MODE_AUTO else "Manual MQTT selection"
-
-        probe = self._solarflow_local_probe
-        local_ok = bool(probe and probe.qualified)
-        if self._solarflow_transport_selection == TRANSPORT_MODE_AUTO:
-            if local_ok:
-                solar_selected = "LOCAL_HTTP"
-                solar_reason = "AUTO: qualified local HTTP preferred"
-            else:
-                solar_selected = "MQTT"
-                solar_reason = "AUTO fallback: local HTTP not qualified"
-        elif self._solarflow_transport_selection == TRANSPORT_MODE_LOCAL_HTTP:
-            solar_selected = "LOCAL_HTTP" if local_ok else "BLOCKED"
-            solar_reason = "Manual Local HTTP selection" if local_ok else "Manual Local HTTP unavailable: no automatic fallback"
-        else:
+        # Explicit routing, never silently fall back to another transport.
+        hyper_selected = (
+            "LOCAL_MQTT" if self._hyper_transport_selection == TRANSPORT_MODE_MQTT_LOCAL
+            else "CLOUD_MQTT" if self._hyper_transport_selection == TRANSPORT_MODE_MQTT_CLOUD
+            else "BLOCKED"
+        )
+        if self._solarflow_transport_selection == TRANSPORT_MODE_ZENSDK:
+            probe = self._solarflow_local_probe
+            solar_selected = "LOCAL_HTTP" if probe and probe.qualified else "BLOCKED"
+            solar_reason = "ZenSDK: qualified local HTTP" if solar_selected == "LOCAL_HTTP" else "ZenSDK: local HTTP not qualified"
+        elif self._solarflow_transport_selection == TRANSPORT_MODE_CLOUD:
+            solar_selected = "CLOUD"
+            solar_reason = "Cloud selected; physical executor not implemented"
+        elif self._solarflow_transport_selection == TRANSPORT_MODE_MQTT:
             solar_selected = "MQTT"
-            solar_reason = "Manual MQTT selection"
-
+            solar_reason = "MQTT selected; physical executor not implemented"
+        else:
+            solar_selected = "BLOCKED"
+            solar_reason = "Unsupported selection"
         return {
             ATTR_TRANSPORT_HYPER_SELECTION: self._hyper_transport_selection,
             ATTR_TRANSPORT_HYPER_SELECTED: hyper_selected,
-            ATTR_TRANSPORT_HYPER_FALLBACK_REASON: hyper_reason,
+            ATTR_TRANSPORT_HYPER_FALLBACK_REASON: "Explicit selection; no automatic fallback",
             ATTR_TRANSPORT_SOLARFLOW_SELECTION: self._solarflow_transport_selection,
             ATTR_TRANSPORT_SOLARFLOW_SELECTED: solar_selected,
             ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON: solar_reason,
@@ -909,7 +910,11 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             hyper_intent = self._r25_pack_transition_intents["hyper_2000"]
             # Existing AUTO/MQTT selector does not distinguish local from cloud.
             # Fail closed until Zendure-HA's actual connection source is mapped.
-            hyper_transport = "UNRESOLVED_MQTT_ROUTE"
+            hyper_transport = (
+                "LOCAL_MQTT" if self._hyper_transport_selection == TRANSPORT_MODE_MQTT_LOCAL
+                else "CLOUD_MQTT" if self._hyper_transport_selection == TRANSPORT_MODE_MQTT_CLOUD
+                else "UNRESOLVED_MQTT_ROUTE"
+            )
             self._r25_hyper_mqtt_prepared = prepare_hyper_transition(
                 hyper_intent["action"],
                 transport=hyper_transport,

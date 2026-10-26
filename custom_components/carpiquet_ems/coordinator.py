@@ -88,6 +88,7 @@ from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .pack_state_supervisor import evaluate_pack
 from .pack_transition_controller import plan_transitions
 from .hyper_mqtt_transition import prepare_hyper_transition
+from .r25_hyper_mqtt_events import unproven_hyper_mqtt_event
 from .transition_feedback import verify_transition
 from .r25_transport_evidence import correlate_evidence, unproven_transport_evidence
 from .const import TRANSPORT_MODE_MQTT_LOCAL, TRANSPORT_MODE_MQTT_CLOUD, TRANSPORT_MODE_CLOUD, TRANSPORT_MODE_ZENSDK
@@ -997,6 +998,10 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 minimum_soc=dynamic["hyper_min_soc"],
             )
 
+            self._r25_hyper_mqtt_event = unproven_hyper_mqtt_event(
+                transport=hyper_transport, action=hyper_intent["action"],
+            )
+
             result = allocate_discharge_power(
                 requested,
                 BatteryState(
@@ -1777,6 +1782,16 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     "prepared": self._r25_hyper_mqtt_prepared.allowed,
                     "reason": self._r25_hyper_mqtt_prepared.reason,
                     "write_enabled": False,
+                },
+                "r25_hyper_mqtt_event": {
+                    "transport": self._r25_hyper_mqtt_event.transport,
+                    "action": self._r25_hyper_mqtt_event.action,
+                    "command_id": self._r25_hyper_mqtt_event.command_id,
+                    "published": self._r25_hyper_mqtt_event.published,
+                    "published_at": self._r25_hyper_mqtt_event.published_at,
+                    "broker_accepted": self._r25_hyper_mqtt_event.broker_accepted,
+                    "device_acknowledged": self._r25_hyper_mqtt_event.device_acknowledged,
+                    "pack_transition_confirmed": False,
                 },
                 "r25_cycle_ready": self._r25_ready_for_real,
                 "r25_http_result": self._r25_last_result.state if self._r25_last_result else "NOT_RUN",

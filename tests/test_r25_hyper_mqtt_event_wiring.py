@@ -54,3 +54,22 @@ def test_coordinator_diagnostic_is_read_only():
     assert "self._r25_hyper_mqtt_event = unproven_hyper_mqtt_event(" in source
     assert '"r25_hyper_mqtt_event": {' in source
     assert '"pack_transition_confirmed": False' in source
+
+
+@pytest.mark.parametrize("route", ["LOCAL_MQTT", "CLOUD_MQTT"])
+def test_mqtt_candidate_surface_is_not_execution(route):
+    contract = module.hyper_mqtt_transport_contract(
+        transport=route, product_key="key", protocol_device_id="device")
+    assert contract["topic"] == "iot/key/device/function/invoke"
+    assert contract["state"] == "CANDIDATE_UNVERIFIED"
+    assert not contract["publisher_verified"]
+    assert not contract["feedback_verified"]
+    assert not contract["write_enabled"]
+
+
+def test_mqtt_candidate_missing_metadata_is_fail_closed():
+    contract = module.hyper_mqtt_transport_contract(
+        transport="LOCAL_MQTT", product_key="", protocol_device_id="")
+    assert contract["state"] == "METADATA_MISSING"
+    assert contract["topic"] is None
+    assert not contract["write_enabled"]

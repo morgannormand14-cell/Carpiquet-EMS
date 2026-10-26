@@ -773,6 +773,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             async with self._r25_update_lock:
                 session, self._r25_session = self._r25_session, None
                 if session is not None:
+                    self._remember_r25_http_post_event(session)
                     await session.close()
                     if session.status.stop_confirmed is not True:
                         _LOGGER.error("R25 shutdown: physical zero NOT confirmed")

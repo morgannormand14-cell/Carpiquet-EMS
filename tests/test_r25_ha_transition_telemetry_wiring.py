@@ -9,8 +9,8 @@ def test_ha_telemetry_wiring_does_not_claim_dispatch_or_confirmation():
     assert '"last_updated": changed.isoformat() if changed is not None else None' in source
     assert '"dispatch_registered": False' in source
     assert '"confirmation_state": correlation.state' in source
-    assert 'dispatched=False' in source
-    assert 'command_id=None' in source
-    assert 'correlation = correlate_transition(' in source
+    assert 'evidence = unproven_transport_evidence(' in source
+    assert 'correlation = correlate_evidence(' in source
+    assert 'from .r25_transport_evidence import correlate_evidence, unproven_transport_evidence' in source
     assert '"r25_transition_telemetry": self._r25_transition_telemetry' in source
     assert '"r25_pack_transition_execution": "LOCKED_SIMULATION_ONLY"' in source

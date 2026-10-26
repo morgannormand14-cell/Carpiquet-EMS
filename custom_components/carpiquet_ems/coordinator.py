@@ -88,6 +88,7 @@ from .entity_mapper import build_shadow_systems, mapper_diagnostics
 from .pack_state_supervisor import evaluate_pack
 from .pack_transition_controller import plan_transitions
 from .hyper_mqtt_transition import prepare_hyper_transition
+from .transition_feedback import verify_transition
 from .const import TRANSPORT_MODE_MQTT_LOCAL, TRANSPORT_MODE_MQTT_CLOUD, TRANSPORT_MODE_CLOUD, TRANSPORT_MODE_ZENSDK
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
 from .zendure_discovery import (
@@ -907,6 +908,25 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 {"hyper_2000": hyper_pack, "solarflow_2400_pro": solar_pack},
                 discharge_needed=bool(self.automation_enabled and requested > 0),
             )
+            # Observational feedback only: no command or network I/O.
+            self._r25_pack_transition_feedback = {}
+            for system_id, eligibility, soc_value, minimum, output_entity in (
+                ("hyper_2000", hyper_pack, hyper_soc, dynamic["hyper_min_soc"], None),
+                ("solarflow_2400_pro", solar_pack, solar_soc, dynamic["solarflow_min_soc"], None),
+            ):
+                intent = self._r25_pack_transition_intents[system_id]
+                if intent["action"] == "none":
+                    continue
+                feedback = verify_transition(
+                    intent["action"], observed_state=eligibility.state,
+                    fresh=False,  # freshness is not proven by the current sensor mapping
+                    observed_soc=soc_value, minimum_soc=minimum,
+                    observed_power_w=None,
+                )
+                self._r25_pack_transition_feedback[system_id] = {
+                    "state": feedback.state, "confirmed": feedback.confirmed,
+                    "reason": feedback.reason,
+                }
             hyper_intent = self._r25_pack_transition_intents["hyper_2000"]
             # Existing AUTO/MQTT selector does not distinguish local from cloud.
             # Fail closed until Zendure-HA's actual connection source is mapped.
@@ -1678,6 +1698,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             result_data = {
                 "r25_cycle_mode": self._r25_cycle_mode,
                 "r25_pack_transition_intents": self._r25_pack_transition_intents,
+                "r25_pack_transition_feedback": self._r25_pack_transition_feedback,
                 "r25_pack_transition_execution": "LOCKED_SIMULATION_ONLY",
                 "r25_hyper_mqtt_preparation": {
                     "transport": self._r25_hyper_mqtt_prepared.transport,

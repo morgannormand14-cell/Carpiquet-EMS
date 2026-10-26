@@ -324,6 +324,7 @@ SENSORS = [
     ("automation_last_transition", "Automation Last Transition", ATTR_AUTOMATION_LAST_TRANSITION, None, None),
     ("automation_hold_remaining", "Automation Hold Remaining", ATTR_AUTOMATION_HOLD_REMAINING, "s", "duration"),
     ("automation_policy", "Automation Policy", ATTR_AUTOMATION_POLICY, None, None),
+    ("r25_diagnostic", "R25 Diagnostic", "r25_cycle_mode", None, None),
 ]
 
 async def async_setup_entry(hass, entry, async_add_entities):
@@ -359,6 +360,25 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
+        if self._data_key == "r25_cycle_mode":
+            data = self.coordinator.data or {}
+            feedback = data.get("r25_http_setpoint_feedback") or {}
+            # Intentionally expose only bounded, non-secret diagnostic fields.
+            return {
+                "cycle_ready": bool(data.get("r25_cycle_ready", False)),
+                "transition_execution": data.get("r25_pack_transition_execution", "UNKNOWN"),
+                "watchdog_state": data.get("r25_watchdog_state", "UNKNOWN"),
+                "http_result": data.get("r25_http_result", "NOT_RUN"),
+                "http_requested_w": feedback.get("requested_w"),
+                "http_observed_w": feedback.get("observed_w"),
+                "http_verified": bool(feedback.get("verified", False)),
+                "http_zero_verified": bool(feedback.get("zero_verified", False)),
+                "hyper_transition_state": (data.get("r25_pack_transition_feedback") or {}).get("hyper_2000", {}).get("state", "NOT_TRACKED"),
+                "solarflow_transition_state": (data.get("r25_pack_transition_feedback") or {}).get("solarflow_2400_pro", {}).get("state", "NOT_TRACKED"),
+                "hyper_telemetry_available": bool((data.get("r25_transition_telemetry") or {}).get("hyper_2000", {}).get("entity_available", False)),
+                "solarflow_telemetry_available": bool((data.get("r25_transition_telemetry") or {}).get("solarflow_2400_pro", {}).get("entity_available", False)),
+            }
+
         if self._data_key in (ATTR_EXECUTOR_HYPER_ENVELOPE, ATTR_EXECUTOR_SOLARFLOW_ENVELOPE):
             return {
                 "mode": "locked_dry_run",

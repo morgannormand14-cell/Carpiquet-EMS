@@ -2,7 +2,10 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any
 from homeassistant.core import HomeAssistant
-from .const import CONF_BATTERIES, CONF_BATTERY_ENTITIES, CONF_BATTERY_SERIAL, CONF_BATTERY_SYSTEM, CONF_BATTERY_TYPE, DASHBOARD_FILENAME, DASHBOARD_RELATIVE_PATH
+from homeassistant.components import frontend
+from homeassistant.components.lovelace.const import LOVELACE_DATA, MODE_YAML
+from homeassistant.components.lovelace.dashboard import LovelaceYAML
+from .const import CONF_BATTERIES, CONF_BATTERY_ENTITIES, CONF_BATTERY_SERIAL, CONF_BATTERY_SYSTEM, CONF_BATTERY_TYPE, DASHBOARD_FILENAME, DASHBOARD_RELATIVE_PATH, DASHBOARD_URL_PATH, DASHBOARD_TITLE, DASHBOARD_ICON
 from .entity_mapper import build_shadow_systems
 
 BATTERY_MARKER="      # __CARPIQUET_BATTERY_CARDS__"
@@ -111,3 +114,66 @@ def remove_dashboard_file(hass: HomeAssistant):
         target.unlink()
         return True
     return False
+
+
+async def async_register_dashboard(hass: HomeAssistant) -> bool:
+    """Register the Carpiquet YAML dashboard at runtime without configuration.yaml.
+
+    If the same URL path is already registered (for example by the legacy manual
+    lovelace: dashboards: block), leave it untouched. This makes alpha.3.8 safe
+    to install before the user removes the old YAML declaration.
+    """
+    lovelace_data = hass.data.get(LOVELACE_DATA)
+    if lovelace_data is None:
+        raise RuntimeError("Lovelace is not initialized")
+
+    existing = lovelace_data.dashboards.get(DASHBOARD_URL_PATH)
+    if existing is not None or frontend.async_panel_exists(hass, DASHBOARD_URL_PATH):
+        return False
+
+    config = {
+        "title": DASHBOARD_TITLE,
+        "icon": DASHBOARD_ICON,
+        "show_in_sidebar": True,
+        "require_admin": False,
+        "mode": MODE_YAML,
+        "filename": DASHBOARD_RELATIVE_PATH,
+    }
+    lovelace_data.dashboards[DASHBOARD_URL_PATH] = LovelaceYAML(
+        hass, DASHBOARD_URL_PATH, config
+    )
+    try:
+        frontend.async_register_built_in_panel(
+            hass,
+            "lovelace",
+            frontend_url_path=DASHBOARD_URL_PATH,
+            require_admin=False,
+            show_in_sidebar=True,
+            sidebar_title=DASHBOARD_TITLE,
+            sidebar_icon=DASHBOARD_ICON,
+            config={"mode": MODE_YAML},
+        )
+    except Exception:
+        lovelace_data.dashboards.pop(DASHBOARD_URL_PATH, None)
+        raise
+    return True
+
+
+async def async_unregister_dashboard(hass: HomeAssistant) -> bool:
+    """Unregister only the runtime dashboard owned by Carpiquet EMS."""
+    lovelace_data = hass.data.get(LOVELACE_DATA)
+    if lovelace_data is None:
+        return False
+    # Never remove a dashboard declared by the user in configuration.yaml.
+    if DASHBOARD_URL_PATH in lovelace_data.yaml_dashboards:
+        return False
+    dashboard = lovelace_data.dashboards.get(DASHBOARD_URL_PATH)
+    if not isinstance(dashboard, LovelaceYAML):
+        return False
+    config = dashboard.config or {}
+    if config.get("filename") != DASHBOARD_RELATIVE_PATH:
+        return False
+    if frontend.async_panel_exists(hass, DASHBOARD_URL_PATH):
+        frontend.async_remove_panel(hass, DASHBOARD_URL_PATH)
+    lovelace_data.dashboards.pop(DASHBOARD_URL_PATH, None)
+    return True

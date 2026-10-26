@@ -1,11 +1,31 @@
 DOMAIN = "carpiquet_ems"
-VERSION = "0.6.5-alpha.3.7"
+from importlib.metadata import PackageNotFoundError, version as package_version
+import json
+from pathlib import Path
+
+
+def _integration_version() -> str:
+    """Read the installed integration version from the Home Assistant manifest."""
+    try:
+        manifest = Path(__file__).with_name("manifest.json")
+        return str(json.loads(manifest.read_text(encoding="utf-8"))["version"])
+    except (OSError, KeyError, TypeError, ValueError, json.JSONDecodeError):
+        try:
+            return package_version("carpiquet_ems")
+        except PackageNotFoundError:
+            return "unknown"
+
+
+VERSION = _integration_version()
 DEFAULT_SCAN_INTERVAL = 2
 
 SERVICE_INSTALL_DASHBOARD = "install_dashboard"
 CONF_OVERWRITE = "overwrite"
 DASHBOARD_FILENAME = "carpiquet_ems.yaml"
 DASHBOARD_RELATIVE_PATH = "dashboards/carpiquet_ems.yaml"
+DASHBOARD_URL_PATH = "carpiquet-ems-dynamic"
+DASHBOARD_TITLE = "Carpiquet EMS Dynamic"
+DASHBOARD_ICON = "mdi:home-lightning-bolt"
 
 CONF_GRID_POWER_ENTITY = "grid_power_entity"
 CONF_HYPER_SOC_ENTITY = "hyper_soc_entity"
@@ -272,6 +292,16 @@ ATTR_ADAPTER_HYPER_REASON = "adapter_hyper_reason"
 ATTR_ADAPTER_SOLARFLOW_REASON = "adapter_solarflow_reason"
 ATTR_ADAPTER_HYPER_WOULD_EXECUTE = "adapter_hyper_would_execute"
 ATTR_ADAPTER_SOLARFLOW_WOULD_EXECUTE = "adapter_solarflow_would_execute"
+ATTR_ADAPTER_HYPER_PROFILE = "adapter_hyper_control_profile"
+ATTR_ADAPTER_HYPER_PROTOCOL = "adapter_hyper_protocol_generation"
+ATTR_ADAPTER_HYPER_OPERATION = "adapter_hyper_operation"
+ATTR_ADAPTER_HYPER_SERVICE = "adapter_hyper_service"
+ATTR_ADAPTER_HYPER_PAYLOAD = "adapter_hyper_payload"
+ATTR_ADAPTER_SOLARFLOW_PROFILE = "adapter_solarflow_control_profile"
+ATTR_ADAPTER_SOLARFLOW_PROTOCOL = "adapter_solarflow_protocol_generation"
+ATTR_ADAPTER_SOLARFLOW_OPERATION = "adapter_solarflow_operation"
+ATTR_ADAPTER_SOLARFLOW_SERVICE = "adapter_solarflow_service"
+ATTR_ADAPTER_SOLARFLOW_PAYLOAD = "adapter_solarflow_payload"
 DEFAULT_ADAPTER_DEADBAND_W = 5.0
 
 # v0.6.5 Entity Mapper Shadow diagnostics
@@ -283,3 +313,61 @@ ATTR_MAPPER_PARITY_READY = "mapper_parity_ready"
 ATTR_ZENDURE_DISCOVERY_STATE = "zendure_discovery_state"
 ATTR_ZENDURE_DISCOVERED_SYSTEMS_COUNT = "zendure_discovered_systems_count"
 ATTR_ZENDURE_DISCOVERED_BATTERIES_COUNT = "zendure_discovered_batteries_count"
+
+# Sprint 7 — alpha.3.12 final hardware Write Gate diagnostics
+ATTR_WRITE_GATE_STATE = "write_gate_state"
+ATTR_WRITE_GATE_EXECUTE_ALLOWED = "write_gate_execute_allowed"
+ATTR_WRITE_GATE_MASTER_LOCK = "write_gate_master_lock"
+ATTR_WRITE_GATE_BLOCKERS = "write_gate_blockers"
+ATTR_WRITE_GATE_EVALUATED_AT = "write_gate_evaluated_at"
+
+# Sprint 7 — alpha.3.13 execution transport observation
+ATTR_TRANSPORT_HYPER_KIND = "transport_hyper_kind"
+ATTR_TRANSPORT_HYPER_SURFACE = "transport_hyper_surface"
+ATTR_TRANSPORT_HYPER_TARGET = "transport_hyper_target"
+ATTR_TRANSPORT_HYPER_METADATA_READY = "transport_hyper_metadata_ready"
+ATTR_TRANSPORT_HYPER_EXECUTION_READY = "transport_hyper_execution_ready"
+ATTR_TRANSPORT_HYPER_REASON = "transport_hyper_reason"
+ATTR_TRANSPORT_SOLARFLOW_KIND = "transport_solarflow_kind"
+ATTR_TRANSPORT_SOLARFLOW_SURFACE = "transport_solarflow_surface"
+ATTR_TRANSPORT_SOLARFLOW_TARGET = "transport_solarflow_target"
+ATTR_TRANSPORT_SOLARFLOW_METADATA_READY = "transport_solarflow_metadata_ready"
+ATTR_TRANSPORT_SOLARFLOW_EXECUTION_READY = "transport_solarflow_execution_ready"
+ATTR_TRANSPORT_SOLARFLOW_REASON = "transport_solarflow_reason"
+
+ATTR_SOLARFLOW_LOCAL_HTTP_HOST = "solarflow_local_http_host"
+ATTR_SOLARFLOW_LOCAL_HTTP_TARGET = "solarflow_local_http_target"
+ATTR_SOLARFLOW_LOCAL_HTTP_REACHABLE = "solarflow_local_http_reachable"
+ATTR_SOLARFLOW_LOCAL_HTTP_QUALIFIED = "solarflow_local_http_qualified"
+ATTR_SOLARFLOW_LOCAL_HTTP_STATUS = "solarflow_local_http_status"
+ATTR_SOLARFLOW_LOCAL_HTTP_REASON = "solarflow_local_http_reason"
+
+
+# Sprint 7 — alpha.3.13 transport policy selection (observation only)
+TRANSPORT_MODE_AUTO = "Automatique"
+TRANSPORT_MODE_MQTT = "MQTT"
+TRANSPORT_MODE_LOCAL_HTTP = "Local HTTP"
+TRANSPORT_HYPER_OPTIONS = [TRANSPORT_MODE_AUTO, TRANSPORT_MODE_MQTT]
+TRANSPORT_SOLARFLOW_OPTIONS = [TRANSPORT_MODE_AUTO, TRANSPORT_MODE_LOCAL_HTTP, TRANSPORT_MODE_MQTT]
+ATTR_TRANSPORT_HYPER_SELECTION = "transport_hyper_selection"
+ATTR_TRANSPORT_HYPER_SELECTED = "transport_hyper_selected"
+ATTR_TRANSPORT_HYPER_FALLBACK_REASON = "transport_hyper_fallback_reason"
+ATTR_TRANSPORT_SOLARFLOW_SELECTION = "transport_solarflow_selection"
+ATTR_TRANSPORT_SOLARFLOW_SELECTED = "transport_solarflow_selected"
+ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON = "transport_solarflow_fallback_reason"
+
+# alpha.3.14 — Controlled Hardware Executor (locked/dry-run)
+ATTR_EXECUTOR_STATE = "controlled_executor_state"
+ATTR_EXECUTOR_WRITE_LOCKED = "controlled_executor_write_locked"
+ATTR_EXECUTOR_EXECUTION_REQUESTED = "controlled_executor_execution_requested"
+ATTR_EXECUTOR_EXECUTION_ALLOWED = "controlled_executor_execution_allowed"
+ATTR_EXECUTOR_COMMAND_SENT = "controlled_executor_command_sent"
+ATTR_EXECUTOR_PREPARED_AT = "controlled_executor_prepared_at"
+ATTR_EXECUTOR_HYPER_PREPARED = "controlled_executor_hyper_prepared"
+ATTR_EXECUTOR_HYPER_TARGET = "controlled_executor_hyper_target"
+ATTR_EXECUTOR_HYPER_ENVELOPE = "controlled_executor_hyper_envelope"
+ATTR_EXECUTOR_HYPER_REASON = "controlled_executor_hyper_reason"
+ATTR_EXECUTOR_SOLARFLOW_PREPARED = "controlled_executor_solarflow_prepared"
+ATTR_EXECUTOR_SOLARFLOW_TARGET = "controlled_executor_solarflow_target"
+ATTR_EXECUTOR_SOLARFLOW_ENVELOPE = "controlled_executor_solarflow_envelope"
+ATTR_EXECUTOR_SOLARFLOW_REASON = "controlled_executor_solarflow_reason"

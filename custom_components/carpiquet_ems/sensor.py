@@ -3,13 +3,47 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import *
 
 SENSORS = [
+    ("controlled_executor_state", "Controlled Executor State", ATTR_EXECUTOR_STATE, None, None),
+    ("controlled_executor_hyper_target", "Controlled Executor Hyper Target", ATTR_EXECUTOR_HYPER_TARGET, None, None),
+    ("controlled_executor_hyper_envelope", "Controlled Executor Hyper Envelope", ATTR_EXECUTOR_HYPER_ENVELOPE, None, None),
+    ("controlled_executor_hyper_reason", "Controlled Executor Hyper Reason", ATTR_EXECUTOR_HYPER_REASON, None, None),
+    ("controlled_executor_solarflow_target", "Controlled Executor SolarFlow Target", ATTR_EXECUTOR_SOLARFLOW_TARGET, None, None),
+    ("controlled_executor_solarflow_envelope", "Controlled Executor SolarFlow Envelope", ATTR_EXECUTOR_SOLARFLOW_ENVELOPE, None, None),
+    ("controlled_executor_solarflow_reason", "Controlled Executor SolarFlow Reason", ATTR_EXECUTOR_SOLARFLOW_REASON, None, None),
+    ("controlled_executor_prepared_at", "Controlled Executor Prepared At", ATTR_EXECUTOR_PREPARED_AT, None, None),
     ("engine_authority", "Engine Authority", ATTR_ENGINE_AUTHORITY, None, None),
     ("generic_engine_mode", "Generic Engine Mode", ATTR_GENERIC_ENGINE_MODE, None, None),
+    ("generic_authority", "Generic Authority", ATTR_GENERIC_AUTHORITY, None, None),
+    ("real_writes_enabled", "Real Writes Enabled", ATTR_REAL_WRITES_ENABLED, None, None),
+    ("command_write_locked", "Command Write Locked", ATTR_COMMAND_WRITE_LOCKED, None, None),
+    ("command_adapter_write_locked", "Command Adapter Write Locked", ATTR_ADAPTER_WRITE_LOCKED, None, None),
+    ("mapper_ready", "Mapper Ready", ATTR_MAPPER_READY, None, None),
     ("mapper_systems_count", "Mapper Systems Count", ATTR_MAPPER_SYSTEMS_COUNT, None, None),
     ("mapper_available_systems_count", "Mapper Available Systems Count", ATTR_MAPPER_AVAILABLE_SYSTEMS_COUNT, None, None),
     ("zendure_discovery_state", "Zendure Discovery State", ATTR_ZENDURE_DISCOVERY_STATE, None, None),
     ("zendure_discovered_systems_count", "Zendure Discovered Systems Count", ATTR_ZENDURE_DISCOVERED_SYSTEMS_COUNT, None, None),
     ("zendure_discovered_batteries_count", "Zendure Discovered Batteries Count", ATTR_ZENDURE_DISCOVERED_BATTERIES_COUNT, None, None),
+    ("transport_hyper_kind", "Transport Hyper Kind", ATTR_TRANSPORT_HYPER_KIND, None, None),
+    ("transport_hyper_surface", "Transport Hyper Surface", ATTR_TRANSPORT_HYPER_SURFACE, None, None),
+    ("transport_hyper_target", "Transport Hyper Target", ATTR_TRANSPORT_HYPER_TARGET, None, None),
+    ("transport_hyper_reason", "Transport Hyper Reason", ATTR_TRANSPORT_HYPER_REASON, None, None),
+    ("transport_solarflow_kind", "Transport SolarFlow Kind", ATTR_TRANSPORT_SOLARFLOW_KIND, None, None),
+    ("transport_solarflow_surface", "Transport SolarFlow Surface", ATTR_TRANSPORT_SOLARFLOW_SURFACE, None, None),
+    ("transport_solarflow_target", "Transport SolarFlow Target", ATTR_TRANSPORT_SOLARFLOW_TARGET, None, None),
+    ("transport_solarflow_reason", "Transport SolarFlow Reason", ATTR_TRANSPORT_SOLARFLOW_REASON, None, None),
+    ("solarflow_local_http_host", "SolarFlow Local HTTP Host", ATTR_SOLARFLOW_LOCAL_HTTP_HOST, None, None),
+    ("solarflow_local_http_target", "SolarFlow Local HTTP Target", ATTR_SOLARFLOW_LOCAL_HTTP_TARGET, None, None),
+    ("solarflow_local_http_status", "SolarFlow Local HTTP Status", ATTR_SOLARFLOW_LOCAL_HTTP_STATUS, None, None),
+    ("solarflow_local_http_reason", "SolarFlow Local HTTP Reason", ATTR_SOLARFLOW_LOCAL_HTTP_REASON, None, None),
+    ("transport_hyper_selection", "Hyper Transport Selection", ATTR_TRANSPORT_HYPER_SELECTION, None, None),
+    ("transport_hyper_selected", "Hyper Selected Transport", ATTR_TRANSPORT_HYPER_SELECTED, None, None),
+    ("transport_hyper_fallback_reason", "Hyper Transport Selection Reason", ATTR_TRANSPORT_HYPER_FALLBACK_REASON, None, None),
+    ("transport_solarflow_selection", "SolarFlow Transport Selection", ATTR_TRANSPORT_SOLARFLOW_SELECTION, None, None),
+    ("transport_solarflow_selected", "SolarFlow Selected Transport", ATTR_TRANSPORT_SOLARFLOW_SELECTED, None, None),
+    ("transport_solarflow_fallback_reason", "SolarFlow Transport Selection Reason", ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON, None, None),
+    ("write_gate_state", "Write Gate State", ATTR_WRITE_GATE_STATE, None, None),
+    ("write_gate_blockers", "Write Gate Blockers", ATTR_WRITE_GATE_BLOCKERS, None, None),
+    ("write_gate_evaluated_at", "Write Gate Evaluated At", ATTR_WRITE_GATE_EVALUATED_AT, None, None),
     ("command_adapter_state", "Command Adapter State", ATTR_ADAPTER_STATE, None, None),
     ("command_adapter_sequence", "Command Adapter Sequence", ATTR_ADAPTER_SEQUENCE, None, None),
     ("command_adapter_prepared_at", "Command Adapter Prepared At", ATTR_ADAPTER_PREPARED_AT, None, None),
@@ -21,6 +55,16 @@ SENSORS = [
     ("adapter_solarflow_action", "Adapter SolarFlow Action", ATTR_ADAPTER_SOLARFLOW_ACTION, None, None),
     ("adapter_hyper_reason", "Adapter Hyper Reason", ATTR_ADAPTER_HYPER_REASON, None, None),
     ("adapter_solarflow_reason", "Adapter SolarFlow Reason", ATTR_ADAPTER_SOLARFLOW_REASON, None, None),
+    ("adapter_hyper_profile", "Adapter Hyper Control Profile", ATTR_ADAPTER_HYPER_PROFILE, None, None),
+    ("adapter_hyper_protocol", "Adapter Hyper Protocol", ATTR_ADAPTER_HYPER_PROTOCOL, None, None),
+    ("adapter_hyper_operation", "Adapter Hyper Operation", ATTR_ADAPTER_HYPER_OPERATION, None, None),
+    ("adapter_hyper_service", "Adapter Hyper Service", ATTR_ADAPTER_HYPER_SERVICE, None, None),
+    ("adapter_hyper_payload", "Adapter Hyper Payload", ATTR_ADAPTER_HYPER_PAYLOAD, None, None),
+    ("adapter_solarflow_profile", "Adapter SolarFlow Control Profile", ATTR_ADAPTER_SOLARFLOW_PROFILE, None, None),
+    ("adapter_solarflow_protocol", "Adapter SolarFlow Protocol", ATTR_ADAPTER_SOLARFLOW_PROTOCOL, None, None),
+    ("adapter_solarflow_operation", "Adapter SolarFlow Operation", ATTR_ADAPTER_SOLARFLOW_OPERATION, None, None),
+    ("adapter_solarflow_service", "Adapter SolarFlow Service", ATTR_ADAPTER_SOLARFLOW_SERVICE, None, None),
+    ("adapter_solarflow_payload", "Adapter SolarFlow Payload", ATTR_ADAPTER_SOLARFLOW_PAYLOAD, None, None),
     ("safety_state", "Safety State", ATTR_SAFETY_STATE, None, None),
     ("safety_state_reason", "Safety State Reason", ATTR_SAFETY_STATE_REASON, None, None),
     ("safety_state_since", "Safety State Since", ATTR_SAFETY_STATE_SINCE, None, None),
@@ -171,6 +215,9 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def native_value(self):
+        if self._data_key in (ATTR_EXECUTOR_HYPER_ENVELOPE, ATTR_EXECUTOR_SOLARFLOW_ENVELOPE):
+            value = self.coordinator.data.get(self._data_key)
+            return "PREPARED" if value and value not in ("None", "{}", "") else "NOT_PREPARED"
         return self.coordinator.data.get(self._data_key)
 
     @property
@@ -185,10 +232,38 @@ class CarpiquetSensor(CoordinatorEntity, SensorEntity):
 
     @property
     def extra_state_attributes(self):
+        if self._data_key in (ATTR_EXECUTOR_HYPER_ENVELOPE, ATTR_EXECUTOR_SOLARFLOW_ENVELOPE):
+            return {
+                "mode": "locked_dry_run",
+                "version": VERSION,
+                "envelope": self.coordinator.data.get(self._data_key),
+            }
         if self._data_key == ATTR_DATA_MODE:
             return {
+                "integration_version": VERSION,
+                "version": VERSION,
                 "sources": self.coordinator.data.get(ATTR_DYNAMIC_SOURCES, {}),
                 "fallbacks": self.coordinator.data.get(ATTR_FALLBACKS, {}),
                 "last_sync": self.coordinator.data.get(ATTR_LAST_FALLBACK_SYNC),
+            }
+        if self._data_key == ATTR_ADAPTER_HYPER_PREPARED:
+            return {
+                "mode": "simulation",
+                "version": VERSION,
+                "control_profile": self.coordinator.data.get(ATTR_ADAPTER_HYPER_PROFILE),
+                "protocol_generation": self.coordinator.data.get(ATTR_ADAPTER_HYPER_PROTOCOL),
+                "operation": self.coordinator.data.get(ATTR_ADAPTER_HYPER_OPERATION),
+                "service": self.coordinator.data.get(ATTR_ADAPTER_HYPER_SERVICE),
+                "payload": self.coordinator.data.get(ATTR_ADAPTER_HYPER_PAYLOAD),
+            }
+        if self._data_key == ATTR_ADAPTER_SOLARFLOW_PREPARED:
+            return {
+                "mode": "simulation",
+                "version": VERSION,
+                "control_profile": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_PROFILE),
+                "protocol_generation": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_PROTOCOL),
+                "operation": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_OPERATION),
+                "service": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_SERVICE),
+                "payload": self.coordinator.data.get(ATTR_ADAPTER_SOLARFLOW_PAYLOAD),
             }
         return {"mode": "simulation", "version": VERSION}

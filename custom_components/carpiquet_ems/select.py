@@ -1,10 +1,24 @@
 from homeassistant.components.select import SelectEntity
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from .const import DOMAIN, CONTROL_MODE_OPTIONS
+from .const import (
+    DOMAIN, CONTROL_MODE_OPTIONS,
+    TRANSPORT_HYPER_OPTIONS, TRANSPORT_SOLARFLOW_OPTIONS,
+    ATTR_TRANSPORT_HYPER_SELECTED, ATTR_TRANSPORT_HYPER_FALLBACK_REASON,
+    ATTR_TRANSPORT_SOLARFLOW_SELECTED, ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON,
+)
 
 async def async_setup_entry(hass, entry, async_add_entities):
     coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([SimulationReportSelect(coordinator, entry), ControlModeSelect(coordinator, entry)])
+    entities = [SimulationReportSelect(coordinator, entry), ControlModeSelect(coordinator, entry)]
+    profiles = {
+        str(system.get("control_profile") or "")
+        for system in coordinator._zendure_discovery.get("systems", [])
+    }
+    if "legacy_hyper" in profiles:
+        entities.append(HyperTransportSelect(coordinator, entry))
+    if "zensdk_ac" in profiles:
+        entities.append(SolarFlowTransportSelect(coordinator, entry))
+    async_add_entities(entities)
 
 class SimulationReportSelect(CoordinatorEntity, SelectEntity):
     def __init__(self, coordinator, entry):
@@ -51,4 +65,64 @@ class ControlModeSelect(CoordinatorEntity, SelectEntity):
             "real_writes_enabled": False,
             "restart_default": "Simulation",
             "safety_note": "v0.6.4-alpha-sprint6 never writes to Zendure",
+        }
+
+
+class HyperTransportSelect(CoordinatorEntity, SelectEntity):
+    """Select Hyper transport policy without enabling execution."""
+
+    def __init__(self, coordinator, entry):
+        super().__init__(coordinator)
+        self._attr_name = "Carpiquet EMS Hyper Transport"
+        self._attr_unique_id = f"{entry.entry_id}_hyper_transport"
+        self._attr_icon = "mdi:lan-connect"
+        self._attr_options = list(TRANSPORT_HYPER_OPTIONS)
+
+    @property
+    def current_option(self):
+        return self.coordinator.hyper_transport_selection
+
+    async def async_select_option(self, option):
+        await self.coordinator.async_set_hyper_transport_selection(option)
+
+    @property
+    def extra_state_attributes(self):
+        diag = self.coordinator._transport_policy_diagnostics()
+        return {
+            "selected_transport": diag[ATTR_TRANSPORT_HYPER_SELECTED],
+            "selection_reason": diag[ATTR_TRANSPORT_HYPER_FALLBACK_REASON],
+            "execution_enabled": False,
+            "write_locked": True,
+        }
+
+
+class SolarFlowTransportSelect(CoordinatorEntity, SelectEntity):
+    """Select SolarFlow transport policy without enabling execution."""
+
+    def __init__(self, coordinator, entry):
+        super().__init__(coordinator)
+        self._attr_name = "Carpiquet EMS SolarFlow Transport"
+        self._attr_unique_id = f"{entry.entry_id}_solarflow_transport"
+        self._attr_icon = "mdi:lan-connect"
+        self._attr_options = list(TRANSPORT_SOLARFLOW_OPTIONS)
+
+    @property
+    def current_option(self):
+        return self.coordinator.solarflow_transport_selection
+
+    async def async_select_option(self, option):
+        await self.coordinator.async_set_solarflow_transport_selection(option)
+
+    @property
+    def extra_state_attributes(self):
+        diag = self.coordinator._transport_policy_diagnostics()
+        return {
+            "selected_transport": diag[ATTR_TRANSPORT_SOLARFLOW_SELECTED],
+            "selection_reason": diag[ATTR_TRANSPORT_SOLARFLOW_FALLBACK_REASON],
+            "local_http_qualified": bool(
+                self.coordinator._solarflow_local_probe
+                and self.coordinator._solarflow_local_probe.qualified
+            ),
+            "execution_enabled": False,
+            "write_locked": True,
         }

@@ -1739,7 +1739,21 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                             self._r25_cycle_mode = "Simulation"
                             self._r25_session = None
                             await previous.close()
+            # Diagnostic only: HTTP setpoint POST is not a pack transition.
+            http_setpoint_event = (
+                self._r25_session.last_setpoint_event
+                if self._r25_session is not None else None
+            )
             result_data = {
+                "r25_http_post_event": {
+                    "attempted": http_setpoint_event is not None,
+                    "command_id": http_setpoint_event.command_id if http_setpoint_event else None,
+                    "sent_at_monotonic": http_setpoint_event.sent_at if http_setpoint_event else None,
+                    "requested_w": http_setpoint_event.requested_w if http_setpoint_event else None,
+                    "post_status": http_setpoint_event.post_status if http_setpoint_event else None,
+                    "transport_accepted": bool(http_setpoint_event and http_setpoint_event.transport_accepted),
+                    "pack_transition_confirmed": False,
+                },
                 "r25_cycle_mode": self._r25_cycle_mode,
                 "r25_pack_transition_intents": self._r25_pack_transition_intents,
                 "r25_pack_transition_feedback": self._r25_pack_transition_feedback,

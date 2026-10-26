@@ -11,6 +11,7 @@ from copy import deepcopy
 from dataclasses import dataclass
 from math import isfinite
 from time import monotonic
+from uuid import uuid4
 from typing import Any
 
 from .controlled_real_test_executor import _get_output, _post, _restore_zero
@@ -28,6 +29,16 @@ class DynamicHttpResult:
     verified: bool
     zero_verified: bool
     error: str
+
+
+@dataclass(frozen=True)
+class HttpSetpointEvent:
+    """Actual HTTP setpoint attempt, NOT a physical pack transition."""
+    command_id: str
+    sent_at: float
+    requested_w: float
+    post_status: int | None
+    transport_accepted: bool
 
 
 class DynamicHttpExecutor:
@@ -60,6 +71,11 @@ class DynamicHttpExecutor:
         self._fault = False
         self._last_verified_w = 0.0
         self._last_verified_at: float | None = None
+        self._last_setpoint_event: HttpSetpointEvent | None = None
+
+    @property
+    def last_setpoint_event(self) -> HttpSetpointEvent | None:
+        return self._last_setpoint_event
 
     @property
     def active(self) -> bool:
@@ -94,8 +110,18 @@ class DynamicHttpExecutor:
             session = async_get_clientsession(self.hass)
             status = None
             observed = None
+            # Record an actual POST attempt, not merely a prepared payload.
+            # This event cannot be used as evidence of a pack-state transition.
+            command_id = uuid4().hex
+            sent_at = monotonic()
+            self._last_setpoint_event = HttpSetpointEvent(
+                command_id, sent_at, float(watts), None, False,
+            )
             try:
                 status = await _post(session, self.write_target, self._body(float(watts)))
+                self._last_setpoint_event = HttpSetpointEvent(
+                    command_id, sent_at, float(watts), status, 200 <= status < 300,
+                )
                 if not 200 <= status < 300:
                     raise RuntimeError(f"POST_HTTP_{status}")
                 await asyncio.sleep(SETTLE_SECONDS)

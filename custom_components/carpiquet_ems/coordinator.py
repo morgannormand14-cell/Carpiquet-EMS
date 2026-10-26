@@ -89,6 +89,7 @@ from .pack_state_supervisor import evaluate_pack
 from .pack_transition_controller import plan_transitions
 from .hyper_mqtt_transition import prepare_hyper_transition
 from .r25_hyper_mqtt_events import unproven_hyper_mqtt_event
+from .r25_hyper_mqtt_observer import HyperMqttObserver
 from .transition_feedback import verify_transition
 from .r25_transport_evidence import correlate_evidence, unproven_transport_evidence
 from .const import TRANSPORT_MODE_MQTT_LOCAL, TRANSPORT_MODE_MQTT_CLOUD, TRANSPORT_MODE_CLOUD, TRANSPORT_MODE_ZENSDK
@@ -213,6 +214,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
         self._r25_update_lock = asyncio.Lock()
         self._r25_last_result = None
         self._r25_last_http_post_event = None
+        self._r25_hyper_mqtt_observer = HyperMqttObserver()
+        self._r25_hyper_mqtt_last_observation = None
         self._r25_ready_for_real = False
         self._r25_transport_info = None
         self._zendure_reconciliation = None
@@ -223,6 +226,34 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             name="Carpiquet EMS",
             update_interval=timedelta(seconds=DEFAULT_SCAN_INTERVAL),
         )
+
+    def r25_observe_hyper_mqtt_published(self, *, route, message_id, action, published_at):
+        """Trusted transport adapter callback; not called by command preparation."""
+        observation = self._r25_hyper_mqtt_observer.on_published(
+            route=route, message_id=message_id, action=action,
+            published_at=published_at,
+        )
+        self._r25_hyper_mqtt_last_observation = observation
+        return observation
+
+    def r25_observe_hyper_mqtt_broker_ack(self, *, route, message_id, accepted):
+        """Broker callback only; never a physical transition confirmation."""
+        observation = self._r25_hyper_mqtt_observer.on_broker_ack(
+            route=route, message_id=message_id, accepted=accepted,
+        )
+        if observation is not None:
+            self._r25_hyper_mqtt_last_observation = observation
+        return observation
+
+    def r25_observe_hyper_mqtt_device_reply(self, *, route, message_id, received_at, success):
+        """Device reply callback; physical telemetry still required."""
+        observation = self._r25_hyper_mqtt_observer.on_device_reply(
+            route=route, message_id=message_id, received_at=received_at,
+            success=success,
+        )
+        if observation is not None:
+            self._r25_hyper_mqtt_last_observation = observation
+        return observation
 
     async def async_initialize(self):
         await self.hass.async_add_executor_job(self._session.finalize_orphaned_sessions)
@@ -998,8 +1029,14 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 minimum_soc=dynamic["hyper_min_soc"],
             )
 
-            self._r25_hyper_mqtt_event = unproven_hyper_mqtt_event(
-                transport=hyper_transport, action=hyper_intent["action"],
+            # Preserve actual callback evidence across EMS refreshes.
+            # Preparation must never overwrite a real transport observation.
+            observed = self._r25_hyper_mqtt_last_observation
+            self._r25_hyper_mqtt_event = (
+                observed if observed is not None and observed.route == hyper_transport
+                else unproven_hyper_mqtt_event(
+                    transport=hyper_transport, action=hyper_intent["action"],
+                )
             )
 
             result = allocate_discharge_power(
@@ -1784,13 +1821,13 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     "write_enabled": False,
                 },
                 "r25_hyper_mqtt_event": {
-                    "transport": self._r25_hyper_mqtt_event.transport,
+                    "transport": getattr(self._r25_hyper_mqtt_event, "transport", getattr(self._r25_hyper_mqtt_event, "route", None)),
                     "action": self._r25_hyper_mqtt_event.action,
-                    "command_id": self._r25_hyper_mqtt_event.command_id,
-                    "published": self._r25_hyper_mqtt_event.published,
+                    "command_id": getattr(self._r25_hyper_mqtt_event, "command_id", getattr(self._r25_hyper_mqtt_event, "message_id", None)),
+                    "published": getattr(self._r25_hyper_mqtt_event, "published", getattr(self._r25_hyper_mqtt_event, "publish_reported", False)),
                     "published_at": self._r25_hyper_mqtt_event.published_at,
                     "broker_accepted": self._r25_hyper_mqtt_event.broker_accepted,
-                    "device_acknowledged": self._r25_hyper_mqtt_event.device_acknowledged,
+                    "device_acknowledged": getattr(self._r25_hyper_mqtt_event, "device_acknowledged", getattr(self._r25_hyper_mqtt_event, "device_replied", False)),
                     "pack_transition_confirmed": False,
                 },
                 "r25_cycle_ready": self._r25_ready_for_real,

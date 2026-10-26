@@ -1,4 +1,4 @@
-# Package contents — 0.6.5-alpha.3.8
+# Package contents — 0.6.5-alpha.3.7
 
 Ce package contient uniquement les fichiers applicables à la version packagée.
 

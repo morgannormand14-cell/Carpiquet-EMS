@@ -705,3 +705,9 @@ ATTR_REAL_TEST_ZERO_VERIFIED = "controlled_real_test_zero_verified"
 ATTR_REAL_TEST_RELOCKED = "controlled_real_test_relocked"
 ATTR_REAL_TEST_ERROR = "controlled_real_test_error"
 ATTR_REAL_TEST_COMPLETED_AT = "controlled_real_test_completed_at"
+
+# R25 pack state mapping (Home Assistant entity IDs)
+CONF_HYPER_PACK_STATE_ENTITY = "hyper_pack_state_entity"
+CONF_SOLARFLOW_PACK_STATE_ENTITY = "solarflow_pack_state_entity"
+DEFAULT_HYPER_PACK_STATE_ENTITY = "sensor.hyper_2000_pack_state"
+DEFAULT_SOLARFLOW_PACK_STATE_ENTITY = "sensor.solarflow_2400_pro_pack_state"

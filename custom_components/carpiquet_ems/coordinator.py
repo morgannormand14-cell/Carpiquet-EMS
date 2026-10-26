@@ -907,7 +907,9 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 discharge_needed=bool(self.automation_enabled and requested > 0),
             )
             hyper_intent = self._r25_pack_transition_intents["hyper_2000"]
-            hyper_transport = self._hyper_transport_selection
+            # Existing AUTO/MQTT selector does not distinguish local from cloud.
+            # Fail closed until Zendure-HA's actual connection source is mapped.
+            hyper_transport = "UNRESOLVED_MQTT_ROUTE"
             self._r25_hyper_mqtt_prepared = prepare_hyper_transition(
                 hyper_intent["action"],
                 transport=hyper_transport,

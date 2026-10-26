@@ -89,6 +89,7 @@ from .pack_state_supervisor import evaluate_pack
 from .pack_transition_controller import plan_transitions
 from .hyper_mqtt_transition import prepare_hyper_transition
 from .transition_feedback import verify_transition
+from .r25_command_correlation import correlate_transition
 from .const import TRANSPORT_MODE_MQTT_LOCAL, TRANSPORT_MODE_MQTT_CLOUD, TRANSPORT_MODE_CLOUD, TRANSPORT_MODE_ZENSDK
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
 from .zendure_discovery import (
@@ -938,12 +939,39 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                 ("solarflow_2400_pro", solar_pack_entity),
             ):
                 changed = getattr(entity, "last_updated", None)
+                # No physical pack-transition dispatch event is registered yet.
+                # Feed the correlation gate only proven evidence: missing dispatch
+                # identity MUST remain NOT_TRACKED, even if HA telemetry is fresh.
+                selected_transport = (
+                    "LOCAL_MQTT" if system_id == "hyper_2000"
+                    and self._hyper_transport_selection == TRANSPORT_MODE_MQTT_LOCAL
+                    else "CLOUD_MQTT" if system_id == "hyper_2000"
+                    and self._hyper_transport_selection == TRANSPORT_MODE_MQTT_CLOUD
+                    else "ZenSDK" if system_id == "solarflow_2400_pro"
+                    else "UNRESOLVED"
+                )
+                correlation = correlate_transition(
+                    system_id=system_id,
+                    transport=selected_transport,
+                    action=self._r25_pack_transition_intents[system_id]["action"],
+                    command_id=None,
+                    dispatched=False,
+                    sent_at=None,
+                    transport_accepted=False,
+                    now=0.0,
+                    telemetry_at=None,
+                    observed_state=getattr(entity, "state", None),
+                    observed_soc=hyper_soc if system_id == "hyper_2000" else solar_soc,
+                    minimum_soc=dynamic["hyper_min_soc"] if system_id == "hyper_2000" else dynamic["solarflow_min_soc"],
+                    observed_power_w=None,
+                )
                 self._r25_transition_telemetry[system_id] = {
                     "entity_available": entity is not None,
                     "last_updated": changed.isoformat() if changed is not None else None,
                     "dispatch_registered": False,
-                    "confirmation_state": "NOT_TRACKED",
-                    "reason": "no_physical_transition_dispatch",
+                    "confirmation_state": correlation.state,
+                    "reason": correlation.reason,
+                    "correlation_command_id": correlation.command_id,
                 }
             hyper_intent = self._r25_pack_transition_intents["hyper_2000"]
             # Explicit MQTT route; broker qualification remains required.

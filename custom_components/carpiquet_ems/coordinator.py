@@ -868,8 +868,8 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
             solar_pv = self._state_float(solar_pv_entity)
             # R25 pack supervision: fail closed on missing/unknown pack state.
             # Keep the HA state objects and timestamps for read-only transition diagnostics.
-            hyper_pack_entity = self._state("sensor.hyper_2000_pack_state")
-            solar_pack_entity = self._state("sensor.solarflow_2400_pro_pack_state")
+            hyper_pack_entity = self._state(self.config.get(CONF_HYPER_PACK_STATE_ENTITY, DEFAULT_HYPER_PACK_STATE_ENTITY))
+            solar_pack_entity = self._state(self.config.get(CONF_SOLARFLOW_PACK_STATE_ENTITY, DEFAULT_SOLARFLOW_PACK_STATE_ENTITY))
             hyper_pack = evaluate_pack(
                 getattr(hyper_pack_entity, "state", None),
                 hyper_soc, dynamic["hyper_min_soc"],

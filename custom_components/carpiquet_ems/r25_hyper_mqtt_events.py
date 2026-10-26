@@ -64,3 +64,26 @@ def hyper_mqtt_transport_contract(*, transport: str, product_key: str | None,
             "state": "CANDIDATE_UNVERIFIED" if topic else "METADATA_MISSING",
             "topic": topic, "publisher_verified": False,
             "feedback_verified": False, "write_enabled": False}
+
+
+def zendure_ha_publish_integration_status(*, transport: str) -> dict[str, object]:
+    """Source-audited Zendure-HA seam; no runtime hook is installed.
+
+    ZendureLegacy.mqttInvoke calls mqttPublish(topic_function, command).
+    mqttPublish calls paho client.publish but discards the MQTTMessageInfo.
+    mqttMessage ignores function/invoke/reply as an execution proof.
+    Without an explicit upstream callback we cannot infer broker PUBACK.
+    """
+    if transport not in ROUTES:
+        raise ValueError("Unsupported MQTT route")
+    return {
+        "transport": transport,
+        "upstream_class": "ZendureLegacy",
+        "command_entrypoint": "Hyper2000.discharge -> mqttInvoke -> mqttPublish",
+        "publish_surface": "paho.Client.publish",
+        "publish_result_exposed": False,
+        "broker_ack_callback_exposed": False,
+        "device_reply_correlated": False,
+        "integration_state": "UPSTREAM_OBSERVABILITY_REQUIRED",
+        "write_enabled": False,
+    }

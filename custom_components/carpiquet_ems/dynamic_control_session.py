@@ -26,6 +26,11 @@ class DynamicControlSession:
         self._closing_lock = asyncio.Lock()
 
     @property
+    def last_setpoint_event(self):
+        """Read-only HTTP attempt evidence, not pack-transition evidence."""
+        return self.executor.last_setpoint_event
+
+    @property
     def status(self):
         return self._watchdog.status
 

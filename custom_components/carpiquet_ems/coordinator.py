@@ -89,7 +89,7 @@ from .pack_state_supervisor import evaluate_pack
 from .pack_transition_controller import plan_transitions
 from .hyper_mqtt_transition import prepare_hyper_transition
 from .transition_feedback import verify_transition
-from .r25_command_correlation import correlate_transition
+from .r25_transport_evidence import correlate_evidence, unproven_transport_evidence
 from .const import TRANSPORT_MODE_MQTT_LOCAL, TRANSPORT_MODE_MQTT_CLOUD, TRANSPORT_MODE_CLOUD, TRANSPORT_MODE_ZENSDK
 from .generic_energy_engine import GenericSystemInput, allocate_discharge as allocate_generic_discharge
 from .zendure_discovery import (
@@ -950,14 +950,13 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     else "ZenSDK" if system_id == "solarflow_2400_pro"
                     else "UNRESOLVED"
                 )
-                correlation = correlate_transition(
+                evidence = unproven_transport_evidence(
                     system_id=system_id,
                     transport=selected_transport,
                     action=self._r25_pack_transition_intents[system_id]["action"],
-                    command_id=None,
-                    dispatched=False,
-                    sent_at=None,
-                    transport_accepted=False,
+                )
+                correlation = correlate_evidence(
+                    evidence,
                     now=0.0,
                     telemetry_at=None,
                     observed_state=getattr(entity, "state", None),

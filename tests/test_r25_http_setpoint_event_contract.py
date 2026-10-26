@@ -37,3 +37,27 @@ def test_http_event_retained_after_session_teardown():
     assert "self._r25_last_http_post_event = event" in coordinator
     assert "else self._r25_last_http_post_event" in coordinator
     assert "self._remember_r25_http_post_event(previous)" in coordinator
+
+
+def test_all_coordinator_teardown_paths_retain_event():
+    root = Path(__file__).resolve().parents[1] / "custom_components/carpiquet_ems"
+    source = (root / "coordinator.py").read_text()
+    import ast
+    tree = ast.parse(source)
+    coordinator = next(node for node in tree.body if isinstance(node, ast.ClassDef)
+                       and any(isinstance(n, ast.AsyncFunctionDef)
+                               and n.name == "async_set_r25_cycle_mode"
+                               for n in node.body))
+    for method_name in ("async_set_r25_cycle_mode", "async_shutdown", "_async_update_data"):
+        method = next((node for node in coordinator.body
+                       if isinstance(node, ast.AsyncFunctionDef) and node.name == method_name), None)
+        if method is None:
+            continue
+        for node in ast.walk(method):
+            if not isinstance(node, ast.Call) or not isinstance(node.func, ast.Attribute):
+                continue
+            if node.func.attr != "close":
+                continue
+            # Every session.close() must be preceded by a retention call
+            # in its enclosing method (including safety and failure branches).
+            assert "_remember_r25_http_post_event" in ast.get_source_segment(source, method)

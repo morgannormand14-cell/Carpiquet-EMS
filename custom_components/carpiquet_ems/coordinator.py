@@ -928,8 +928,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                     "reason": feedback.reason,
                 }
             hyper_intent = self._r25_pack_transition_intents["hyper_2000"]
-            # Existing AUTO/MQTT selector does not distinguish local from cloud.
-            # Fail closed until Zendure-HA's actual connection source is mapped.
+            # Explicit MQTT route; broker qualification remains required.
             hyper_transport = (
                 "LOCAL_MQTT" if self._hyper_transport_selection == TRANSPORT_MODE_MQTT_LOCAL
                 else "CLOUD_MQTT" if self._hyper_transport_selection == TRANSPORT_MODE_MQTT_CLOUD

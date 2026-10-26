@@ -23,14 +23,17 @@ def evaluate_pack(raw_state: object, soc: float | None, min_soc: float | None) -
     Standby above minimum is a *candidate*, not eligible until discharge is
     confirmed. No physical transition is performed here.
     """
-    try:
-        raw = int(raw_state)
-        if str(raw_state).strip() not in (str(raw), str(float(raw))):
-            raise ValueError("non-integral pack state")
-    except (TypeError, ValueError, OverflowError):
-        return PackEligibility("unknown", False, False, False, "pack_state_unknown")
-    names = {0: "standby", 1: "charging", 2: "discharging", 3: "off"}
-    state = names.get(raw, "unknown")
+    # HA state entities may expose localized enum labels rather than raw integers.
+    aliases = {
+        "0": "standby", "1": "charging", "2": "discharging", "3": "off",
+        "standby": "standby", "idle": "standby", "veille": "standby", "en veille": "standby",
+        "charging": "charging", "charge": "charging", "en charge": "charging",
+        "discharging": "discharging", "discharge": "discharging",
+        "décharge": "discharging", "decharge": "discharging",
+        "en décharge": "discharging", "en decharge": "discharging",
+        "off": "off", "arrêt": "off", "arret": "off", "éteint": "off", "eteint": "off",
+    }
+    state = aliases.get(str(raw_state).strip().casefold(), "unknown")
     if state == "unknown":
         return PackEligibility(state, False, False, False, "pack_state_unknown")
     if state == "off":

@@ -1741,7 +1741,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                             self._r25_cycle_mode = "Simulation"
                             self._r25_session = None
                             self._remember_r25_http_post_event(previous)
-                        await previous.close()
+                            await previous.close()
                             if previous.status.stop_confirmed is not True:
                                 _LOGGER.error("R25 physical zero unconfirmed after HTTP command failure")
                         elif self._r25_session.status.state != "MONITORING":
@@ -1749,7 +1749,7 @@ class CarpiquetEMSCoordinator(DataUpdateCoordinator):
                             self._r25_cycle_mode = "Simulation"
                             self._r25_session = None
                             self._remember_r25_http_post_event(previous)
-                        await previous.close()
+                            await previous.close()
             # Diagnostic only: HTTP setpoint POST is not a pack transition.
             http_setpoint_event = (
                 self._r25_session.last_setpoint_event

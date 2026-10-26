@@ -158,3 +158,39 @@ async def test_operator_stop_waits_for_inflight_ems_update():
     assert active.closes == 1
     assert active.status.stop_confirmed is True
     assert c._r25_session is None
+
+
+@pytest.mark.asyncio
+async def test_operator_stop_retains_last_http_attempt():
+    c = Coordinator()
+    event = object()
+    active = Session()
+    active.last_setpoint_event = event
+    c._r25_session = active
+    await c.async_set_r25_cycle_mode(False)
+    assert c._r25_last_http_post_event is event
+    assert active.closes == 1
+
+
+@pytest.mark.asyncio
+async def test_shutdown_retains_last_http_attempt():
+    c = Coordinator()
+    event = object()
+    active = Session()
+    active.last_setpoint_event = event
+    c._r25_session = active
+    await c.async_shutdown()
+    assert c._r25_last_http_post_event is event
+    assert active.closes == 1
+
+
+@pytest.mark.asyncio
+async def test_shutdown_retains_event_even_when_zero_unconfirmed():
+    c = Coordinator()
+    event = object()
+    active = Session(zero=False)
+    active.last_setpoint_event = event
+    c._r25_session = active
+    with pytest.raises(RuntimeError, match="physical zero"):
+        await c.async_shutdown()
+    assert c._r25_last_http_post_event is event

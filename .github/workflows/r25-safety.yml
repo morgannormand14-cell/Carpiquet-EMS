@@ -34,4 +34,5 @@ jobs:
             tests/test_r25_transition_feedback.py \
             tests/test_r25_transition_confirmation_tracker.py \
             tests/test_r25_coordinator_readback_wiring.py \
-            tests/test_r25_transition_validation_matrix.py
+            tests/test_r25_transition_validation_matrix.py \
+            tests/test_r25_ha_transition_telemetry_wiring.py
